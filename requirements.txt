@@ -1,0 +1,14 @@
+pandas==2.2.*
+numpy==1.26.*
+scikit-learn==1.4.*
+xgboost==2.0.*
+lightgbm==4.3.*
+catboost==1.2.*
+joblib
+pyarrow
+openpyxl
+pydantic==2.*
+pytest
+jupyter
+matplotlib
+seaborn

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "raw2value-ml"
+version = "0.1.0"
+description = "Raw2Value AI ML pipeline (Kapadokya Hackathon 2026)"
+readme = "README.md"
+requires-python = "==3.11.*"
+authors = [{ name = "Team Feza" }]
+license = { text = "Proprietary" }
+dependencies = [
+    "pandas==2.2.*",
+    "numpy==1.26.*",
+    "scikit-learn==1.4.*",
+    "xgboost==2.0.*",
+    "lightgbm==4.3.*",
+    "catboost==1.2.*",
+    "joblib",
+    "pyarrow",
+    "openpyxl",
+    "pydantic==2.*",
+    "pytest",
+    "jupyter",
+    "matplotlib",
+    "seaborn",
+]
+
+[tool.setuptools.packages.find]
+include = ["raw2value_ml*"]
+exclude = ["ml*", "data*", "models*", "scripts*", "docs*"]
