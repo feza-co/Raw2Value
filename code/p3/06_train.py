@@ -51,10 +51,12 @@ MetricAccumulator = loss_mod.MetricAccumulator
 # -----------------------------------------------------------------------
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--tile-dir", required=True)
+    p.add_argument("--tile-dir", default=None,
+                   help="Manifest tiles_dir override (opsiyonel — manifest yoksa zorunlu).")
     p.add_argument("--full-mask", required=True)
     p.add_argument("--split-json", required=True)
-    p.add_argument("--manifest-json", default=None)
+    p.add_argument("--manifest-json", required=True,
+                   help="P1 data/manifest.json — sözleşme zorunlu (DEFAULT fallback yok).")
     p.add_argument("--ssl4eo-ckpt", default=None,
                    help="SSL4EO-S12 .pth (yoksa random init)")
     p.add_argument("--output-dir", default="/models")
@@ -141,7 +143,7 @@ def train_one_fold(args, fold: int, device: torch.device) -> dict:
                             pos_weight=args.pos_weight,
                             ignore_index=255)
 
-    scaler = torch.cuda.amp.GradScaler(enabled=args.amp and device.type == "cuda")
+    scaler = torch.amp.GradScaler('cuda', enabled=args.amp and device.type == "cuda")
 
     wandb_run = maybe_init_wandb(args, fold)
 
@@ -162,7 +164,7 @@ def train_one_fold(args, fold: int, device: torch.device) -> dict:
                 # B04, B03, B02 (S2 L2A indeksleri 3, 2, 1)
                 x = x[:, [3, 2, 1], :, :]
             optimizer.zero_grad(set_to_none=True)
-            with torch.cuda.amp.autocast(enabled=args.amp and device.type == "cuda"):
+            with torch.amp.autocast('cuda', enabled=args.amp and device.type == "cuda"):
                 logits = model(x)
                 loss = criterion(logits, y)
             scaler.scale(loss).backward()
@@ -185,7 +187,7 @@ def train_one_fold(args, fold: int, device: torch.device) -> dict:
                 y = y.to(device, non_blocking=True)
                 if args.rgb_only:
                     x = x[:, [3, 2, 1], :, :]
-                with torch.cuda.amp.autocast(enabled=args.amp and device.type == "cuda"):
+                with torch.amp.autocast('cuda', enabled=args.amp and device.type == "cuda"):
                     logits = model(x)
                     loss = criterion(logits, y)
                 val_loss_sum += loss.item(); n_val += 1

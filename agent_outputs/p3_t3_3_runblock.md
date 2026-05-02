@@ -97,9 +97,26 @@ Bana yapistir:
 ## DELIVER
 
 ```
-[P3] T3.3 TAMAM
-Cikti: PomzaTileDataset + PomzaDataModule + BCEDiceLoss + MetricAccumulator + sentetik sanity OK.
-Metric: forward+backward NaN-free, batch (B,17,256,256), 5-fold loader uretiyor.
-Slack T3.4 (saat 6-12) icinde inference iskelet + Grad-CAM + ablation + threshold + FP16 export + Plan B fallback yazildi.
-Siradaki bagimli: T1.9 (saat 11) + T2.7 (saat 13) -> T3.5 fine-tune (saat 12).
+[P3] T3.3 SENTETIK SANITY TAMAM (2026-05-01, Colab Pro A100/H100)
+
+Cikti:
+  - PomzaTileDataset + PomzaDataModule + BCEDiceLoss + MetricAccumulator import OK
+  - 05_synthetic_sanity.py end-to-end testi gecti
+
+Metric:
+  - Model: 32.57 M param (SSL4EO-S12 B3 RN50 + 3->17 adapter)
+  - Target: pos=74860 neg=174277 ignore=13007 (sentetik mask)
+  - Forward: (4,17,256,256) -> (4,1,256,256)
+  - Loss: 0.7573 (BCE+Dice combo, 0.7-1.0 aralginda)
+  - Backward: grad norm min=1.35e-03 max=6.35e-01 (NaN-free, healthy)
+  - Metrics @0.5: IoU=0.272 F1=0.428 P=0.300 R=0.745 (sentetik, random)
+  - Threshold sweep: best_thr=0.05 best_F1=0.462
+  - Peak VRAM (b=4): 0.89 GB
+
+BEKLEYEN:
+  - Gercek DataLoader sanity P1 T1.9 (saat 11) ARD + manifest sonrasi
+  - 5-fold split test P2 T2.7 (saat 11) blok_cv_split.json sonrasi
+  - T3.5 fine-tune P2 T2.8 (saat 13) full_mask.tif sonrasi
+
+Saat 4 itibariyle: T3.4 SLACK (6 saat) basladi. Inference review + Grad-CAM + ablation + Plan B fallback hazirlama.
 ```

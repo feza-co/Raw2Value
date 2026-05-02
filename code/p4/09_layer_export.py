@@ -48,11 +48,11 @@ LAYER_SPEC: dict[str, dict[str, Any]] = {
         "interpretation": "Pomza yüksek albedo (0.30–0.45 tipik) — açık renk.",
     },
     "s2_sabins.tif": {
-        "name": "S2 Sabins B11/B8 (clay/iron oxide)",
-        "formula": "B11 / B8",
+        "name": "S2 Sabins B11/B12 (clay/carbonate 2.2 µm)",
+        "formula": "B11 / B12",
         "ref": "Sabins 1999",
-        "typical_range": [0.5, 2.0],
-        "interpretation": "Yüksek değer → kil/SWIR aktif mineral; pomza tipik 1.0–1.5.",
+        "typical_range": [0.7, 2.0],
+        "interpretation": "B12 (2.19 µm) clay/carbonate hydroxyl absorption merkezi; B11/B12 yüksek → silikat/aluminoz mineraller (pomza dahil) baskın. Pomza tipik 1.1–1.5.",
     },
     "aster_qi.tif": {
         "name": "ASTER Quartz Index (Ninomiya)",

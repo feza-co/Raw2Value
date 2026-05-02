@@ -37,8 +37,11 @@ import segmentation_models_pytorch as smp
 # 1) SSL4EO-S12 weight indirme
 # -----------------------------------------------------------------------
 SSL4EO_HF_REPO = "wangyi111/SSL4EO-S12"
-SSL4EO_DEFAULT_FILENAME = "B13_rn50_moco_0099_ckpt.pth"   # ResNet-50 MoCo, 13ch
-DEFAULT_SSL4EO_CHANNELS = 13
+# NOT: wangyi111/SSL4EO-S12 reposunda B13 ResNet-50 MoCo bulunmuyor (sadece ViT MAE).
+# B3 (Sentinel-2 RGB, 3 kanal) ResNet-50 MoCo en yakin akademik referans:
+# Wang et al. 2023, MoCo SSL pretrain, S2 RGB (B2-B3-B4) uzerinde.
+SSL4EO_DEFAULT_FILENAME = "B3_rn50_moco_0099_full_ckpt.pth"   # ResNet-50 MoCo, 3ch RGB
+DEFAULT_SSL4EO_CHANNELS = 3
 
 
 def download_ssl4eo_weights(
@@ -212,7 +215,16 @@ def build_ssl4eo_unet(
     # SSL4EO-S12 backbone agirliklari yukle
     if ssl4eo_ckpt is not None and os.path.exists(str(ssl4eo_ckpt)):
         sd = load_ssl4eo_resnet50_state_dict(ssl4eo_ckpt)
-        missing, unexpected = model.encoder.load_state_dict(sd, strict=strict_load)
+        result = model.encoder.load_state_dict(sd, strict=strict_load)
+        if result is None:
+            # smp 0.5.0 + torch 2.10 bazen None dondurur — manuel diff hesapla
+            model_keys = set(model.encoder.state_dict().keys())
+            ckpt_keys = set(sd.keys())
+            missing = sorted(model_keys - ckpt_keys)
+            unexpected = sorted(ckpt_keys - model_keys)
+        else:
+            missing = list(result.missing_keys)
+            unexpected = list(result.unexpected_keys)
         print(f"[SSL4EO] Yuklendi. Missing keys: {len(missing)}, Unexpected: {len(unexpected)}")
         if len(missing) > 0:
             print(f"[SSL4EO] Ornek missing: {missing[:5]}")
@@ -266,4 +278,4 @@ if __name__ == "__main__":
     print(f"Input  : {tuple(x.shape)}")
     print(f"Output : {tuple(y.shape)}")
     assert y.shape == (2, 1, 256, 256), "Output shape uyumsuz!"
-    print("OK — SSL4EO-S12 + 13->17 adapter calisti.")
+    print(f"OK — SSL4EO-S12 + {DEFAULT_SSL4EO_CHANNELS}->{args.in_channels} adapter calisti.")

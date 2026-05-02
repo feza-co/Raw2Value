@@ -53,9 +53,13 @@ def load_wdpa_goreme(wdpa_path: Path = WDPA_SHP) -> gpd.GeoDataFrame:
             f"WDPA shapefile yok: {wdpa_path}. P1 T1.2 ile indir veya UNEP-WCMC'den çek."
         )
     gdf = gpd.read_file(wdpa_path)
-    # WDPAID alanı bazen WDPA_PID olarak gelir
-    id_col = "WDPAID" if "WDPAID" in gdf.columns else "WDPA_PID"
-    sub = gdf[gdf[id_col] == GOREME_WDPAID].copy()
+    # ID sütunu farklı WDPA indirme formatlarında değişebilir
+    sub = gpd.GeoDataFrame()
+    for id_col in ("WDPAID", "WDPA_PID", "SITE_ID"):
+        if id_col in gdf.columns:
+            sub = gdf[gdf[id_col] == GOREME_WDPAID].copy()
+            if not sub.empty:
+                break
     if sub.empty:
         # Name fallback
         sub = gdf[gdf["NAME"].str.contains("Göreme", case=False, na=False)].copy()

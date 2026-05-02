@@ -65,8 +65,11 @@ Bana yapistir:
 ## DELIVER
 
 ```
-[P3] T3.1 TAMAM
+[P3] T3.1 TAMAM (2026-05-01, Colab Pro A100/H100)
 Cikti: GPU erisimi + library importlar + U-Net smoke OK.
-Metric: torch.cuda.is_available()=True, peak VRAM (b=4) ~X GB.
+Metric:
+  - torch 2.10.0+cu128, smp 0.5.0, timm 1.0.26, rasterio 1.5.0
+  - Forward (1,17,256,256) -> (1,1,256,256) OK
+  - Peak VRAM (b=4 fwd+bwd) = 0.89 GB
 Siradaki bagimli: T3.2 SSL4EO-S12 pretrained yukleme + 13->17 adapter.
 ```

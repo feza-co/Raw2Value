@@ -242,32 +242,148 @@ def predict_raster(
 # -----------------------------------------------------------------------
 # 4) Landsat snapshot inference (P5 icin)
 # -----------------------------------------------------------------------
+
+# Roy et al. (2016) standart Landsat -> Sentinel-2 reflectance band mapping
+# Kanal indeksleri 1-tabanli (rasterio okuma ile uyumlu).
+# Hedef: P3 ARD 17-kanal yapisi (B2, B3, B4, B5, B6, B7, B8, B8A, B11, B12,
+# VV, VH, DEM, slope, NDVI, BSI, Albedo).
+LANDSAT_TO_S2_DEFAULT = {
+    # Landsat 8/9 OLI -> S2 indexes (P3 ARD'a)
+    "L8_OLI": {
+        # ARD idx -> Landsat band number
+        0: ("B2", "Blue"),       # L8 B2 -> S2 B2
+        1: ("B3", "Green"),      # L8 B3 -> S2 B3
+        2: ("B4", "Red"),        # L8 B4 -> S2 B4
+        # B5, B6, B7 (Red Edge) -> Landsat'ta yok, fill_zero
+        6: ("B5", "NIR"),        # L8 B5 -> S2 B8 (NIR), Roy 2016 cross-sensor
+        7: ("B5", "NIR"),        # L8 B5 -> S2 B8A (NIR narrow), ayni kaynak
+        8: ("B6", "SWIR1"),      # L8 B6 -> S2 B11 (SWIR1)
+        9: ("B7", "SWIR2"),      # L8 B7 -> S2 B12 (SWIR2)
+    },
+    # Landsat 5/7 ETM+ -> S2 indexes
+    "L5_TM": {
+        0: ("B1", "Blue"),       # L5 B1 -> S2 B2
+        1: ("B2", "Green"),      # L5 B2 -> S2 B3
+        2: ("B3", "Red"),        # L5 B3 -> S2 B4
+        6: ("B4", "NIR"),        # L5 B4 -> S2 B8
+        7: ("B4", "NIR"),        # L5 B4 -> S2 B8A
+        8: ("B5", "SWIR1"),      # L5 B5 -> S2 B11
+        9: ("B7", "SWIR2"),      # L5 B7 -> S2 B12
+    },
+    "L7_ETM": {
+        0: ("B1", "Blue"),
+        1: ("B2", "Green"),
+        2: ("B3", "Red"),
+        6: ("B4", "NIR"),
+        7: ("B4", "NIR"),
+        8: ("B5", "SWIR1"),
+        9: ("B7", "SWIR2"),
+    },
+}
+
+
 def predict_landsat_snapshot(
     landsat_path: str | os.PathLike,
     model_path: Union[str, os.PathLike, torch.nn.Module],
     output_path: str | os.PathLike,
+    sensor: str = "L8_OLI",
     band_mapping: Optional[dict] = None,
     fill_strategy: str = "zero",
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
     fp16: bool = True,
+    n_target_channels: int = 17,
 ) -> str:
-    """Landsat snapshot (1985-2025 [K#9]) RAW prob raster.
+    """Landsat snapshot (1985-2025, [K#9]) RAW prob raster.
 
     Landsat 5/7/8/9 -> 17 kanal Sentinel-2 esit kanal modeli. Eksik bantlar
-    fill_strategy="zero" ile sifir doldurulur (P5 historical, kalite gostergesi
-    P5'in zaman ekranina dusurur).
+    fill_strategy="zero" ile sifir doldurulur. P5 (T5.10) historical Landsat
+    Tier 2 icin bu fonksiyonu cagirir; kalite gostergesi (eksik bant orani)
+    P5'in zaman ekranina dusurulur.
+
+    Args:
+        sensor: "L8_OLI" | "L5_TM" | "L7_ETM" | "L9_OLI" (L8 ile ayni mapping)
+        band_mapping: P5 custom mapping override (sensor parametresini gormezden gelir).
+                      Format: {ard_idx (int): (landsat_band_name (str), description)}
+        fill_strategy: "zero" | "interp" (sadece zero implement edilmis).
+        n_target_channels: 17 (default ARD kanal sayisi).
+
+    Returns:
+        Output path (RAW prob GeoTIFF).
     """
-    if band_mapping is not None and len(band_mapping) > 0:
-        # Burada Landsat -> S2 band mapping P5 ile sozlesilir.
-        # Iskelet: predict_raster ile aynidir, normalizasyon farkli olabilir.
-        pass
-    return predict_raster(
-        raster_path=landsat_path,
-        model_path=model_path,
-        output_path=output_path,
-        device=device,
-        fp16=fp16,
-    )
+    try:
+        import rasterio
+        import numpy as np
+    except ImportError as e:
+        raise ImportError("rasterio gerekli.") from e
+
+    # Mapping cozumle
+    if band_mapping is None:
+        sensor_norm = sensor.upper().replace("LANDSAT", "L").replace("-", "_")
+        if sensor_norm in ("L9_OLI", "L9OLI"):
+            sensor_norm = "L8_OLI"  # L9 == L8 OLI mapping
+        if sensor_norm not in LANDSAT_TO_S2_DEFAULT:
+            raise ValueError(
+                f"Bilinmeyen sensor: {sensor}. "
+                f"Desteklenen: {list(LANDSAT_TO_S2_DEFAULT)}. "
+                f"Custom band_mapping ile override edebilirsin."
+            )
+        band_mapping = LANDSAT_TO_S2_DEFAULT[sensor_norm]
+
+    # Landsat raster -> 17 kanal sentetik ARD raster
+    with rasterio.open(landsat_path) as src:
+        h, w = src.height, src.width
+        profile = src.profile.copy()
+        landsat_bands = {f"B{i}": src.read(i).astype(np.float32) for i in range(1, src.count + 1)}
+
+    # Hedef 17-kanal arrayi (eksikler 0)
+    target = np.zeros((n_target_channels, h, w), dtype=np.float32)
+    fill_log = {"mapped": [], "missing": []}
+    for ard_idx in range(n_target_channels):
+        if ard_idx in band_mapping:
+            landsat_band_name, _desc = band_mapping[ard_idx]
+            if landsat_band_name in landsat_bands:
+                target[ard_idx] = landsat_bands[landsat_band_name]
+                fill_log["mapped"].append((ard_idx, landsat_band_name))
+            else:
+                fill_log["missing"].append((ard_idx, landsat_band_name, "band_not_in_raster"))
+        else:
+            fill_log["missing"].append((ard_idx, None, "no_mapping_zero_filled"))
+
+    # Quality flag: kac kanal eksik?
+    n_missing = len(fill_log["missing"])
+    n_mapped = len(fill_log["mapped"])
+    print(f"[predict_landsat_snapshot] {sensor}: mapped={n_mapped}, "
+          f"missing(zero-filled)={n_missing}/{n_target_channels}")
+    if n_missing > 11:
+        print(f"  UYARI: {n_missing} kanal eksik. Pomza tespit hassasiyeti dusuk olabilir.")
+
+    # Sentetik 17-kanal raster'i Drive disindaki gecici dosyaya yaz
+    # (predict_raster zaten dosyadan okur, en kolay yol gecici dosya)
+    import tempfile
+    tmp_path = tempfile.NamedTemporaryFile(suffix=".tif", delete=False).name
+    profile.update(count=n_target_channels, dtype=rasterio.float32)
+    with rasterio.open(tmp_path, "w", **profile) as dst:
+        dst.write(target)
+
+    try:
+        result = predict_raster(
+            raster_path=tmp_path,
+            model_path=model_path,
+            output_path=output_path,
+            device=device,
+            fp16=fp16,
+        )
+        # Output'a quality tag ekle
+        with rasterio.open(output_path, "r+") as dst:
+            dst.update_tags(
+                P3_LANDSAT_SENSOR=sensor,
+                P3_LANDSAT_MAPPED_CHANNELS=str(n_mapped),
+                P3_LANDSAT_MISSING_CHANNELS=str(n_missing),
+                P3_LANDSAT_QUALITY=("HIGH" if n_missing <= 7 else "MEDIUM" if n_missing <= 11 else "LOW"),
+            )
+        return result
+    finally:
+        Path(tmp_path).unlink(missing_ok=True)
 
 
 # -----------------------------------------------------------------------
