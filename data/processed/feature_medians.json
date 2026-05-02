@@ -1,0 +1,22 @@
+{
+  "tonnage": 35.1096282280718,
+  "raw_price_typical_usd_ton": 90.74732043207023,
+  "processed_price_typical_usd_ton": 283.86556620494247,
+  "processing_cost_typical_usd_ton": 33.0,
+  "packaging_cost_usd_ton": 5.0,
+  "source_to_processor_km": 123.69866851959041,
+  "processor_to_buyer_km": 2627.956482571411,
+  "total_distance_km": 2808.2626904446643,
+  "transport_cost_usd_ton_km": 0.05,
+  "emission_factor_kg_co2_ton_km": 0.1,
+  "co2_kg": 3580.5567473581864,
+  "usd_try": 45.05,
+  "eur_try": 52.67,
+  "fx_scenario_pct": 0.0,
+  "demand_score": 0.49707013101277386,
+  "lead_time_days": 8.323714746171163,
+  "delivery_risk": 0.25380800874264464,
+  "price_volatility_risk": 0.17,
+  "quality_match_score": 1.0,
+  "data_confidence_score": 90.0
+}
