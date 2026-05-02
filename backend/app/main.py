@@ -13,7 +13,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
 from . import __version__
-from .api import analyze, auth, evidence, fx, health, processors, whatif
+from .api import (
+    analyze,
+    auth,
+    evidence,
+    fx,
+    health,
+    history as history_router,
+    organizations,
+    processors,
+    whatif,
+)
 from .config import settings
 from .core.cache import close_redis
 from .services.ml_service import warmup_ml
@@ -66,3 +76,5 @@ app.include_router(evidence.router)
 app.include_router(analyze.router)
 app.include_router(whatif.router)
 app.include_router(processors.router)
+app.include_router(organizations.router)
+app.include_router(history_router.router)
