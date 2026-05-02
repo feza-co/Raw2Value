@@ -1,6 +1,8 @@
 """T1.2 — Avanos AOI polygon üretici.
 
-Bbox: 34.7-35.0 E, 38.65-38.85 N (Avanos / Nevsehir).
+Bbox: 34.60-35.00 E, 38.40-38.90 N (Avanos / Nevsehir genisletilmis).
+Guncelleme: P2 pozitif poligonlar (38.47-38.71 N) orijinal AOI'nin (38.65-38.85 N)
+guneyinde kaliyor. Guncellenmis bbox tum pomza sahalarini kapsiyor.
 Source CRS: EPSG:4326 (WGS84) — analiz CRS'i: EPSG:32636 (UTM 36N).
 Cikti: data/aoi/avanos_aoi.geojson + .gpkg (her iki CRS'te).
 """
@@ -13,7 +15,8 @@ OUT = REPO / "data" / "aoi"
 OUT.mkdir(parents=True, exist_ok=True)
 
 # Avanos bbox: WSEN (lon_min, lat_min, lon_max, lat_max)
-BBOX_WGS84 = (34.70, 38.65, 35.00, 38.85)
+# Guncellendi: guney sinir 38.65 -> 38.40 (P2 poligonlarini kapsamak icin)
+BBOX_WGS84 = (34.60, 38.40, 35.00, 38.90)
 
 poly = Polygon([
     (BBOX_WGS84[0], BBOX_WGS84[1]),
