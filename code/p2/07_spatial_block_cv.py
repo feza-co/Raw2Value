@@ -45,21 +45,55 @@ from collections import defaultdict
 import numpy as np
 
 
-def load_tile_manifest(manifest_path):
+def load_tile_manifest(manifest_path, raster_ref=None):
     """
-    Tile manifest formati (P1 T1.9):
-    {
-      "tiles": [
-        {"tile_id": "tile_0001", "bbox_utm": [xmin, ymin, xmax, ymax], ...},
-        ...
-      ]
-    }
+    İki format desteklenir:
+
+    Format A — P1 orijinal beklenti (bbox_utm listesi):
+      {"tiles": [{"tile_id": "...", "bbox_utm": [xmin,ymin,xmax,ymax]}, ...]}
+
+    Format B — tile_index.json (pixel_offset + src_window dict):
+      {"tile_size": 256, "tiles": {"000_000.tif": {"pixel_offset": [cx,cy], "src_window": [...]}}}
+
+    Format B için raster_ref (EPSG:32636 GeoTIFF) zorunlu — UTM koordinat hesabı için.
     """
     with open(manifest_path, "r", encoding="utf-8") as f:
         m = json.load(f)
-    tiles = m.get("tiles", m if isinstance(m, list) else [])
+
+    tiles_raw = m.get("tiles", m if isinstance(m, list) else [])
+
+    # Format B: tiles bir dict (tile_id → metadata)
+    if isinstance(tiles_raw, dict):
+        if raster_ref is None:
+            raise ValueError(
+                "tile_index.json (Format B) için --raster-ref belirtilmeli "
+                "(UTM bbox hesabında kaynak transform gerekir)."
+            )
+        import rasterio as _rio
+        with _rio.open(raster_ref) as src:
+            tf = src.transform  # Affine: origin + pixel size
+        tile_size = m.get("tile_size", 256)
+        out = []
+        for tile_id, meta in tiles_raw.items():
+            po = meta.get("pixel_offset", [0, 0])  # [col_start, row_start]
+            col_start, row_start = po[0], po[1]
+            # src_window varsa gerçek boyutu kullan (kenar tile'lar)
+            sw = meta.get("src_window")
+            col_end = sw[2] if sw else col_start + tile_size
+            row_end = sw[3] if sw else row_start + tile_size
+            xmin = tf.c + col_start * tf.a
+            xmax = tf.c + col_end * tf.a
+            ymax = tf.f + row_start * tf.e
+            ymin = tf.f + row_end * tf.e
+            cx = (xmin + xmax) / 2
+            cy = (ymin + ymax) / 2
+            out.append({"tile_id": tile_id, "cx": cx, "cy": cy,
+                        "bbox": [xmin, ymin, xmax, ymax]})
+        return out
+
+    # Format A: tiles bir liste
     out = []
-    for t in tiles:
+    for t in tiles_raw:
         bbox = t.get("bbox_utm") or t.get("bbox") or t.get("bounds")
         if bbox is None or len(bbox) != 4:
             raise ValueError(f"Tile {t.get('tile_id')} bbox eksik")
@@ -131,12 +165,12 @@ def try_verde(tiles, n_folds):
     return splits  # [(train_idx, test_idx), ...]
 
 
-def main(manifest_path, out_path, n_folds, block_grid, use_verde):
+def main(manifest_path, raster_ref, out_path, n_folds, block_grid, use_verde):
     print(f"[T2.7] Roberts 2017 Spatial Blok CV Split")
     print(f"  N-fold: {n_folds}, Block grid: {block_grid[0]}x{block_grid[1]}")
     print(f"  Use verde: {use_verde}")
 
-    tiles = load_tile_manifest(manifest_path)
+    tiles = load_tile_manifest(manifest_path, raster_ref=raster_ref)
     if not tiles:
         raise RuntimeError("Tile manifest bos! P1 T1.9 calistirilmis mi?")
     print(f"  Tile sayisi: {len(tiles)}")
@@ -210,8 +244,10 @@ def main(manifest_path, out_path, n_folds, block_grid, use_verde):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--manifest", default="data/ard/tile_manifest.json",
-                    help="P1 T1.9 cikti")
+    ap.add_argument("--manifest", default="data/tiles/tile_index.json",
+                    help="P1 tile manifest (tile_index.json veya eski format)")
+    ap.add_argument("--raster-ref", default="data/ard/full_ard_20m.tif",
+                    help="UTM bbox hesabi icin ARD raster (Format B icin zorunlu)")
     ap.add_argument("--out", default="data/labels/blok_cv_split.json")
     ap.add_argument("--n-folds", type=int, default=5,
                     help="5 (varsayilan) veya 3 (Plan B — orchestrator onayli)")
@@ -220,4 +256,5 @@ if __name__ == "__main__":
     ap.add_argument("--use-verde", action="store_true", default=True,
                     help="verde.BlockKFold dene; basarisiz ise manuel grid'e dus")
     args = ap.parse_args()
-    main(args.manifest, args.out, args.n_folds, (args.blocks_x, args.blocks_y), args.use_verde)
+    main(args.manifest, args.raster_ref, args.out, args.n_folds,
+         (args.blocks_x, args.blocks_y), args.use_verde)

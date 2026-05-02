@@ -1,157 +1,175 @@
-# P2 — Etiketleme Lead Durum Raporu
+# P2 — Etiketleme Lead Güncel Durum Raporu
 
-> Tarih: 2026-05-01
-> Modül: A (v2 — Akademik Hizalama)
-> Sahip: P2 — Etiketleme Lead
-> Kaynak: `Modul_A_Critical_Path_Dependency_v2.md` § P2
-
----
-
-## 1. Hazır Çıktılar (Saat 0 — Hazırlık Aşaması)
-
-### Şablonlar / Dokümanlar (`code/p2/`)
-| Dosya | İçerik | Görev |
-|---|---|---|
-| `01_qgis_setup.md` | QGIS LTR 3.34 kurulum + EPSG:32636 + S2 RGB altlık + Esri yedek | T2.1 |
-| `02_mapeg_query_template.md` | MAPEG ÇED + Nevşehir 2014 + OSM cross-check sorgu şablonu, CSV schema | T2.2 |
-| `03_polygon_template.gpkg.md` | Manuel poligon attribute schema (12 alan), çizim protokolü, kalite kriterleri | T2.3 |
-
-### Python Scriptleri (`code/p2/`)
-| Dosya | İşlev | Görev |
-|---|---|---|
-| `04_pixel_sampling.py` | Pozitif piksel örneklemesi (saha başına ~300, stratified random within polygon) | T2.4 |
-| `05_negative_sampling.py` | Negatif piksel örneklemesi (2 km buffer dışı, ~6000 piksel, AOI içi) | T2.5 |
-| `06_wdpa_ignore_mask.py` | WDPA Göreme + 1000 m buffer + ignore_mask.tif (uint8, 255=ignore) | T2.6 |
-| `07_spatial_block_cv.py` | Roberts 2017 spatial 5-fold blok CV, verde + manuel grid fallback | T2.7 |
-| `08_rasterize_mask.py` | full_mask.tif: pos=1, neg=0, ignore=255 (CRITICAL PATH, saat 13) | T2.8 |
-| `09_augmentation.py` | Geometric (flip/rotate) + spektral (brightness/contrast/noise) | T2.9 |
-| `requirements.txt` | geopandas, rasterio, shapely, verde, scikit-learn, ... | env |
-
-### RUN-BLOCK Dosyaları (`agent_outputs/`)
-| Dosya | Görev | Kritiklik |
-|---|---|---|
-| `p2_t2_1_runblock.md` | T2.1 QGIS kurulum (1h, manuel) | normal |
-| `p2_t2_2_runblock.md` | T2.2 MAPEG sorgu (2h, manuel) | normal |
-| `p2_t2_3_runblock.md` | T2.3 manuel poligon (4h, **EN YORUCU**) — her 30 dk check-in | **YÜKSEK** |
-| `p2_status.md` | Bu dosya | — |
+> Tarih: 2026-05-02  
+> Kaynak: `Modul_A_Critical_Path_Dependency_v2.md`  
+> Son guncelleme: P1 AOI uyumsuzlugu tespit edildi, duzeltme yapildi
 
 ---
 
-## 2. P2 Yol Haritası — Saat-Saat (v2 § 1.P2)
+## 1. Tamamlanan Gorevler
 
-```
-Saat  Görev                                        Durum    Notlar
-----  -------------------------------------------  -------  -------------------------------
-0-1   T2.1 QGIS kurulum                            ⏳ HAZ   şablon hazır → kullanıcı manuel
-1-3   T2.2 MAPEG ÇED + Nevşehir 2014 sorgu        ⏳ HAZ   şablon + CSV schema hazır
-3-7   T2.3 Manuel pozitif poligon (30-40 saha)    ⏳ HAZ   schema + check-in protokolü hazır
-                                                            ★ EN YORUCU GÖREV ★
-7-8   T2.4 Pozitif piksel örnekleme (~10K)        ⏳ HAZ   04_pixel_sampling.py — auto run
-8-9   T2.5 Negatif örnekleme (2km buffer dışı)    ⏳ HAZ   05_negative_sampling.py — auto run
-9-10  T2.6 WDPA buffer + ignore_mask              ⏳ HAZ   06_wdpa_ignore_mask.py — auto run
-10-11 T2.7 Spatial 5-fold blok CV (Roberts 2017)  ⏳ HAZ   07_spatial_block_cv.py — auto run
-11-13 T2.8 Raster mask → Full label               ⏳ HAZ   08_rasterize_mask.py — CRITICAL
-                                                            ★ T3.5 BLOKÇUSU ★
-13-14 T2.9 Augmentation pipeline                  ⏳ HAZ   09_augmentation.py — class hazır
-14-16 T2.10 P3 DataLoader entegrasyon             —        P3 ile koordinasyon
-16-17 T2.11 Etiket QC raporu                      —        sınıf+blok dağılımı
-17-18.5 T2.12 P3 inference hata analizi           —        FP/FN tur 2
-18.5-20 HELP→P5 KPI doğrulama                     —        slack
-18-24 T2.13/T2.14 Entegrasyon + KOD FREEZE        —        son aşama
+| Gorev | Cikti | Durum |
+|---|---|---|
+| T2.1 QGIS kurulumu | — | TAMAM |
+| T2.2 MAPEG CED sorgu | `data/labels/02_mapeg_query.csv` | TAMAM |
+| T2.3 Manuel pozitif poligon (27 saha) | `data/labels/positive_polygons.gpkg` | TAMAM |
 
-⏳ HAZ = şablon/script hazır, çalıştırılmaya hazır
+---
+
+## 2. Kritik Sorun — AOI Uyumsuzlugu (COZULDU)
+
+### Tespit
+P1'den gelen `data/ard/full_ard_20m.tif` raster'i ile P2'nin cizilen poligonlari arasinda
+**cografi uyumsuzluk** tespit edildi:
+
+| | Enlem (WGS84) | Boylam (WGS84) |
+|---|---|---|
+| P1 raster kapsami | 38.65°N – 38.85°N | 34.70°E – 35.00°E |
+| P2 poligon kapsami | 38.47°N – 38.71°N | 34.66°E – 34.82°E |
+| Ortusme | **sadece ~0.06° (~7 km)** | kismi |
+
+**Sonuc:** 27 poligonun 24'u (%89) raster kapsami disinda kaldi. Ortusen alan sadece 3 poligon,
+toplamda 19 piksel — egitim icin yetersiz.
+
+### Yapilan Duzeltme
+
+`code/p1/02_aoi_avanos.py` guncellendi:
+
+```python
+# Eski
+BBOX_WGS84 = (34.70, 38.65, 35.00, 38.85)
+
+# Yeni — tum pomza sahalari dahil, 0.05 derece buffer ile
+BBOX_WGS84 = (34.60, 38.40, 35.00, 38.90)
 ```
 
----
-
-## 3. Bağımlılıklar — Kim → Kim
-
-### P2 Tüketicisi (Bana Bağlı Olanlar)
-| Saat | Çıktı | Kime | Görevi |
-|---|---|---|---|
-| 7 | positive_polygons.gpkg (ön versiyon) | P3 | T3.4 sanity check için |
-| 11 | data/labels/blok_cv_split.json | P3 | T3.5 cross-validation |
-| 13 | data/labels/full_mask.tif | P3 | T3.5 fine-tune asıl input — **CRITICAL** |
-| 14 | augmentation pipeline | P3 | T2.10 DataLoader entegrasyonu |
-
-### P2'nin Sağlayıcıları (Beni Bekleyenler)
-| Saat | Girdi | Kimden | Kullanım |
-|---|---|---|---|
-| 4 | S2 RGB altlık (T1.4) | P1 | T2.3 manuel çizim altlığı (Esri yedek var) |
-| 8 | 17-kanal Full ARD (T1.7) | P1 | T2.4-T2.6 raster grid referansı |
-| 10 | Tile dosyaları (T1.8) | P1 | T2.7 spatial blok CV input — **T2.8 öncesi şart** |
+`code/p2/07_spatial_block_cv.py` guncellendi:  
+`tile_index.json` formatini (pixel_offset) UTM bbox'a cevirme destegi eklendi.
 
 ---
 
-## 4. Risk + Plan B Tetik Noktaları
+## 3. Mevcut Bekleme Durumu (P1 Blokaj)
 
-| Risk | Tetik Saati | Aksiyon |
-|---|---|---|
-| T2.3 yavaş (saat 4:30'da <9 saha) | 4:30 | Orchestrator'a sinyal → HELP→P2 saat 14'te kesin |
-| T2.7 5-fold blok problemli (yetersiz dolu blok) | 11 | Plan B: 3-fold'a düş (--n-folds 3, K#10 metodoloji korunur) |
-| T1.8 tile geç (saat 10 sonrası) | 10:30 | T2.7 blok CV beklemede, T2.8 deadline (saat 13) riskte |
-| T2.8 critical path slip | 13 | P3 T3.5 fine-tune gecikir → tüm kritik patika kayar |
+Asagidaki gorevler **yeni raster gelene kadar baslayamaz**:
 
-### Plan B — 5-fold → 3-fold (orchestrator onayı gerekir)
+| Gorev | Bekledigi P1 Ciktisi |
+|---|---|
+| T2.4 Pozitif piksel ornekleme | `data/ard/full_ard_20m.tif` (yeni) |
+| T2.5 Negatif piksel ornekleme | `data/ard/full_ard_20m.tif` (yeni) |
+| T2.6 WDPA ignore mask | `data/ard/full_ard_20m.tif` (yeni) |
+| T2.7 Spatial 5-fold blok CV | `data/tiles/tile_index.json` (yeni) |
+| **T2.8 full_mask.tif (CRITICAL PATH)** | T2.4–T2.7 ciktilarinin tamami |
+
+**P1'in calistirmasi gereken komutlar (sirasyla):**
 ```bash
+python code/p1/02_aoi_avanos.py          # AOI yenile (duzeltme zaten yapildi)
+python code/p1/03_sentinel2_l2a_fetch.py # S2 yeniden cek
+python code/p1/05_sentinel1_grd_fetch.py # S1 yeniden cek
+python code/p1/06_dem_slope.py           # DEM/slope yenile
+python code/p1/07_full_coregistration.py # 17 kanal co-register
+python code/p1/08_tile_splitting.py      # Tile'lari bol
+python code/p1/09_export_manifest.py     # Manifest uret
+```
+
+---
+
+## 4. P1 Ciktilari Gelince Calistirilacak Siradaki Adimlar
+
+```bash
+# T2.4 — Pozitif piksel ornekleme
+python code/p2/04_pixel_sampling.py \
+  --positives data/labels/positive_polygons.gpkg \
+  --raster data/ard/full_ard_20m.tif \
+  --out data/labels/positive_pixels.gpkg
+
+# T2.6 — WDPA ignore mask (T2.4 ile paralel)
+python code/p2/06_wdpa_ignore_mask.py \
+  --wdpa "data/raw/WDPA_WDOECM_May2026_Public_478637_shp-polygons.shp" \
+  --raster-ref data/ard/full_ard_20m.tif \
+  --out-buffer data/labels/wdpa_buffer.gpkg \
+  --out-mask data/labels/ignore_mask.tif
+
+# T2.5 — Negatif piksel ornekleme (T2.6 sonrasi)
+python code/p2/05_negative_sampling.py \
+  --positives data/labels/positive_polygons.gpkg \
+  --raster data/ard/full_ard_20m.tif \
+  --aoi data/aoi/avanos_aoi.gpkg \
+  --out data/labels/negative_pixels.gpkg
+
+# T2.7 — Spatial 5-fold blok CV (tile_index.json gelince)
 python code/p2/07_spatial_block_cv.py \
-    --n-folds 3 --blocks-x 3 --blocks-y 3 \
-    --out data/labels/blok_cv_split.json
-```
-Akademik gerekçe: Roberts et al. 2017 — blok boyutu domain'e göre ayarlanır, 3-fold istatistiksel güveni hafif düşürür ama metodoloji aynı kalır.
+  --manifest data/tiles/tile_index.json \
+  --raster-ref data/ard/full_ard_20m.tif \
+  --out data/labels/blok_cv_split.json
 
----
-
-## 5. Şu Anda Beklenen Aksiyon
-
-**Kullanıcıya sıradaki adım:**
-1. T2.1 RUN-BLOCK'u aç → QGIS kurulumu başlat (saat 0-1)
-2. P1'in T1.4 çıktısını paralelde takip et (S2 RGB altlık, saat 4'te gelir)
-3. T2.2 MAPEG sorgu için tarayıcı + PDF okuyucu hazırla
-
-**Orchestrator/agent (ben):**
-- T2.3 başladığında her 30 dk check-in scheduler aktif edilebilir.
-- T1.8 tile manifest geldiğinde T2.4 + T2.7 + T2.8 zincirini script chain ile koştururum.
-
----
-
-## 6. Çıktı Klasör Yapısı (Beklenen)
-
-```
-data/
-├── aoi/avanos_aoi.gpkg                    (P1 T1.2)
-├── raw/
-│   ├── s2_l2a_avanos_rgb.tif              (P1 T1.4)
-│   └── wdpa_goreme.gpkg                   (manuel indirme — protectedplanet.net)
-├── ard/
-│   └── tile_manifest.json                 (P1 T1.9)
-├── qgis_projects/
-│   └── avanos_etiketleme.qgz              (T2.1)
-└── labels/
-    ├── uretici_saha_listesi.csv           (T2.2)
-    ├── positive_polygons.gpkg             (T2.3) — 30-40 feature
-    ├── positive_pixels.gpkg               (T2.4) — ~10K Point
-    ├── negative_pixels.gpkg               (T2.5) — ~6K Point
-    ├── wdpa_buffer.gpkg                   (T2.6)
-    ├── ignore_mask.tif                    (T2.6) — uint8, 255=ignore
-    ├── blok_cv_split.json                 (T2.7) — Roberts 2017 5-fold
-    └── full_mask.tif                      (T2.8) — uint8 0/1/255  ★ CRITICAL ★
+# T2.8 — Raster mask — CRITICAL PATH (hepsi tamamlaninca)
+python code/p2/08_rasterize_mask.py \
+  --positives data/labels/positive_pixels.gpkg \
+  --negatives data/labels/negative_pixels.gpkg \
+  --ignore-mask data/labels/ignore_mask.tif \
+  --raster-ref data/ard/full_ard_20m.tif \
+  --out data/labels/full_mask.tif
 ```
 
 ---
 
-## 7. Akademik Hizalama Doğrulama
+## 5. Diger P Rollerine Etkisi
 
-| Karar | Uygulandı mı? | Nerede |
+### P3 (ML Muhendisi) — BLOKE
+
+| P2 Ciktisi | P3 Gorev | Gecikme Etkisi |
 |---|---|---|
-| K#8 — Göreme + 1000 m UNESCO buffer | ✓ | `06_wdpa_ignore_mask.py` (WDPA_BUFFER_M=1000) |
-| K#10 — Roberts 2017 spatial 5-fold blok CV | ✓ | `07_spatial_block_cv.py` (verde + manuel grid) |
-| K#11 — MAPEG ÇED + Nevşehir 2014 sorgu | ✓ | `02_mapeg_query_template.md` |
-| K#12 — Negatif örnek 2 km buffer dışı | ✓ | `05_negative_sampling.py` (POSITIVE_BUFFER_M=2000) |
-| K#15 — 20m grid, EPSG:32636 | ✓ | tüm scriptler PIXEL_SIZE_M=20, EPSG:32636 |
-| WDPA buffer içi = ignore_index (negatif değil) | ✓ | `08_rasterize_mask.py` (IGNORE_VAL=255, mask değer hiyerarşisi) |
-| Piksel-bazlı örnekleme (poligon-bazlı değil) | ✓ | T2.4/T2.5 Point geometry, label=0/1 |
+| `positive_polygons.gpkg` (on versiyon) | T3.4 sanity check | Mevcut 27 poligon kullanilabilir ama raster disinda |
+| `blok_cv_split.json` | T3.5 fine-tune (CV split) | T2.7 tamamlanana dek bekliyor |
+| **`full_mask.tif`** | **T3.5 fine-tune (CRITICAL)** | **P1 raster gelmeden uretilemiyor** |
+
+P3'un T3.5 fine-tune'u (critical path) `full_mask.tif` olmadan baslayamaz.
+P1 raster uretimindeki her saat kaymasi, T3.5'i ve ardindan T3.10, T5.8, T5.13 zincirini kaydirir.
+
+### P1 (Veri Muhendisi) — AKSIYON GEREKLI
+
+AOI guncellemesi yapildi (`code/p1/02_aoi_avanos.py`).
+Yeni raster boyutu: ~2700×2750 px (orijinal 1327×1137 yerine, ~5x daha genis alan).
+Pipeline basi basina yeniden calistirilmali.
+
+### P4 (Spektral Muhendis) — DOLAYLI ETKI
+
+P4 dogrudan P2'ye bagimli degil. Ancak genisletilmis AOI P4'un ASTER/S2 indeks
+layerlarinin da bu alani kapsamasini gerektirir. P1'in yeni raster'i geldikten sonra
+P4'un `04_s2_indices.py` ve `06_resample_to_s2_grid.py` adimlarinin da ayni
+genisletilmis grid uzerinde calistigini dogrulamali.
+
+### P5 (Dashboard / Vizualizasyon) — DOLAYLI ETKI
+
+P5, P3'un inference ciktisina (`raw_probability.tif`) bagli. P3 fine-tune P2'nin
+`full_mask.tif`'ini bekledigi icin P5 downstream zinciri de baskili.
+Streamlit dashboard test edilirken demo fallback PNG'lerin hazir olmasi onem kazanir.
 
 ---
 
-*Hazır. T2.1-T2.3 kullanıcı yapacak; T2.4-T2.9 script chain otomatik (girdi geldikçe).*
+## 6. Beklenen Ciktilar (Tamamlaninca)
+
+```
+data/labels/
+  positive_pixels.gpkg     ~10K Point (label=1)      T2.4
+  negative_pixels.gpkg     ~6K Point  (label=0)      T2.5
+  wdpa_buffer.gpkg         Goreme + 1000m buffer     T2.6
+  ignore_mask.tif          uint8, 255=ignore zone    T2.6
+  blok_cv_split.json       Roberts 2017, 5-fold      T2.7
+  full_mask.tif            uint8 0/1/255 -- CRITICAL T2.8
+```
+
+---
+
+## 7. Risk & Plan B
+
+| Risk | Tetik | Plan B |
+|---|---|---|
+| P1 raster gecikirse | full_mask.tif saat 13'u kacirir | P3 T3.5'e 3h slack var; P1 en gec saat 10'da teslim etmeli |
+| 27 poligon yetersiz (~sanity esigi 30-40) | T2.4 ciktisi | P1 HELP slotunda (saat 14-16) 5-10 ek poligon cizebilir |
+| 5-fold blok CV yetersiz dolu blok | T2.7 hata | `--n-folds 3 --blocks-x 3 --blocks-y 3` (orchestrator onayi) |
+
+---
+
+*Son durum: P1 yeni raster uretimi bekleniyor. P2 tarafinda T2.3 tamamlandi,
+T2.4-T2.8 pipeline hazir — tetiklenmeyi bekliyor.*

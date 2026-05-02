@@ -133,7 +133,7 @@ def main(positives_gpkg, raster_path, out_gpkg):
                 "label": 1,
                 "geometry": Point(x, y),
             })
-        print(f"  {row.get('saha_id'):<6} alan={area_ha:6.2f} ha → {len(samples)} piksel")
+        print(f"  {row.get('saha_id'):<6} alan={area_ha:6.2f} ha -> {len(samples)} piksel")
 
     out = gpd.GeoDataFrame(all_records, geometry="geometry", crs="EPSG:32636")
     Path(out_gpkg).parent.mkdir(parents=True, exist_ok=True)
