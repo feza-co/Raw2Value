@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
 from . import __version__
-from .api import health
+from .api import auth, health
 from .config import settings
 from .core.middleware import AccessLogMiddleware, RequestIdMiddleware
 from .exceptions import register_exception_handlers
@@ -53,3 +53,4 @@ app.add_middleware(RequestIdMiddleware)
 register_exception_handlers(app)
 
 app.include_router(health.router)
+app.include_router(auth.router)
