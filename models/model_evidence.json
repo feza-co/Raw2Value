@@ -1,0 +1,311 @@
+{
+  "version": "v1.0",
+  "trained_at": "2026-05-02T22:00:26.180189+00:00",
+  "dataset": {
+    "n_total": 1500,
+    "n_train": 1200,
+    "n_val": 150,
+    "n_test": 150,
+    "split_strategy": "stratified_80_10_10",
+    "stratify_on": [
+      "raw_material",
+      "processing_route_candidate"
+    ],
+    "augmentation": "domain_informed_v1",
+    "raw_reference_rows": 78
+  },
+  "profit_regression": {
+    "rule_based": {
+      "rmse": 768081.6119089503,
+      "mae": 176208.31509307897,
+      "r2": 0.9997538082825322,
+      "mape": 0.040592566153038565
+    },
+    "linear_regression": {
+      "rmse": 48849870.71999489,
+      "mae": 23153546.98233032,
+      "r2": 0.004169234786547071,
+      "mape": 1535.1470570529896
+    },
+    "random_forest": {
+      "rmse": 25749650.070889533,
+      "mae": 4552737.850989383,
+      "r2": 0.7233049659035449,
+      "mape": 14.487064084251973
+    },
+    "xgboost": {
+      "rmse": 19632941.45016943,
+      "mae": 3141633.1860269257,
+      "r2": 0.8391468964691471,
+      "mape": 13.376034270678659,
+      "train_sec": 0.18916821479797363
+    },
+    "lightgbm": {
+      "rmse": 18781529.38469648,
+      "mae": 3866058.196995535,
+      "r2": 0.8527956614995998,
+      "mape": 23.935212198090856,
+      "train_sec": 0.25304460525512695
+    },
+    "catboost": {
+      "rmse": 11219333.573886277,
+      "mae": 1964459.9961412556,
+      "r2": 0.9474717632012178,
+      "mape": 18.003394643822016,
+      "train_sec": 16.748626708984375
+    },
+    "best_model": "catboost"
+  },
+  "route_classification": {
+    "majority_baseline": {
+      "accuracy": 0.6666666666666666,
+      "macro_f1": 0.1,
+      "weighted_f1": 0.5333333333333333
+    },
+    "logistic_regression": {
+      "accuracy": 0.88,
+      "macro_f1": 0.5872619481624222,
+      "weighted_f1": 0.8694068248760192,
+      "top2_accuracy": 0.96
+    },
+    "random_forest": {
+      "accuracy": 0.9733333333333334,
+      "macro_f1": 0.6981527093596059,
+      "weighted_f1": 0.9634811165845648,
+      "top2_accuracy": 0.9933333333333333
+    },
+    "xgboost": {
+      "accuracy": 0.9533333333333334,
+      "macro_f1": 0.6248973876092521,
+      "weighted_f1": 0.9510821382007822,
+      "top2_accuracy": 0.9933333333333333,
+      "train_sec": 1.257714033126831
+    },
+    "lightgbm": {
+      "accuracy": 0.9533333333333334,
+      "macro_f1": 0.609053295623028,
+      "weighted_f1": 0.9474426868455947,
+      "top2_accuracy": 1.0,
+      "train_sec": 0.7471826076507568
+    },
+    "catboost": {
+      "accuracy": 0.9533333333333334,
+      "macro_f1": 0.7816764132553605,
+      "weighted_f1": 0.9624795321637426,
+      "top2_accuracy": 0.9866666666666667,
+      "train_sec": 52.63966655731201
+    },
+    "best_model": "catboost",
+    "classes": [
+      "kabak_cekirdegi_protein_powder",
+      "kabak_cekirdegi_pumpkin_seed_oil",
+      "kabak_cekirdegi_roasted_packaged",
+      "kabak_cekirdegi_tourism_gift_pack",
+      "perlit_filtration_product",
+      "perlit_raw_sale",
+      "pomza_bims_aggregate",
+      "pomza_filtration_media",
+      "pomza_micronized_pumice",
+      "pomza_raw_sale"
+    ]
+  },
+  "ablation": {
+    "full_features": {
+      "profit_rmse": 11267473.158872364,
+      "profit_mae": 1962872.4244992018,
+      "profit_r2": 0.9470200229063597,
+      "profit_mape": 17.4654017551933,
+      "route_accuracy": 0.9533333333333334,
+      "route_macro_f1": 0.7816764132553605,
+      "rmse_delta_pct": 0.0,
+      "interpretation": "Tum feature'lar mevcut — referans (baseline). RMSE delta=0% bu senaryodadir."
+    },
+    "without_fx": {
+      "profit_rmse": 3823200.279715984,
+      "profit_mae": 1092206.1927775368,
+      "profit_r2": 0.9939002392593878,
+      "profit_mape": 8.099321477719498,
+      "route_accuracy": 0.9533333333333334,
+      "route_macro_f1": 0.7816764132553605,
+      "rmse_delta_pct": -66.06869858211753,
+      "interpretation": "Kur feature'lari (usd_try, eur_try, fx_scenario_pct) cikarildi. ihracat rotalari (DE/NL alicilari) zayifliyor; modelin TRY-cinsi profit tahmini bozuluyor."
+    },
+    "without_geo": {
+      "profit_rmse": 4905336.5791509515,
+      "profit_mae": 1288529.4556402669,
+      "profit_r2": 0.9899585524194325,
+      "profit_mape": 10.384625430673864,
+      "route_accuracy": 0.96,
+      "route_macro_f1": 0.9224171539961014,
+      "rmse_delta_pct": -56.4646260081096,
+      "interpretation": "Cografi mesafe feature'lari (source-processor-buyer km) cikarildi. Eslesme (matching) bozuluyor; transport maliyeti ve CO2 dolayli olarak gorunmez kaliyor."
+    },
+    "without_carbon": {
+      "profit_rmse": 5384592.845734387,
+      "profit_mae": 1436749.0322982578,
+      "profit_r2": 0.987900583089289,
+      "profit_mape": 11.077110345779472,
+      "route_accuracy": 0.9533333333333334,
+      "route_macro_f1": 0.7742690058479531,
+      "rmse_delta_pct": -52.211176633738965,
+      "interpretation": "Karbon feature'lari (emission_factor, co2_kg) cikarildi. low_carbon priority sinyali kaybolur; karbon onceligi etkisizlesir."
+    },
+    "without_demand": {
+      "profit_rmse": 12338203.355793323,
+      "profit_mae": 2166969.804313403,
+      "profit_r2": 0.9364723851994043,
+      "profit_mape": 9.878533583514114,
+      "route_accuracy": 0.9533333333333334,
+      "route_macro_f1": 0.7816764132553605,
+      "rmse_delta_pct": 9.502842224015707,
+      "interpretation": "Talep feature'lari (demand_score, buyer_sector, buyer_country) cikarildi. Pazar uygunlugu zayiflar; ayni uretici icin tum alici ulkelerine ayni tahmin gelir."
+    },
+    "without_quality": {
+      "profit_rmse": 7206810.364616867,
+      "profit_mae": 1467711.6607711685,
+      "profit_r2": 0.9783257094574321,
+      "profit_mape": 8.230982059062072,
+      "route_accuracy": 0.96,
+      "route_macro_f1": 0.7872147889599896,
+      "rmse_delta_pct": -36.038806012668445,
+      "interpretation": "Kalite feature'lari (grade, match_score, moisture, purity) cikarildi. Premium pazar (DE/NL) ile yerel pazar (TR) arasindaki ayrim kayboluyor."
+    },
+    "without_cost": {
+      "profit_rmse": 8359239.928534388,
+      "profit_mae": 1872594.7728656007,
+      "profit_r2": 0.9708396801661824,
+      "profit_mape": 10.433909915392523,
+      "route_accuracy": 0.9533333333333334,
+      "route_macro_f1": 0.7742690058479531,
+      "rmse_delta_pct": -25.81087338156152,
+      "interpretation": "Maliyet feature'lari (processing_cost, packaging, transport_cost) cikarildi. Kar tahmini onemli olcude bozulur; yuksek-marjinli rotalar ile dusuk-marjinliler ayirt edilemez."
+    }
+  },
+  "feature_importance": {
+    "model_profit": [
+      {
+        "feature": "tonnage",
+        "importance": 35.17276500687151
+      },
+      {
+        "feature": "processed_price_typical_usd_ton",
+        "importance": 27.147571157712605
+      },
+      {
+        "feature": "processing_cost_typical_usd_ton",
+        "importance": 20.64387801263116
+      },
+      {
+        "feature": "co2_kg",
+        "importance": 6.033912017144103
+      },
+      {
+        "feature": "price_volatility_risk",
+        "importance": 1.9388011317744598
+      },
+      {
+        "feature": "raw_material",
+        "importance": 1.50861351522448
+      },
+      {
+        "feature": "raw_price_typical_usd_ton",
+        "importance": 1.4117367574664736
+      },
+      {
+        "feature": "transport_mode",
+        "importance": 1.151475547180438
+      },
+      {
+        "feature": "delivery_risk",
+        "importance": 0.9028183446061783
+      },
+      {
+        "feature": "emission_factor_kg_co2_ton_km",
+        "importance": 0.7071738997640294
+      },
+      {
+        "feature": "source_to_processor_km",
+        "importance": 0.5508864210774651
+      },
+      {
+        "feature": "processor_to_buyer_km",
+        "importance": 0.4277838430688758
+      },
+      {
+        "feature": "transport_cost_usd_ton_km",
+        "importance": 0.4168765776986336
+      },
+      {
+        "feature": "demand_score",
+        "importance": 0.36048262581706003
+      },
+      {
+        "feature": "data_confidence_score",
+        "importance": 0.2915876215115371
+      }
+    ],
+    "model_route": [
+      {
+        "feature": "raw_material",
+        "importance": 14.75241562496686
+      },
+      {
+        "feature": "tonnage",
+        "importance": 14.44794309395641
+      },
+      {
+        "feature": "transport_mode",
+        "importance": 12.735464149708948
+      },
+      {
+        "feature": "buyer_sector",
+        "importance": 12.647222385183573
+      },
+      {
+        "feature": "product_form",
+        "importance": 6.978107845172859
+      },
+      {
+        "feature": "origin_district",
+        "importance": 6.217470316356075
+      },
+      {
+        "feature": "co2_kg",
+        "importance": 4.636758210708245
+      },
+      {
+        "feature": "raw_subtype",
+        "importance": 3.8169468877526835
+      },
+      {
+        "feature": "buyer_city",
+        "importance": 3.494303982688418
+      },
+      {
+        "feature": "quality_grade",
+        "importance": 2.149573056162452
+      },
+      {
+        "feature": "processed_price_typical_usd_ton",
+        "importance": 1.8311587558164757
+      },
+      {
+        "feature": "delivery_risk",
+        "importance": 1.776033526615388
+      },
+      {
+        "feature": "particle_size_class",
+        "importance": 1.683743187814689
+      },
+      {
+        "feature": "transport_cost_usd_ton_km",
+        "importance": 1.5890099583050787
+      },
+      {
+        "feature": "buyer_country",
+        "importance": 1.5686582173226278
+      }
+    ]
+  },
+  "honesty_note": "Sayılar augmented holdout üzerinde ölçüldü. Pilot gerçek veriyle yeniden kalibre edilecektir."
+}
