@@ -1,0 +1,51 @@
+{
+  "profit": {
+    "rule_based": {
+      "rmse": 768081.6119089503,
+      "mae": 176208.31509307897,
+      "r2": 0.9997538082825322,
+      "mape": 0.040592566153038565
+    },
+    "linear_regression": {
+      "rmse": 48849870.71999489,
+      "mae": 23153546.98233032,
+      "r2": 0.004169234786547071,
+      "mape": 1535.1470570529896
+    },
+    "random_forest": {
+      "rmse": 25749650.070889533,
+      "mae": 4552737.850989383,
+      "r2": 0.7233049659035449,
+      "mape": 14.487064084251973
+    }
+  },
+  "route": {
+    "majority_baseline": {
+      "accuracy": 0.6666666666666666,
+      "macro_f1": 0.1,
+      "weighted_f1": 0.5333333333333333
+    },
+    "logistic_regression": {
+      "accuracy": 0.88,
+      "macro_f1": 0.5872619481624222,
+      "weighted_f1": 0.8694068248760192,
+      "top2_accuracy": 0.96
+    },
+    "random_forest": {
+      "accuracy": 0.9733333333333334,
+      "macro_f1": 0.6981527093596059,
+      "weighted_f1": 0.9634811165845648,
+      "top2_accuracy": 0.9933333333333333
+    }
+  },
+  "split": {
+    "train": 1200,
+    "val": 150,
+    "test": 150,
+    "seed": 42,
+    "stratify_cols": [
+      "raw_material",
+      "processing_route_candidate"
+    ]
+  }
+}
