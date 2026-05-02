@@ -14,10 +14,12 @@ Drive/Asset target'ina gider — sonuclar repo'ya manuel/rclone ile alinir.
 """
 import ee
 
+from aoi_config import bbox_text, ee_rectangle
+
 # WHY: GEE auth disarida yapilir (01_gee_setup.ipynb), burada Initialize varsayalir.
 ee.Initialize()
 
-AOI_BBOX = ee.Geometry.Rectangle([34.70, 38.65, 35.00, 38.85])
+AOI_BBOX = ee_rectangle(ee)
 
 DATE_START = "2024-06-01"
 DATE_END   = "2024-09-30"
@@ -44,6 +46,7 @@ col = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
 
 count = col.size().getInfo()
 print(f"S2 L2A scenes (cloud<20%, SCL-masked): {count}")
+print(f"AOI: {bbox_text()}")
 
 # Median composite — pomza yuzeyi seasonal stable, median tek-sahne bulut artiklarini siler
 composite = col.median().clip(AOI_BBOX).toFloat()

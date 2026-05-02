@@ -35,13 +35,48 @@ from shapely.ops import unary_union
 PIXEL_SIZE_M = 20
 POSITIVE_BUFFER_M = 2000      # 2 km buffer dışı = negatif zone
 TARGET_NEGATIVE = 6000
+AGRI_NEGATIVE_FRAC = 0.30
 RNG = np.random.default_rng(43)
 
 
-def main(positives_gpkg, raster_path, aoi_gpkg, wdpa_gpkg, out_gpkg, n_target):
+def _load_optional_mask(mask_path, expected_shape, true_values=(1, 255)):
+    if not mask_path or not Path(mask_path).exists():
+        return None
+    with rasterio.open(mask_path) as src:
+        arr = src.read(1)
+        if arr.shape != expected_shape:
+            raise ValueError(
+                f"Mask boyut uyumsuz: {mask_path} {arr.shape} vs {expected_shape}"
+            )
+    return np.isin(arr, true_values)
+
+
+def _sample_rows_cols(rows, cols, n_pick, used_keys):
+    if n_pick <= 0 or len(rows) == 0:
+        return np.array([], dtype=int), np.array([], dtype=int)
+
+    order = RNG.permutation(len(rows))
+    picked_rows = []
+    picked_cols = []
+    for k in order:
+        r, c = int(rows[k]), int(cols[k])
+        key = (r, c)
+        if key in used_keys:
+            continue
+        used_keys.add(key)
+        picked_rows.append(r)
+        picked_cols.append(c)
+        if len(picked_rows) >= n_pick:
+            break
+    return np.array(picked_rows, dtype=int), np.array(picked_cols, dtype=int)
+
+
+def main(positives_gpkg, raster_path, aoi_gpkg, wdpa_gpkg, agri_mask_path,
+         out_gpkg, n_target, agri_frac):
     print(f"[T2.5] Negatif piksel örneklemesi başlıyor")
     print(f"  Pozitif buffer mesafesi: {POSITIVE_BUFFER_M} m")
     print(f"  Hedef negatif piksel: {n_target}")
+    print(f"  Tarim hard-negative hedef orani: {agri_frac:.0%}")
 
     # Pozitifleri yukle, buffer at, union
     pos = gpd.read_file(positives_gpkg).to_crs(32636)
@@ -74,6 +109,11 @@ def main(positives_gpkg, raster_path, aoi_gpkg, wdpa_gpkg, out_gpkg, n_target):
         raster_shape = (src.height, src.width)
         if src.crs.to_epsg() != 32636:
             raise ValueError(f"Raster CRS != EPSG:32636")
+    agri_mask = _load_optional_mask(agri_mask_path, raster_shape)
+    if agri_mask is not None:
+        print(f"  Tarim maskesi eklendi: {int(agri_mask.sum())} piksel")
+    else:
+        print(f"  Tarim maskesi yok; negatifler tek havuzdan orneklenecek.")
 
     # candidate_zone MultiPolygon olabilir; geometry_mask listesi alir
     if hasattr(candidate_zone, "geoms"):
@@ -97,10 +137,50 @@ def main(positives_gpkg, raster_path, aoi_gpkg, wdpa_gpkg, out_gpkg, n_target):
     else:
         n_pick = n_target
 
-    idx = RNG.choice(n_available, size=n_pick, replace=False)
+    used_keys = set()
+    sampled_rows = []
+    sampled_cols = []
+    sampled_is_agri = []
+
+    if agri_mask is not None and n_pick > 0:
+        agri_candidate = mask & agri_mask
+        other_candidate = mask & ~agri_mask
+        agri_rows, agri_cols = np.where(agri_candidate)
+        other_rows, other_cols = np.where(other_candidate)
+        n_agri_target = int(round(n_pick * max(0.0, min(1.0, agri_frac))))
+        n_agri = min(n_agri_target, len(agri_rows))
+        n_other = min(n_pick - n_agri, len(other_rows))
+
+        ar, ac = _sample_rows_cols(agri_rows, agri_cols, n_agri, used_keys)
+        sampled_rows.extend(ar.tolist())
+        sampled_cols.extend(ac.tolist())
+        sampled_is_agri.extend([1] * len(ar))
+
+        orows, ocols = _sample_rows_cols(other_rows, other_cols, n_other, used_keys)
+        sampled_rows.extend(orows.tolist())
+        sampled_cols.extend(ocols.tolist())
+        sampled_is_agri.extend([0] * len(orows))
+
+        remaining = n_pick - len(sampled_rows)
+        if remaining > 0:
+            fill_rows, fill_cols = np.where(mask)
+            fr, fc = _sample_rows_cols(fill_rows, fill_cols, remaining, used_keys)
+            sampled_rows.extend(fr.tolist())
+            sampled_cols.extend(fc.tolist())
+            sampled_is_agri.extend([int(agri_mask[r, c]) for r, c in zip(fr, fc)])
+
+        print(
+            f"  Tarim negatifleri: {sum(sampled_is_agri)} / {len(sampled_is_agri)} "
+            f"(aday tarim={len(agri_rows)}, diger={len(other_rows)})"
+        )
+    else:
+        idx = RNG.choice(n_available, size=n_pick, replace=False)
+        sampled_rows = [int(rows[k]) for k in idx]
+        sampled_cols = [int(cols[k]) for k in idx]
+        sampled_is_agri = [0] * len(sampled_rows)
+
     records = []
-    for i, k in enumerate(idx):
-        r, c = int(rows[k]), int(cols[k])
+    for i, (r, c, is_agri) in enumerate(zip(sampled_rows, sampled_cols, sampled_is_agri)):
         x, y = rio_xy(raster_transform, r, c, offset="center")
         records.append({
             "pixel_id": f"N{i+1:06d}",
@@ -109,6 +189,7 @@ def main(positives_gpkg, raster_path, aoi_gpkg, wdpa_gpkg, out_gpkg, n_target):
             "x_utm": x,
             "y_utm": y,
             "label": 0,
+            "is_agriculture": int(is_agri),
             "geometry": Point(x, y),
         })
 
@@ -128,7 +209,12 @@ if __name__ == "__main__":
     ap.add_argument("--aoi", default="data/aoi/avanos_aoi.gpkg")
     ap.add_argument("--wdpa", default="data/labels/wdpa_buffer.gpkg",
                     help="T2.6 cikti (yoksa exclude listesinde dahil edilmez)")
+    ap.add_argument("--agri-mask", default="data/labels/agriculture_mask.tif",
+                    help="Opsiyonel tarim maskesi (1 veya 255 = cropland)")
     ap.add_argument("--out", default="data/labels/negative_pixels.gpkg")
     ap.add_argument("--n-target", type=int, default=TARGET_NEGATIVE)
+    ap.add_argument("--agri-frac", type=float, default=AGRI_NEGATIVE_FRAC,
+                    help="Negatiflerin hedef tarim orani (hard-negative)")
     args = ap.parse_args()
-    main(args.positives, args.raster, args.aoi, args.wdpa, args.out, args.n_target)
+    main(args.positives, args.raster, args.aoi, args.wdpa, args.agri_mask,
+         args.out, args.n_target, args.agri_frac)

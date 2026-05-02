@@ -15,9 +15,11 @@ Sensör → Koleksiyon eslemesi (Collection 2):
 """
 import ee
 
+from aoi_config import bbox_text, ee_rectangle
+
 ee.Initialize(project="pomza-495012")
 
-AOI_BBOX = ee.Geometry.Rectangle([34.70, 38.65, 35.00, 38.85])
+AOI_BBOX = ee_rectangle(ee)
 
 # WHY: Yaz penceresi — pomza yuzey donemi, dusuk bulut olasiligi Kapadokya'da
 SUMMER_WINDOW = ("06-01", "09-30")
@@ -118,6 +120,7 @@ for snap in SNAPSHOTS:
     print(f"  Export baslatildi: task={task.id}")
 
 print("\n[T1.10] Tum Landsat export task'lari baslatildi.")
+print(f"AOI: {bbox_text()}")
 print("Drive klasoru: Pomzadoya_GEE_exports/")
 print("Her dosyayi data/landsat/ altina indirin:")
 for t in tasks:

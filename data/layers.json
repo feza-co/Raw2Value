@@ -62,6 +62,20 @@
       "default_visible": true
     },
     {
+      "id": "agriculture_mask",
+      "name": "Agriculture / cropland mask (ESA WorldCover class 40)",
+      "path": "data/labels/agriculture_mask.tif",
+      "owner": "P2",
+      "task": "T2.x",
+      "type": "raster_categorical",
+      "categories": {
+        "0": "not cropland",
+        "1": "cropland"
+      },
+      "default_visible": false,
+      "opacity": 0.45
+    },
+    {
       "id": "p3_raw",
       "name": "P3 RAW pomza probability (Plan B \u2014 f\u00fczyon yok)",
       "path": "data/ard/p3_raw_prob.tif",

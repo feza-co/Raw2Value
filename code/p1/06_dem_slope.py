@@ -8,12 +8,14 @@ Cozunurluk : 20 m (GLO-30 native 30m → GEE bilinear resample)
 """
 import ee
 
+from aoi_config import bbox_text, ee_rectangle
+
 PROJECT = "pomza-495012"
 # WHY: Service account Drive kotasi yok. earthengine authenticate ile
 # kisisel credentials kullanilir -> Drive'a export calisir.
 ee.Initialize(project=PROJECT)
 
-AOI_BBOX = ee.Geometry.Rectangle([34.70, 38.65, 35.00, 38.85])
+AOI_BBOX = ee_rectangle(ee)
 
 dem = (
     ee.ImageCollection("COPERNICUS/DEM/GLO30")
@@ -58,7 +60,9 @@ task_slope = ee.batch.Export.image.toDrive(
 )
 task_slope.start()
 print(f"Slope export baslatildi. Task id: {task_slope.id}")
-print("Drive'dan: dem_avanos.tif -> data/dem.tif, slope_avanos.tif -> data/slope.tif")
+print(f"AOI: {bbox_text()}")
+print("Drive'dan: dem_avanos.tif -> data/dem/dem_avanos.tif")
+print("Drive'dan: slope_avanos.tif -> data/dem/slope_avanos.tif")
 
 # Sanity check
 stats = elev.reduceRegion(

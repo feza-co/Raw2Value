@@ -10,13 +10,13 @@ T4.4 S2 indeks script'i P1 ARD'sini bekliyor — paralel iş üret.
 
 1. **AOI seç** (Avanos default bbox):
    ```
-   west=34.70  south=38.65  east=34.95  north=38.78
+   west=34.60  south=38.40  east=35.00  north=38.90
    ```
 
 2. **CMR dry-run** (önce listele, indirme yapma):
    ```bash
    python code/p4/02_aster_l1b_download.py \
-       --aoi 34.70,38.65,34.95,38.78 \
+       --aoi 34.60,38.40,35.00,38.90 \
        --start 2024-04-01 --end 2024-09-30 \
        --max-cloud 20 \
        --out data/aster/ \
@@ -30,7 +30,7 @@ T4.4 S2 indeks script'i P1 ARD'sini bekliyor — paralel iş üret.
 3. **Gerçek indirme** (ASENKRON başlat):
    ```bash
    nohup python code/p4/02_aster_l1b_download.py \
-       --aoi 34.70,38.65,34.95,38.78 \
+       --aoi 34.60,38.40,35.00,38.90 \
        --start 2024-04-01 --end 2024-09-30 \
        --max-cloud 20 \
        --out data/aster/ --limit 3 \
@@ -41,7 +41,7 @@ T4.4 S2 indeks script'i P1 ARD'sini bekliyor — paralel iş üret.
    ```powershell
    Start-Job -ScriptBlock {
      python C:\Users\tuna9\OneDrive\Masaüstü\Pomzadoya\code\p4\02_aster_l1b_download.py `
-       --aoi 34.70,38.65,34.95,38.78 --start 2024-04-01 --end 2024-09-30 `
+       --aoi 34.60,38.40,35.00,38.90 --start 2024-04-01 --end 2024-09-30 `
        --max-cloud 20 --out data\aster --limit 3
    } -Name aster_dl
    ```
