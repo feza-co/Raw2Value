@@ -1,0 +1,83 @@
+{
+  "version": "v2",
+  "aoi": {
+    "name": "Avanos",
+    "epsg": 32636,
+    "center_ll": [
+      38.7167,
+      34.85
+    ]
+  },
+  "plan": "B",
+  "layers": [
+    {
+      "id": "s2_rgb",
+      "name": "Sentinel-2 RGB (ground truth)",
+      "path": "data/ard/s2_rgb.tif",
+      "owner": "P1",
+      "task": "T1.4",
+      "type": "raster_rgb",
+      "default_visible": true,
+      "opacity": 1.0
+    },
+    {
+      "id": "aster_qi",
+      "name": "ASTER Ninomiya QI (B11\u00b2/(B10\u00b7B12))",
+      "path": "data/ard/aster_qi.tif",
+      "owner": "P4",
+      "task": "T4.6",
+      "type": "raster_continuous",
+      "colormap": "viridis",
+      "default_visible": true,
+      "opacity": 0.7
+    },
+    {
+      "id": "s1_change",
+      "name": "Sentinel-1 amplitude change (Mazza 2023)",
+      "path": "data/change/s1_change.tif",
+      "owner": "P5",
+      "task": "T5.5",
+      "type": "raster_categorical",
+      "categories": {
+        "0": "stable",
+        "1": "increase",
+        "2": "decrease"
+      },
+      "default_visible": false,
+      "opacity": 0.6
+    },
+    {
+      "id": "unesco_buffer",
+      "name": "UNESCO G\u00f6reme buffer (1000 m)",
+      "path": "data/aoi/wdpa_goreme_buffer.gpkg",
+      "owner": "P5",
+      "task": "T5.2",
+      "type": "vector_polygon",
+      "style": {
+        "color": "#d62728",
+        "fill": false,
+        "weight": 2,
+        "dash": "5,5"
+      },
+      "default_visible": true
+    },
+    {
+      "id": "p3_raw",
+      "name": "P3 RAW pomza probability (Plan B \u2014 f\u00fczyon yok)",
+      "path": "data/ard/p3_raw_prob.tif",
+      "owner": "P3",
+      "task": "T3.10",
+      "type": "raster_continuous",
+      "colormap": "magma",
+      "default_visible": true,
+      "opacity": 0.75,
+      "fallback_for": "final_confidence"
+    }
+  ],
+  "annotations": {
+    "historical_pomza_dir": "data/temporal/historical_pomza_overlay",
+    "landsat_timelapse_gif": "data/temporal/landsat_timelapse.gif",
+    "red_flags": "reports/red_flags.json",
+    "kpi": "reports/kpi.json"
+  }
+}

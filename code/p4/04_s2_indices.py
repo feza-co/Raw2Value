@@ -6,7 +6,7 @@ Formüller (S2 L2A reflectance, [0,1] ölçek):
   BSI     = ((B11 + B4) - (B8 + B2)) / ((B11 + B4) + (B8 + B2))  (Rikimaru 2002)
   Albedo  = 0.356·B2 + 0.130·B4 + 0.373·B8 + 0.085·B11
             + 0.072·B12 - 0.0018                                (Liang 2001)
-  Sabins  = B11 / B8                                            (Sabins 1999, clay/iron oxide)
+  Sabins  = B11 / B12                                           (Sabins 1999, clay/carbonate 2.2 µm)
 
 Girdi: P1 ARD GeoTIFF — bantlar B2,B3,B4,B8,B11,B12 sıralı (manifest.json'dan oku).
 Çıktı: data/layers/s2_{ndvi,bsi,albedo,sabins}.tif  (EPSG:32636, 20 m, COG)
@@ -28,8 +28,11 @@ import rasterio
 from rasterio.enums import Resampling
 
 
-# P1 ARD manifest'inde bant indexleri
-BAND_KEY = {"B2": 1, "B3": 2, "B4": 3, "B8": 4, "B11": 5, "B12": 6}
+# P1 ARD bant sıralaması — s2_ard_20m.tif: B2,B3,B4,B5,B6,B7,B8,B8A,B11,B12 (10 bant)
+BAND_KEY = {
+    "B2": 1, "B3": 2, "B4": 3, "B5": 4, "B6": 5,
+    "B7": 6, "B8": 7, "B8A": 8, "B11": 9, "B12": 10,
+}
 
 
 def _safe_div(num: np.ndarray, den: np.ndarray) -> np.ndarray:
@@ -71,8 +74,8 @@ def compute_albedo_liang(
     ).astype(np.float32)
 
 
-def compute_sabins(b8: np.ndarray, b11: np.ndarray) -> np.ndarray:
-    return _safe_div(b11, b8)
+def compute_sabins(b11: np.ndarray, b12: np.ndarray) -> np.ndarray:
+    return _safe_div(b11, b12)
 
 
 def write_cog(arr: np.ndarray, profile: dict, out_path: Path) -> None:
@@ -130,6 +133,12 @@ def main() -> int:
         band_key = {k: int(v) for k, v in m.get("bands", BAND_KEY).items()}
 
     with rasterio.open(args.ard) as src:
+        if src.count < max(band_key.values()):
+            raise SystemExit(
+                f"[hata] ARD '{args.ard}' {src.count} bant içeriyor; "
+                f"BAND_KEY max={max(band_key.values())} bekliyor. "
+                f"--manifest ile doğru haritayı geçin veya P1 ARD'ı kontrol edin."
+            )
         profile = src.profile.copy()
         b2 = read_band(src, band_key["B2"])
         b4 = read_band(src, band_key["B4"])
@@ -140,7 +149,7 @@ def main() -> int:
     ndvi = compute_ndvi(b4, b8)
     bsi = compute_bsi(b2, b4, b8, b11)
     albedo = compute_albedo_liang(b2, b4, b8, b11, b12)
-    sabins = compute_sabins(b8, b11)
+    sabins = compute_sabins(b11, b12)
 
     write_cog(ndvi, profile, out_dir / "s2_ndvi.tif")
     write_cog(bsi, profile, out_dir / "s2_bsi.tif")

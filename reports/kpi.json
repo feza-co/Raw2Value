@@ -1,0 +1,46 @@
+{
+  "annual_areas": {
+    "1985": {
+      "n_polygons": 1,
+      "area_ha": 58027.23
+    },
+    "1990": {
+      "n_polygons": 1,
+      "area_ha": 58027.23
+    },
+    "2000": {
+      "n_polygons": 1,
+      "area_ha": 58027.23
+    },
+    "2010": {
+      "n_polygons": 1,
+      "area_ha": 57902.22
+    },
+    "2025": {
+      "n_polygons": 99,
+      "area_ha": 57006.18
+    }
+  },
+  "growth": {
+    "growth_pct_total": -1.759604930306001,
+    "cagr_pct": -0.044371903064166496,
+    "first_year": 1985,
+    "last_year": 2025,
+    "first_area_ha": 58027.23,
+    "last_area_ha": 57006.18
+  },
+  "unesco_violations": {
+    "violations_per_year": {
+      "1985": 1,
+      "1990": 1,
+      "2000": 1,
+      "2010": 1,
+      "2025": 1
+    },
+    "buffer_missing": false
+  },
+  "notes": [
+    "v2: T5.10 historical RAW threshold 0.5; T5.13 current FUSED threshold P3 T3.6 F1-max.",
+    "UNESCO buffer = WDPA G\u00f6reme + 1000 m (K#8)."
+  ]
+}

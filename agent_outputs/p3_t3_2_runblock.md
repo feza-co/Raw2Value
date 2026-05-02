@@ -84,9 +84,23 @@ Bana yapistir:
 ## DELIVER
 
 ```
-[P3] T3.2 TAMAM
-Cikti: SSL4EO-S12 ResNet-50 backbone yuklendi + 13->17 adapter (mean_replicate).
-Metric: encoder missing=N, unexpected=M; forward (2,17,256,256)->(2,1,256,256) OK.
-Adapter: conv1.weight[:, :13]=SSL4EO, conv1.weight[:, 13:17]=mean(SSL4EO 13).
-Siradaki bagimli: T3.3 DataModule + sanity check; T3.5 fine-tune (saat 12).
+[P3] T3.2 TAMAM (2026-05-01, Colab Pro A100/H100)
+
+NOT: wangyi111/SSL4EO-S12 reposunda B13 ResNet-50 MoCo bulunamadi.
+B3 (Sentinel-2 RGB, 3-kanal) ResNet-50 MoCo + 3->17 mean_replicate adapter ile devam.
+Akademik referans korundu: Wang et al. 2023 SSL4EO-S12 MoCo, S2 RGB pretrain.
+
+Cikti:
+  - models/pretrained/B3_rn50_moco_0099_full_ckpt.pth (370 MB)
+  - 02_ssl4eo_pretrained.py 3-kanal default'a guncellendi
+  - smp 0.5.0 + torch 2.10 load_state_dict None-dondurme patch'i eklendi
+
+Metric:
+  - Missing keys: 0 (encoder_q backbone tam yuklendi)
+  - Unexpected: 324 (encoder_k momentum + queue, segmentasyonda kullanilmaz)
+  - Adapter: conv1.weight[:, :3]=SSL4EO RGB, conv1.weight[:, 3:17]=mean(SSL4EO RGB)
+  - Param: 32.57 M
+  - Forward (2,17,256,256) -> (2,1,256,256) OK
+
+Siradaki bagimli: T3.3 sentetik sanity (1 hucre); T3.5 fine-tune (saat 12).
 ```

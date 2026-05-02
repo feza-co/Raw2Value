@@ -3,15 +3,41 @@
 _Modul A v2 — Pomzadoya hackathon, 24h penceresi_
 _Son guncelleme: 2026-05-01_
 
-## Saat 0-6 (T3.1, T3.2, T3.3) — TAMAM (kod hazirlandi, GPU calistirma kullanicida)
+## Saat 0-6 (T3.1, T3.2, T3.3)
 
 | Görev | Durum | Cikti |
 |---|---|---|
-| T3.1 Ortam + GPU test | KOD HAZIR | `code/p3/01_env_setup.ipynb` + RUN-BLOCK |
-| T3.2 SSL4EO-S12 + 13->17 adapter | KOD HAZIR | `code/p3/02_ssl4eo_pretrained.py` + RUN-BLOCK |
-| T3.3 DataModule + Loss + sanity | KOD HAZIR | `code/p3/03_datamodule.py`, `04_loss_metrics.py`, `05_synthetic_sanity.py` + RUN-BLOCK |
+| T3.1 Ortam + GPU test | ✅ TAMAM (Colab Pro A100/H100) | torch 2.10, peak VRAM b=4: 0.89 GB |
+| T3.2 SSL4EO-S12 + 3->17 adapter | ✅ TAMAM (B3 RN50 MoCo, 32.57M param) | Missing=0, Unexpected=324 (momentum+queue), forward OK |
+| T3.3 DataModule + Loss + sanity | ✅ SENTETIK TAMAM (gercek P1/P2 verisi sonrasi DataLoader sanity yapilacak) | Loss 0.7573, grad finite, peak VRAM 0.89 GB |
 
-## Saat 6-12 (T3.4 — 6h slack) — TAMAM (kod hazirlandi)
+## KRITIK KESIF (2026-05-02 ~saat 21, slack icinde)
+
+P1 manifest.json (Drive'da hazir) P3 sozlesmesinden FARKLI:
+- **Bant sayisi (17) UYUMLU** ama **bant sirasi tamamen farkli**.
+- P1 yapisi: 10 S2 (B2-B8, B8A, B11, B12) + 2 S1 (VV/VH dB) + 2 topografya (DEM, slope) + **3 derived (NDVI, BSI, Albedo)**.
+- P3 eski default 13 S2 + 2 S1 + 2 topografya bekliyordu — yanlis kanala mean/std uyguluyor olacakti.
+- Aksiyon: `code/p3/03_datamodule.py` DEFAULT_MEAN/STD + `code/p3/11_export_fp16.py` channel_order GUNCELLENDI.
+- Mean/std degerleri PLACEHOLDER — T3.5 oncesi (saat ~11) P1 ARD'sinden ampirik hesap + manifest'e yaz + `--manifest-json` ile override.
+- P1 manifest'inde mean/std YOK; P1'e manifest'e ampirik istatistik ekleme istegi gonderilmeli.
+
+## Saat 4-12 (T3.4 — 8h slack) — DEVAM EDIYOR
+
+### Slack progress
+| Is | Durum | Cikti |
+|---|:-:|---|
+| Is 1: predict_raw API review + sentetik test | ✅ TAMAM | TEST 1+2+3 gecti, threshold yok dogrulandi (64783 unique vals), GeoTIFF metadata OK |
+| Is 2: Grad-CAM target layer + sentetik test | ✅ API SAGLAM | encoder.layer4 erisilebilir, GradCAM lib uyumlu, RGB overlay+PNG OK. Gercek CAM heatmap T3.11'de fine-tune sonrasi test edilecek (sentetik random veri = ReLU sonrasi 0, beklenen). |
+| Is 3: Ablation 5-config dry-run | ✅ KISMI | CONFIGS yapisi + 06_train.py CLI uyumu OK; tam 5-config koşumu T3.7'de gercek datayla yapilacak |
+| Is 4: Threshold tuning sentetik test | ✅ TAMAM | CLI end-to-end OK. n_pixel=262144 (4 val tile), 37-nokta sweep, best_thr=0.325 best_F1=0.059 best_IoU=0.030 (sentetik random+1ep, beklenen). JSON 10-anahtar semasi + Recall↓/Precision-floor monotonisitesi dogrulandi. |
+| Is 5: Plan B fallback test | ✅ TAMAM | 12_fallback_threshold.py CLI end-to-end OK. Sentetik 17-band ARD (yari pomza/yari bg) -> bolgesel skor: pomza=0.561, bg=0.000, fark=0.561. Albedo+SWIR+BSI sigmoid AND mantigi saglikli. P3_OUTPUT=RAW_PROBABILITY_FALLBACK tag dogrulandi. |
+| Is 6: T3.5 RUN-BLOCK hazirligi | ✅ TAMAM | agent_outputs/p3_t3_5_runblock.md uretildi. Onkosul kontrol + egitim hucresi (30ep, b=8, --amp, --seed 42) + async monitor + verify-block + Plan B trigger esikleri. Saat ~12-13'te P1+P2 dosyalari Drive'a inince tek tikla baslatilir. |
+| Is 7: 06_train.py parametre review | ✅ TAMAM | Sentetik mini-dataset (16 tile, 1024x1024 mask) + 1-fold 1-epoch smoke test gecti (1.7s, H100). AMP deprecation patch'lendi (torch.amp.GradScaler/autocast). Train loop+DataLoader+SSL4EO+Adapter+AMP+threshold sweep+ckpt save hepsi calisti. |
+| Is 8: FP16 + ONNX export kuru test | ✅ TAMAM | 11_export_fp16.py end-to-end. FP16 PT 65.4 MB (yari), ONNX 130 MB (graph+external .data). Dynamic batch+spatial OK. Torch GPU FP32 vs ONNX CPU FP32 max diff 2.1e-3 (platform farki). Manifest 17ch + P4/P5 consumer OK. Bagimlilik notu: onnxscript pip kurulmali, .onnx + .onnx.data BIRLIKTE deploy. |
+| Is 9 (opt): reports/p3_architecture.md | ✅ TAMAM | 13 bolum: SSL4EO gerekce, 17-bant adapter, Roberts spatial CV, BCE+Dice loss, K#6 RAW output, F1-max threshold, export, Plan B, akademik referanslar. |
+| Is 10 (opt): predict_landsat_snapshot band_mapping | ✅ ISKELET TAMAM | Roy 2016 standart Landsat-S2 mapping eklendi (L5_TM, L7_ETM, L8_OLI, L9_OLI). Eksik bantlar zero-fill, quality tag (HIGH/MEDIUM/LOW). P5 custom override edebilir. Tam test T3.10'da gercek checkpoint sonrasi yapilacak. |
+
+## Saat 6-12 (T3.4 — 6h slack) — KOD HAZIR
 
 | Iskelet | Dosya |
 |---|---|

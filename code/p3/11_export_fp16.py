@@ -108,12 +108,12 @@ def main():
         "output_shape": [None, 1, args.input_h, args.input_w],
         "output_meaning": "RAW probability (sigmoid). KARAR #6: thresholdsuz.",
         "channel_order": [
-            "S2_B01", "S2_B02", "S2_B03", "S2_B04",
-            "S2_B05", "S2_B06", "S2_B07", "S2_B08",
-            "S2_B8A", "S2_B09", "S2_B11", "S2_B12",
-            "S2_B10",   # SSL4EO 13. bant (cirrus) — P1 manifestine gore yer ayar
-            "S1_VV", "S1_VH",
-            "DEM", "slope",
+            # P1 Modul A v2 sozlesmesi (manifest.json bands array uyumlu)
+            "S2_B2", "S2_B3", "S2_B4", "S2_B5", "S2_B6", "S2_B7",
+            "S2_B8", "S2_B8A", "S2_B11", "S2_B12",
+            "S1_VV_dB", "S1_VH_dB",
+            "DEM_m", "slope_deg",
+            "NDVI", "BSI", "Albedo",
         ][:args.in_channels],
         "normalization": {
             "mean": dm_mod.DEFAULT_MEAN[:args.in_channels].tolist(),
