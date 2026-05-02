@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "name": "avanos_aoi", "source": "P1_T1.2", "aoi_version": "avanos_nevsehir_extended_v2" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 34.6, 38.4 ], [ 35.0, 38.4 ], [ 35.0, 38.9 ], [ 34.6, 38.9 ], [ 34.6, 38.4 ] ] ] } }
+]
+}

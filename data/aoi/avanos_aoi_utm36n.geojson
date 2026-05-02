@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32636" } },
+"features": [
+{ "type": "Feature", "properties": { "name": "avanos_aoi", "source": "P1_T1.2", "aoi_version": "avanos_nevsehir_extended_v2" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 639713.468846418196335, 4251409.258342375978827 ], [ 674644.781062057823874, 4252091.135119501501322 ], [ 673434.541406560107134, 4307580.847880005836487 ], [ 638745.466928764828481, 4306896.270083342678845 ], [ 639713.468846418196335, 4251409.258342375978827 ] ] ] } }
+]
+}
