@@ -13,9 +13,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
 from . import __version__
-from .api import auth, evidence, fx, health
+from .api import analyze, auth, evidence, fx, health
 from .config import settings
 from .core.cache import close_redis
+from .services.ml_service import warmup_ml
 from .core.middleware import AccessLogMiddleware, RequestIdMiddleware
 from .exceptions import register_exception_handlers
 from .logging import configure_logging, get_logger
@@ -26,8 +27,10 @@ logger = get_logger("app")
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    """Startup/shutdown hook'u — DB/Redis/ML init ileride eklenecek."""
+    """Startup/shutdown — ML warmup + Redis cleanup."""
     logger.info("app_starting", env=settings.APP_ENV, version=__version__)
+    if settings.ML_WARMUP_ON_STARTUP:
+        await warmup_ml()
     try:
         yield
     finally:
@@ -60,3 +63,4 @@ app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(fx.router)
 app.include_router(evidence.router)
+app.include_router(analyze.router)
