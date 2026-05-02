@@ -1,1 +1,0 @@
-Kapadokya Hackathon - PomzaDokya
