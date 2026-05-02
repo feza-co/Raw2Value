@@ -1,0 +1,47 @@
+# Raw2Value AI backend bağımlılıkları (pinned).
+# Kaynak: MASTER_BACKEND_GELISTIRME_RAPORU_PART1.md §4.1.
+
+# --- Web framework ---
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+gunicorn==23.0.0
+
+# --- Validation & settings ---
+pydantic==2.9.2
+pydantic-settings==2.6.1
+
+# --- Database ---
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+geoalchemy2==0.16.0
+
+# --- Redis & cache ---
+redis[hiredis]==5.2.0
+
+# --- Auth ---
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.17
+
+# --- HTTP client ---
+httpx==0.28.0
+tenacity==9.0.0
+
+# --- Logging & observability ---
+structlog==24.4.0
+prometheus-fastapi-instrumentator==7.0.0
+sentry-sdk[fastapi]==2.18.0
+
+# --- Rate limiting ---
+slowapi==0.1.9
+
+# --- File storage ---
+boto3==1.35.0
+
+# --- Util ---
+orjson==3.10.11
+python-dotenv==1.0.1
+
+# --- ML paketi (lokal editable; root pyproject.toml zaten install ediyor) ---
+# raw2value-ml @ file:..  ← Docker imajında veya dev kurulumunda root'tan editable

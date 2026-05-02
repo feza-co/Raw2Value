@@ -1,0 +1,30 @@
+# Backend Docker imajına alınmaması gereken dosyalar.
+# DİKKAT: models/*.pkl ve data/reference/*.parquet imaja KOPYALANMALI; burada hariç tutulmaz.
+
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+.tox/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+.git/
+.github/
+.idea/
+.vscode/
+*.md
+!backend/README.md
+!README.md
+tests/
+catboost_info/
