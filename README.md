@@ -1,11 +1,85 @@
-# Raw2Value AI ML Pipeline
+# Raw2Value AI
 
-Kapadokya Hackathon 2026 — Team Feza. Türkiye'nin pomza, perlit ve kabak çekirdeği hammaddelerini en yüksek katma değerli ürüne dönüştürecek route + buyer + lojistik tavsiyesi üreten ML sistemi.
+Türkiye'nin Kapadokya bölgesindeki üç hammaddeyi (pomza, perlit, kabak çekirdeği) işleyip ihraç etmek için karar destek motoru. Hammadde + tonaj + kalite + hedef pazar girilir → en kârlı işleme rotası, beklenen kâr (TRY), CO₂ ayak izi, alıcı eşleşmesi ve Türkçe gerekçe metni döner.
 
-Hedef: Hammadde + lokasyon + miktar girdisinden, 15 işleme rotası arasından net kâr / CO2 / risk dengesi en iyi olan rotayı seçip, alıcı şehir ve taşıma modu önerisini gerekçeli şekilde döndürmek.
+## 4 ana çıktı (deliverables)
 
-## Deliverables
-- `raw2value_ml/` — eğitilmiş model ve inference paketi (FastAPI ile entegre).
-- `models/` — eğitilmiş artefaktlar (`.parquet` model objeleri, `metadata.json`, `model_evidence.json`).
-- `data/reference/` — Master Excel'den üretilmiş referans parquet tabloları.
-- `ml/notebooks/` — uçtan uca eğitim ve değerlendirme defterleri.
+- **Profit Regression Model** (`models/model_profit.pkl`) — `predict_profit(features)`
+- **Route Classifier Model** (`models/model_route.pkl`) — `predict_route(features)`
+- **B2B Match Scorer + Reason Codes + Confidence** (`raw2value_ml/scorer.py`, `reasons.py`, `confidence.py`)
+- **Inference paketi** (`raw2value_ml/`) — `from raw2value_ml import analyze`
+
+## Hızlı kullanım
+
+```python
+from raw2value_ml import analyze, AnalyzePayload, LiveFx
+
+payload = AnalyzePayload(
+    raw_material="pomza",
+    tonnage=150,
+    quality="A",
+    origin_city="Nevşehir",
+    target_country="DE",
+    target_city="Hamburg",
+    transport_mode="kara",
+    priority="max_profit",
+    input_mode="basic",
+    live_fx=LiveFx(usd_try=45.05, eur_try=52.67, last_updated="2026-05-02"),
+)
+
+response = analyze(payload)
+print(response.recommended_route)
+print(response.expected_profit_try)
+print(response.co2_kg)
+for reason in response.reason_codes:
+    print("-", reason.text)
+```
+
+## Eğitim pipeline (sıfırdan)
+
+```bash
+# Linux/Mac
+bash scripts/run_full_pipeline.sh
+
+# Windows
+pwsh scripts/run_full_pipeline.ps1
+```
+
+Veya tek tek notebook çalıştırılabilir:
+
+```bash
+jupyter notebook ml/notebooks/01_data_prep.ipynb
+jupyter notebook ml/notebooks/02_augmentation.ipynb
+jupyter notebook ml/notebooks/03_baselines.ipynb
+jupyter notebook ml/notebooks/04_gbm_benchmark.ipynb
+jupyter notebook ml/notebooks/05_ablation.ipynb
+jupyter notebook ml/notebooks/06_export_artifacts.ipynb
+```
+
+## Kurulum
+
+```bash
+pip install -e .
+```
+
+Python 3.11 gereklidir. Bağımlılıklar `requirements.txt` dosyasında pinli.
+
+## Test
+
+```bash
+pytest ml/tests/ -v
+```
+
+80+ test, hepsi yeşil olmalıdır.
+
+## Performans hedefi
+
+| Operasyon | Hedef |
+|---|---|
+| `analyze()` cold start | <2s |
+| `analyze()` warm | <500ms |
+| `match_buyers()` (top_k=5) | <50ms |
+
+## Sözleşme
+
+Backend tarafıyla `analyze(payload) → AnalyzeResponse` sözleşmesi sabittir. Detay: `docs/master_model_egitim_raporu.md` §11.3.
