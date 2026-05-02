@@ -1,0 +1,72 @@
+{
+  "full_features": {
+    "profit_rmse": 11267473.158872364,
+    "profit_mae": 1962872.4244992018,
+    "profit_r2": 0.9470200229063597,
+    "profit_mape": 17.4654017551933,
+    "route_accuracy": 0.9533333333333334,
+    "route_macro_f1": 0.7816764132553605,
+    "rmse_delta_pct": 0.0,
+    "interpretation": "Tum feature'lar mevcut — referans (baseline). RMSE delta=0% bu senaryodadir."
+  },
+  "without_fx": {
+    "profit_rmse": 3823200.279715984,
+    "profit_mae": 1092206.1927775368,
+    "profit_r2": 0.9939002392593878,
+    "profit_mape": 8.099321477719498,
+    "route_accuracy": 0.9533333333333334,
+    "route_macro_f1": 0.7816764132553605,
+    "rmse_delta_pct": -66.06869858211753,
+    "interpretation": "Kur feature'lari (usd_try, eur_try, fx_scenario_pct) cikarildi. ihracat rotalari (DE/NL alicilari) zayifliyor; modelin TRY-cinsi profit tahmini bozuluyor."
+  },
+  "without_geo": {
+    "profit_rmse": 4905336.5791509515,
+    "profit_mae": 1288529.4556402669,
+    "profit_r2": 0.9899585524194325,
+    "profit_mape": 10.384625430673864,
+    "route_accuracy": 0.96,
+    "route_macro_f1": 0.9224171539961014,
+    "rmse_delta_pct": -56.4646260081096,
+    "interpretation": "Cografi mesafe feature'lari (source-processor-buyer km) cikarildi. Eslesme (matching) bozuluyor; transport maliyeti ve CO2 dolayli olarak gorunmez kaliyor."
+  },
+  "without_carbon": {
+    "profit_rmse": 5384592.845734387,
+    "profit_mae": 1436749.0322982578,
+    "profit_r2": 0.987900583089289,
+    "profit_mape": 11.077110345779472,
+    "route_accuracy": 0.9533333333333334,
+    "route_macro_f1": 0.7742690058479531,
+    "rmse_delta_pct": -52.211176633738965,
+    "interpretation": "Karbon feature'lari (emission_factor, co2_kg) cikarildi. low_carbon priority sinyali kaybolur; karbon onceligi etkisizlesir."
+  },
+  "without_demand": {
+    "profit_rmse": 12338203.355793323,
+    "profit_mae": 2166969.804313403,
+    "profit_r2": 0.9364723851994043,
+    "profit_mape": 9.878533583514114,
+    "route_accuracy": 0.9533333333333334,
+    "route_macro_f1": 0.7816764132553605,
+    "rmse_delta_pct": 9.502842224015707,
+    "interpretation": "Talep feature'lari (demand_score, buyer_sector, buyer_country) cikarildi. Pazar uygunlugu zayiflar; ayni uretici icin tum alici ulkelerine ayni tahmin gelir."
+  },
+  "without_quality": {
+    "profit_rmse": 7206810.364616867,
+    "profit_mae": 1467711.6607711685,
+    "profit_r2": 0.9783257094574321,
+    "profit_mape": 8.230982059062072,
+    "route_accuracy": 0.96,
+    "route_macro_f1": 0.7872147889599896,
+    "rmse_delta_pct": -36.038806012668445,
+    "interpretation": "Kalite feature'lari (grade, match_score, moisture, purity) cikarildi. Premium pazar (DE/NL) ile yerel pazar (TR) arasindaki ayrim kayboluyor."
+  },
+  "without_cost": {
+    "profit_rmse": 8359239.928534388,
+    "profit_mae": 1872594.7728656007,
+    "profit_r2": 0.9708396801661824,
+    "profit_mape": 10.433909915392523,
+    "route_accuracy": 0.9533333333333334,
+    "route_macro_f1": 0.7742690058479531,
+    "rmse_delta_pct": -25.81087338156152,
+    "interpretation": "Maliyet feature'lari (processing_cost, packaging, transport_cost) cikarildi. Kar tahmini onemli olcude bozulur; yuksek-marjinli rotalar ile dusuk-marjinliler ayirt edilemez."
+  }
+}
