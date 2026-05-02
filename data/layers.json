@@ -8,7 +8,7 @@
       34.85
     ]
   },
-  "plan": "B",
+  "plan": "A",
   "layers": [
     {
       "id": "s2_rgb",
@@ -23,12 +23,12 @@
     {
       "id": "aster_qi",
       "name": "ASTER Ninomiya QI (B11\u00b2/(B10\u00b7B12))",
-      "path": "data/ard/aster_qi.tif",
+      "path": "data/layers/aster_qi_20m.tif",
       "owner": "P4",
       "task": "T4.6",
       "type": "raster_continuous",
       "colormap": "viridis",
-      "default_visible": true,
+      "default_visible": false,
       "opacity": 0.7
     },
     {
@@ -49,7 +49,7 @@
     {
       "id": "unesco_buffer",
       "name": "UNESCO G\u00f6reme buffer (1000 m)",
-      "path": "data/aoi/wdpa_goreme_buffer.gpkg",
+      "path": "data/labels/wdpa_buffer.gpkg",
       "owner": "P5",
       "task": "T5.2",
       "type": "vector_polygon",
@@ -62,16 +62,30 @@
       "default_visible": true
     },
     {
-      "id": "p3_raw",
-      "name": "P3 RAW pomza probability (Plan B \u2014 f\u00fczyon yok)",
-      "path": "data/ard/p3_raw_prob.tif",
-      "owner": "P3",
-      "task": "T3.10",
+      "id": "final_confidence",
+      "name": "P4 FUSED final_confidence (T5.13 ana katman)",
+      "path": "data/layers/final_confidence.tif",
+      "owner": "P4",
+      "task": "T4.12",
       "type": "raster_continuous",
       "colormap": "magma",
       "default_visible": true,
       "opacity": 0.75,
-      "fallback_for": "final_confidence"
+      "critical": true
+    },
+    {
+      "id": "agriculture_mask",
+      "name": "Agriculture / cropland mask (ESA WorldCover class 40)",
+      "path": "data/labels/agriculture_mask.tif",
+      "owner": "P2",
+      "task": "T2.x",
+      "type": "raster_categorical",
+      "categories": {
+        "0": "not cropland",
+        "1": "cropland"
+      },
+      "default_visible": false,
+      "opacity": 0.45
     }
   ],
   "annotations": {

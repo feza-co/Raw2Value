@@ -8,12 +8,14 @@ Tarih : S2 ile eslestirilmis yaz 2024 penceresi
 """
 import ee
 
+from aoi_config import bbox_text, ee_rectangle
+
 PROJECT = "pomza-495012"
 # WHY: Service account Drive kotası yok. earthengine authenticate ile
 # kişisel credentials kullanılır → Drive'a export çalışır.
 ee.Initialize(project=PROJECT)
 
-AOI_BBOX = ee.Geometry.Rectangle([34.70, 38.65, 35.00, 38.85])
+AOI_BBOX = ee_rectangle(ee)
 DATE_START = "2024-06-01"
 DATE_END   = "2024-09-30"
 
@@ -55,6 +57,7 @@ col = (
 
 count = col.size().getInfo()
 print(f"S1 GRD sahneleri (IW, VV+VH, Lee+dB): {count}")
+print(f"AOI: {bbox_text()}")
 
 # Median composite — sezonluk degisimi ortalar, speckle varyansi azaltir
 composite = col.median().clip(AOI_BBOX).toFloat()

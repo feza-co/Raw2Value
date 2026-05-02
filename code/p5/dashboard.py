@@ -13,6 +13,8 @@ P5 — T5.12: Streamlit dashboard (Pomzadoya hackathon, Modül A v2).
 from __future__ import annotations
 
 import json
+import importlib.util
+import sys
 from pathlib import Path
 
 import folium
@@ -27,6 +29,7 @@ KPI_JSON = PROJECT_ROOT / "reports" / "kpi.json"
 RED_FLAGS_JSON = PROJECT_ROOT / "reports" / "red_flags.json"
 GIF_PATH = PROJECT_ROOT / "data" / "temporal" / "landsat_timelapse.gif"
 HISTORICAL_SUMMARY = PROJECT_ROOT / "reports" / "historical_pomza_summary.json"
+RULES_HELPER = PROJECT_ROOT / "code" / "p5" / "11_cave2cloud_rules.py"
 
 AVANOS_CENTER = (38.7167, 34.85)
 
@@ -38,6 +41,16 @@ def _load_json(p: Path, default=None):
         except Exception:
             return default
     return default
+
+
+def _load_rules_helper():
+    spec = importlib.util.spec_from_file_location("cave2cloud_rules", RULES_HELPER)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Rules helper yuklenemedi: {RULES_HELPER}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
 
 
 def _make_basemap() -> folium.Map:
@@ -206,13 +219,73 @@ def page_operasyonel():
         st.info("Red flag raporu yok (03_red_flag_logic.py).")
 
 
+def page_cave2cloud_uyumu():
+    st.header("4) Cave2Cloud Uyumu")
+    st.caption("Zorunlu kurallar: OSRM/OSM rota, CO2 hesabı, TCMB EVDS canlı kur.")
+
+    helper = _load_rules_helper()
+
+    st.subheader("Pomza taşıma karbon ve kur hesabı")
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        origin_lat = st.number_input("Saha lat", value=38.66883, format="%.6f")
+        origin_lon = st.number_input("Saha lon", value=34.763343, format="%.6f")
+    with c2:
+        dest_lat = st.number_input("Fabrika lat", value=38.7167, format="%.6f")
+        dest_lon = st.number_input("Fabrika lon", value=34.85, format="%.6f")
+    with c3:
+        tonnage = st.number_input("Yük (ton)", min_value=1.0, value=25.0, step=1.0)
+        mode_label = st.selectbox("Taşıma modu", ["road", "rail", "sea", "air"], index=0)
+    with c4:
+        pair = st.selectbox("Kur çifti", ["USD/TRY", "EUR/TRY"], index=0)
+        carbon_price = st.number_input("Karbon fiyatı ($/tCO2)", min_value=0.0, value=75.0, step=5.0)
+
+    if st.button("Dinamik hesapla", type="primary"):
+        try:
+            result = helper.compute_demo_decision(
+                origin_lat,
+                origin_lon,
+                dest_lat,
+                dest_lon,
+                tonnage,
+                mode_label,
+                pair,
+                carbon_price,
+            )
+            route = result["route"]
+            fx = result["fx"]
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric("Rota mesafesi", f"{route['distance_km']:.1f} km")
+            m2.metric("Süre", f"{route['duration_min']:.0f} dk")
+            m3.metric("CO2", f"{result['co2_kg']:.1f} kg")
+            if result["carbon_cost_try"] is not None:
+                m4.metric("Karbon maliyeti", f"{result['carbon_cost_try']:.0f} TL")
+                st.success(f"TCMB EVDS kur ({pair}) kullanıldı. Güncelleme: {fx['updated_at']}")
+            else:
+                m4.metric("Karbon maliyeti", "EVDS anahtarı yok")
+                st.error(
+                    "TCMB_EVDS_API_KEY ortam değişkeni yok. Kural 2 için sunum öncesi "
+                    "EVDS anahtarı tanımlanmalı; hardcoded kur kullanılmadı."
+                )
+            st.json(result)
+        except Exception as exc:
+            st.error(f"Dinamik hesap başarısız: {exc}")
+
+    st.divider()
+    st.markdown(
+        "- Kural 1: rota mesafesi OSRM/OpenStreetMap ile dinamik hesaplanır ve CO2'ye çevrilir.\n"
+        "- Kural 2: kur TCMB EVDS'ten `TCMB_EVDS_API_KEY` ile çekilir; anahtar yoksa kullanıcı uyarılır.\n"
+        "- Kural 3: rota mesafesi ve süre, karbon hesabından ayrı bir coğrafi işlev olarak gösterilir."
+    )
+
+
 def main():
     st.set_page_config(page_title="Pomzadoya — Modül A v2", layout="wide", page_icon="⛏️")
     st.sidebar.title("Pomzadoya — Modül A v2")
     st.sidebar.caption("P5 dashboard")
     page = st.sidebar.radio(
         "Sayfa",
-        ("1) Saha Tarama", "2) AI Analizi", "3) Operasyonel Karar"),
+        ("1) Saha Tarama", "2) AI Analizi", "3) Operasyonel Karar", "4) Cave2Cloud Uyumu"),
     )
     st.sidebar.divider()
     st.sidebar.write("Akademik referanslar:")
@@ -228,8 +301,10 @@ def main():
         page_saha_tarama()
     elif page.startswith("2"):
         page_ai_analizi()
-    else:
+    elif page.startswith("3"):
         page_operasyonel()
+    else:
+        page_cave2cloud_uyumu()
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ Karar referansları:
 
 Kullanım:
     python 02_aster_l1b_download.py \
-        --aoi 34.7,38.65,34.95,38.78 \
+        --aoi 34.60,38.40,35.00,38.90 \
         --start 2024-04-01 --end 2024-09-30 \
         --max-cloud 20 \
         --out data/aster/
@@ -37,6 +37,10 @@ from typing import Iterable
 
 import requests
 from requests.auth import HTTPBasicAuth
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 CMR_GRANULE_ENDPOINT = "https://cmr.earthdata.nasa.gov/search/granules.json"
 SHORT_NAMES_PRIORITY = ["AST_L1T", "AST_L1B"]  # L1T (geocoded) öncelikli
@@ -168,8 +172,8 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     p.add_argument(
         "--aoi",
-        default="34.70,38.65,34.95,38.78",
-        help="bbox: west,south,east,north (Avanos default)",
+        default="34.60,38.40,35.00,38.90",
+        help="bbox: west,south,east,north (Avanos/Nevsehir extended default)",
     )
     p.add_argument("--start", default="2024-04-01")
     p.add_argument("--end", default="2024-09-30")

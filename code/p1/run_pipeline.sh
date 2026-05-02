@@ -58,16 +58,16 @@ echo "  s1_vvvh_avanos.tif → data/s1_stack/"
 echo "[P1][T1.6] DEM + slope GEE export task tetikleniyor..."
 python code/p1/06_dem_slope.py
 echo "[P1][T1.6] GEE task baslatildi. Drive'dan:"
-echo "  dem_avanos.tif → data/dem.tif"
-echo "  slope_avanos.tif → data/slope.tif"
+echo "  dem_avanos.tif → data/dem/dem_avanos.tif"
+echo "  slope_avanos.tif → data/dem/slope_avanos.tif"
 
 # ---------------------------------------------------------------------------
 # T1.7 — 17-kanal Full ARD co-registration (yerel, T1.4+T1.5+T1.6 indikten sonra)
 # ---------------------------------------------------------------------------
 ARD_S2="data/ard/s2_ard_20m.tif"
 S1_STACK="data/s1_stack/s1_vvvh_avanos.tif"
-DEM="data/dem.tif"
-SLOPE="data/slope.tif"
+DEM="data/dem/dem_avanos.tif"
+SLOPE="data/dem/slope_avanos.tif"
 
 if [ -f "$ARD_S2" ] && [ -f "$S1_STACK" ] && [ -f "$DEM" ] && [ -f "$SLOPE" ]; then
   echo "[P1][T1.7] Full ARD 17-kanal co-registration basliyor..."

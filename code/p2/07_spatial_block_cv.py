@@ -151,13 +151,13 @@ def try_verde(tiles, n_folds):
     except ImportError:
         return None
 
-    coords = (
+    coords = np.column_stack([
         np.array([t["cx"] for t in tiles]),
         np.array([t["cy"] for t in tiles]),
-    )
+    ])
     # Spacing default — AOI capina gore 5 blok x 5 blok
-    span_x = coords[0].max() - coords[0].min()
-    span_y = coords[1].max() - coords[1].min()
+    span_x = coords[:, 0].max() - coords[:, 0].min()
+    span_y = coords[:, 1].max() - coords[:, 1].min()
     spacing = max(span_x, span_y) / 5.0  # 5x5 grid
 
     bkfold = vd.BlockKFold(spacing=spacing, n_splits=n_folds, shuffle=True, random_state=42)
