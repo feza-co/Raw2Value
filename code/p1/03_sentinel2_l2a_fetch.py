@@ -17,7 +17,7 @@ import ee
 from aoi_config import bbox_text, ee_rectangle
 
 # WHY: GEE auth disarida yapilir (01_gee_setup.ipynb), burada Initialize varsayalir.
-ee.Initialize()
+ee.Initialize(project="pomza-495012")
 
 AOI_BBOX = ee_rectangle(ee)
 

@@ -36,7 +36,7 @@ LAYER_SPECS = [
     {
         "id": "aster_qi",
         "name": "ASTER Ninomiya QI (B11²/(B10·B12))",
-        "path": "data/ard/aster_qi.tif",
+        "path": "data/layers/aster_qi_20m.tif",
         "owner": "P4",
         "task": "T4.6",
         "type": "raster_continuous",
@@ -58,7 +58,7 @@ LAYER_SPECS = [
     {
         "id": "unesco_buffer",
         "name": "UNESCO Göreme buffer (1000 m)",
-        "path": "data/aoi/wdpa_goreme_buffer.gpkg",
+        "path": "data/labels/wdpa_buffer.gpkg",
         "owner": "P5",
         "task": "T5.2",
         "type": "vector_polygon",
@@ -68,7 +68,7 @@ LAYER_SPECS = [
     {
         "id": "final_confidence",
         "name": "P4 FUSED final_confidence (T5.13 ana katman)",
-        "path": "data/ard/final_confidence.tif",
+        "path": "data/layers/final_confidence.tif",
         "owner": "P4",
         "task": "T4.12",
         "type": "raster_continuous",
@@ -84,7 +84,7 @@ PLAN_B_LAYERS = [
     {
         "id": "p3_raw",
         "name": "P3 RAW pomza probability (Plan B — füzyon yok)",
-        "path": "data/ard/p3_raw_prob.tif",
+        "path": "data/inference/raw_prob.tif",
         "owner": "P3",
         "task": "T3.10",
         "type": "raster_continuous",
@@ -94,6 +94,18 @@ PLAN_B_LAYERS = [
         "fallback_for": "final_confidence",
     },
 ]
+
+AGRICULTURE_LAYER = {
+    "id": "agriculture_mask",
+    "name": "Agriculture / cropland mask (ESA WorldCover class 40)",
+    "path": "data/labels/agriculture_mask.tif",
+    "owner": "P2",
+    "task": "T2.x",
+    "type": "raster_categorical",
+    "categories": {"0": "not cropland", "1": "cropland"},
+    "default_visible": False,
+    "opacity": 0.45,
+}
 
 
 def build_manifest(plan_b: bool = False) -> dict:
@@ -105,6 +117,7 @@ def build_manifest(plan_b: bool = False) -> dict:
             if q["id"] == "aster_qi":
                 q["default_visible"] = True
         layers.extend(PLAN_B_LAYERS)
+    layers.append(AGRICULTURE_LAYER)
     return {
         "version": "v2",
         "aoi": {"name": "Avanos", "epsg": 32636, "center_ll": [38.7167, 34.85]},
@@ -122,7 +135,7 @@ def build_manifest(plan_b: bool = False) -> dict:
 def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     # Plan A varsayılan; final_confidence dosyası yoksa Plan B'ye otomatik düş.
-    final_conf = PROJECT_ROOT / "data" / "ard" / "final_confidence.tif"
+    final_conf = PROJECT_ROOT / "data" / "layers" / "final_confidence.tif"
     plan_b = not final_conf.exists()
     if plan_b:
         print("[T5.13] UYARI: final_confidence.tif yok → Plan B (RAW + ayrı ASTER QI).")
