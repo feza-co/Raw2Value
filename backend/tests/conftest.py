@@ -1,20 +1,23 @@
 """Pytest paylaşılan fixture'lar.
 
-Postgres-only tipler (UUID, ARRAY, JSONB) SQLite'da bulunmadığı için
-DB-bağımlı testler `requires_postgres` ile işaretlenmiş ve
-`TEST_DATABASE_URL` env değeri verilmediğinde otomatik skip edilir.
+Auth testleri sqlite (aiosqlite) üzerinde koşar — `users` ve `organizations`
+tabloları portable tipler kullandığı için yeterli.
 
-Live Postgres'le test koşmak için:
+DB-yoğun testler (analysis_history JSONB, ARRAY tipleri) `requires_postgres`
+ile işaretlenir ve `TEST_DATABASE_URL` set edilmediğinde skip olur.
+
+Live Postgres'le tüm testleri koşmak için:
     set TEST_DATABASE_URL=postgresql+asyncpg://test:test@localhost:5432/test
-    pytest backend/tests/
 """
 from __future__ import annotations
 
 import os
 
-# Test ortamı için minimal env override (Settings instantiation hatasını önler).
+# Test ortamı için minimal env override.
 os.environ.setdefault("JWT_SECRET", "test-secret-min-32-chars-needed-here")
 os.environ.setdefault("APP_ENV", "test")
+os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 
 import pytest
 import pytest_asyncio
@@ -35,8 +38,8 @@ requires_postgres = pytest.mark.skipif(
 
 
 @pytest_asyncio.fixture
-async def test_engine():
-    """Test ömürlü async engine. Sadece TEST_DATABASE_URL ile aktif."""
+async def pg_engine():
+    """Live Postgres engine (analysis/profiles testleri için)."""
     url = _test_db_url()
     if url is None:
         pytest.skip("TEST_DATABASE_URL set değil")
@@ -51,16 +54,61 @@ async def test_engine():
 
 
 @pytest_asyncio.fixture
-async def test_db(test_engine) -> AsyncSession:
-    """Transaction-rolled-back AsyncSession (her test taze)."""
-    Session = async_sessionmaker(test_engine, expire_on_commit=False)
+async def pg_db(pg_engine) -> AsyncSession:
+    """Live Postgres session."""
+    Session = async_sessionmaker(pg_engine, expire_on_commit=False)
     async with Session() as session:
         yield session
 
 
 @pytest_asyncio.fixture
+async def auth_engine():
+    """Auth testleri için minimal sqlite — sadece users + organizations."""
+    from app.db.models.organization import Organization
+    from app.db.models.user import User
+
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    async with engine.begin() as conn:
+        await conn.run_sync(
+            lambda sync_conn: Base.metadata.create_all(
+                sync_conn, tables=[Organization.__table__, User.__table__]
+            )
+        )
+    yield engine
+    await engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def auth_session_maker(auth_engine):
+    return async_sessionmaker(auth_engine, expire_on_commit=False)
+
+
+@pytest_asyncio.fixture
+async def auth_client(auth_session_maker):
+    """Test için DB dependency'sini sqlite session'a override eden httpx client."""
+    from app.db.session import get_db
+    from app.main import app
+
+    async def _override():
+        async with auth_session_maker() as session:
+            try:
+                yield session
+            finally:
+                await session.close()
+
+    app.dependency_overrides[get_db] = _override
+    try:
+        async with AsyncClient(
+            transport=ASGITransport(app=app), base_url="http://test"
+        ) as ac:
+            yield ac
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+
+
+@pytest_asyncio.fixture
 async def async_client():
-    """ASGI üzerinden uygulamayı çağıran httpx client."""
+    """ASGI üzerinden uygulamayı çağıran httpx client (DB override yok)."""
     from app.main import app
 
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
