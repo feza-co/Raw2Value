@@ -13,8 +13,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
 from . import __version__
-from .api import auth, health
+from .api import auth, fx, health
 from .config import settings
+from .core.cache import close_redis
 from .core.middleware import AccessLogMiddleware, RequestIdMiddleware
 from .exceptions import register_exception_handlers
 from .logging import configure_logging, get_logger
@@ -27,8 +28,11 @@ logger = get_logger("app")
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     """Startup/shutdown hook'u — DB/Redis/ML init ileride eklenecek."""
     logger.info("app_starting", env=settings.APP_ENV, version=__version__)
-    yield
-    logger.info("app_stopping")
+    try:
+        yield
+    finally:
+        logger.info("app_stopping")
+        await close_redis()
 
 
 app = FastAPI(
@@ -54,3 +58,4 @@ register_exception_handlers(app)
 
 app.include_router(health.router)
 app.include_router(auth.router)
+app.include_router(fx.router)

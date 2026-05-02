@@ -1,0 +1,10 @@
+{
+  "totalCount": 5,
+  "items": [
+    {"Tarih": "29-04-2026", "TP_DK_USD_A_YTL": "44.92", "TP_DK_EUR_A_YTL": "52.31"},
+    {"Tarih": "30-04-2026", "TP_DK_USD_A_YTL": "44.98", "TP_DK_EUR_A_YTL": "52.40"},
+    {"Tarih": "01-05-2026", "TP_DK_USD_A_YTL": null, "TP_DK_EUR_A_YTL": null},
+    {"Tarih": "02-05-2026", "TP_DK_USD_A_YTL": null, "TP_DK_EUR_A_YTL": null},
+    {"Tarih": "03-05-2026", "TP_DK_USD_A_YTL": "45.05", "TP_DK_EUR_A_YTL": "52.67"}
+  ]
+}
