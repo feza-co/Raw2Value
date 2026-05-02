@@ -139,3 +139,5 @@ cython_debug/
 *.pkl
 .idea/
 .vscode/
+.claude/
+catboost_info/
