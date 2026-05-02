@@ -1,0 +1,59 @@
+{
+  "version": "v1.0",
+  "examples": [
+    {
+      "name": "basic_pomza_to_germany",
+      "description": "Pomza, 150 ton, A kalite, Nevşehir → Hamburg kara, max_profit",
+      "request": {
+        "raw_material": "pomza",
+        "tonnage": 150,
+        "quality": "A",
+        "origin_city": "Nevşehir",
+        "target_country": "DE",
+        "target_city": "Hamburg",
+        "transport_mode": "kara",
+        "priority": "max_profit",
+        "input_mode": "basic",
+        "fx_scenario_pct": 0.0,
+        "cost_scenario_pct": 0.0,
+        "live_fx": {"usd_try": 45.05, "eur_try": 52.67, "last_updated": "2026-05-02"}
+      },
+      "response_shape": {
+        "recommended_route": "<string, 15 known routes from one of all_known_routes>",
+        "route_alternatives": "List[RouteOption], length 3",
+        "expected_profit_try": "<float, TRY>",
+        "value_uplift_pct": "<float>",
+        "co2_kg": "<float, tonnage * total_distance_km * emission_factor>",
+        "co2_tonnes": "<float, co2_kg / 1000>",
+        "match_results": "List[MatchResult], length <= 5",
+        "reason_codes": "List[ReasonCode], length 3 (Türkçe)",
+        "confidence": {"data_confidence": "0-100", "model_confidence": "0-100", "overall": "0-100", "warnings": "List[str]"},
+        "feature_importance": "List[FeatureImportance], top-10",
+        "warnings": "List[str]"
+      }
+    },
+    {
+      "name": "advanced_kabak_to_istanbul",
+      "description": "Kabak çekirdeği, 30 ton, advanced mode (moisture/purity dolu), İstanbul iç piyasa",
+      "request": {
+        "raw_material": "kabak_cekirdegi",
+        "tonnage": 30,
+        "quality": "A",
+        "origin_city": "Acıgöl",
+        "target_country": "TR",
+        "target_city": "İstanbul",
+        "transport_mode": "kara",
+        "priority": "max_profit",
+        "input_mode": "advanced",
+        "moisture_pct": 8.0,
+        "purity_pct": 98.0,
+        "particle_size_class": "fine",
+        "fx_scenario_pct": 0.0,
+        "cost_scenario_pct": 0.0,
+        "live_fx": {"usd_try": 45.05, "eur_try": 52.67, "last_updated": "2026-05-02"}
+      },
+      "response_shape": "Same as basic_pomza_to_germany.response_shape; recommended_route should be one of kabak_cekirdegi_* routes."
+    }
+  ],
+  "notes": "Bu örnekler raw2value_ml.analyze() çağrısı için referans niteliğindedir. Gerçek response analyze() runtime'da üretilir."
+}
