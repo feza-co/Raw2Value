@@ -63,15 +63,30 @@ async def pg_db(pg_engine) -> AsyncSession:
 
 @pytest_asyncio.fixture
 async def auth_engine():
-    """Auth testleri için minimal sqlite — sadece users + organizations."""
+    """Auth + processors testleri için sqlite — users, orgs, profiles.
+
+    `analysis_history` (JSONB) sqlite'a oturmadığı için hariç tutuldu;
+    o tabloyu kullanan testler `requires_postgres` ile işaretlenir.
+    """
+    from app.db.models.analysis import AnalysisRecord
     from app.db.models.organization import Organization
+    from app.db.models.profiles import BuyerProfile, ProcessorProfile, ProducerProfile
     from app.db.models.user import User
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    sqlite_safe_tables = [
+        Organization.__table__,
+        User.__table__,
+        ProducerProfile.__table__,
+        ProcessorProfile.__table__,
+        BuyerProfile.__table__,
+    ]
+    # AnalysisRecord JSONB içerdiği için sqlite'da yaratmıyoruz.
+    _ = AnalysisRecord
     async with engine.begin() as conn:
         await conn.run_sync(
             lambda sync_conn: Base.metadata.create_all(
-                sync_conn, tables=[Organization.__table__, User.__table__]
+                sync_conn, tables=sqlite_safe_tables
             )
         )
     yield engine
