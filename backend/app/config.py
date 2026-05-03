@@ -73,6 +73,11 @@ class Settings(BaseSettings):
     S3_SECRET_KEY: str = "minioadmin"
     S3_BUCKET: str = "raw2value-uploads"
     S3_REGION: str = "us-east-1"
+    UPLOAD_DIR: str = "./uploads"
+    MAX_UPLOAD_SIZE_MB: int = 10
+    UPLOAD_ALLOWED_MIME: str = (
+        "application/pdf,image/jpeg,image/png"
+    )
 
     # RATE LIMIT
     RATE_LIMIT_ENABLED: bool = True
@@ -97,6 +102,19 @@ class Settings(BaseSettings):
     def cors_origins_list(self) -> list[str]:
         """`CORS_ORIGINS` string'ini whitelist listesine dönüştürür."""
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+
+    @property
+    def upload_allowed_mime_set(self) -> frozenset[str]:
+        """MIME beyaz listesi — virgülle ayrılmış string'ten."""
+        return frozenset(
+            m.strip().lower()
+            for m in self.UPLOAD_ALLOWED_MIME.split(",")
+            if m.strip()
+        )
+
+    @property
+    def max_upload_size_bytes(self) -> int:
+        return self.MAX_UPLOAD_SIZE_MB * 1024 * 1024
 
     @property
     def is_production(self) -> bool:
