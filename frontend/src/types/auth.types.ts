@@ -10,6 +10,11 @@ export interface CapabilityFlags {
 export interface OrganizationOut {
   id: string
   name: string
+  city?: string | null
+  district?: string | null
+  country?: string | null
+  lat?: number | null
+  lon?: number | null
   capabilities: CapabilityFlags
 }
 

@@ -1,14 +1,20 @@
 import { create } from 'zustand'
-import type { AnalyzeResponseOut } from '@/types/analyze.types'
+import type { AnalyzeRequest, AnalyzeResponseOut } from '@/types/analyze.types'
 
 interface CockpitState {
   lastResult: AnalyzeResponseOut | null
-  setLastResult: (result: AnalyzeResponseOut) => void
+  lastPayload: AnalyzeRequest | null
+  setLastResult: (result: AnalyzeResponseOut, payload?: AnalyzeRequest) => void
   clearResult: () => void
 }
 
 export const useCockpitStore = create<CockpitState>((set) => ({
   lastResult: null,
-  setLastResult: (result) => set({ lastResult: result }),
-  clearResult: () => set({ lastResult: null }),
+  lastPayload: null,
+  setLastResult: (result, payload) =>
+    set((s) => ({
+      lastResult: result,
+      lastPayload: payload ?? s.lastPayload,
+    })),
+  clearResult: () => set({ lastResult: null, lastPayload: null }),
 }))

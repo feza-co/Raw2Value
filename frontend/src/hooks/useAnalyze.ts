@@ -8,8 +8,8 @@ export const useAnalyze = () => {
 
   return useMutation({
     mutationFn: analyzeService.analyze,
-    onSuccess: (data) => {
-      setLastResult(data)
+    onSuccess: (data, variables) => {
+      setLastResult(data, variables)
       queryClient.invalidateQueries({ queryKey: ['history'] })
     },
   })

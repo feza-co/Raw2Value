@@ -1,8 +1,9 @@
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { analyzeSchema, type AnalyzeFormValues } from '@/utils/validators'
 import { useAnalyze } from '@/hooks/useAnalyze'
+import { useAuth } from '@/hooks/useAuth'
 import MaterialPicker from '@/components/domain/MaterialPicker'
 import { QUALITY_GRADES, TRANSPORT_MODES, TARGET_COUNTRIES, PRIORITIES } from '@/utils/constants'
 import { clsx } from 'clsx'
@@ -11,14 +12,19 @@ import type { RawMaterial } from '@/types/analyze.types'
 export default function AnalysisForm() {
   const [advanced, setAdvanced] = useState(false)
   const { mutate: analyze, isPending } = useAnalyze()
+  const { user } = useAuth()
+  const orgCity = user?.organization?.city ?? ''
 
-  const { register, handleSubmit, control, formState: { errors } } = useForm<AnalyzeFormValues>({
+  const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<AnalyzeFormValues>({
     resolver: zodResolver(analyzeSchema),
     defaultValues: {
       raw_material: 'pomza',
+      tonnage: 150,
       quality: 'A',
-      transport_mode: 'deniz',
+      origin_city: orgCity,
       target_country: 'DE',
+      target_city: 'Hamburg',
+      transport_mode: 'kara',
       priority: 'max_profit',
       input_mode: 'basic',
       fx_scenario_pct: 0,
@@ -26,8 +32,17 @@ export default function AnalysisForm() {
     },
   })
 
+  // Org bilgisi geç gelirse origin_city'yi auto-fill et (kullanıcı doldurmadıysa).
+  useEffect(() => {
+    if (orgCity) setValue('origin_city', orgCity, { shouldDirty: false })
+  }, [orgCity, setValue])
+
   const onSubmit = (values: AnalyzeFormValues) => {
-    analyze({ ...values, input_mode: advanced ? 'advanced' : 'basic' })
+    analyze({
+      ...values,
+      input_mode: advanced ? 'advanced' : 'basic',
+      target_city: values.target_city || undefined,
+    })
   }
 
   return (

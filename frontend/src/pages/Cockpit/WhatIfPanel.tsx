@@ -6,15 +6,15 @@ import type { WhatIfScenario } from '@/types/analyze.types'
 import { toast } from 'react-hot-toast'
 
 export default function WhatIfPanel() {
-  const lastResult = useCockpitStore((s) => s.lastResult)
+  const lastPayload = useCockpitStore((s) => s.lastPayload)
   const { mutate: runWhatIf, isPending, data } = useWhatIf()
   const [scenarios, setScenarios] = useState<WhatIfScenario[]>([
-    { name: 'Baz', fx_scenario_pct: 0 },
-    { name: '+10% Kur', fx_scenario_pct: 0.1 },
-    { name: '-10% Kur', fx_scenario_pct: -0.1 },
+    { name: 'Kur -%20', fx_scenario_pct: -0.2 },
+    { name: 'Kur sabit', fx_scenario_pct: 0 },
+    { name: 'Kur +%20', fx_scenario_pct: 0.2 },
   ])
 
-  if (!lastResult) {
+  if (!lastPayload) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-slate-50">
         <div className="w-20 h-20 bg-white shadow-sm border border-slate-100 rounded-full flex items-center justify-center mb-6">
@@ -32,7 +32,7 @@ export default function WhatIfPanel() {
 
   const run = () => {
     runWhatIf(
-      { base_payload: lastResult as never, scenarios },
+      { base_payload: lastPayload, scenarios },
       { onError: () => toast.error('What-If analizi başarısız.') },
     )
   }

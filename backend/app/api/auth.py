@@ -31,6 +31,11 @@ def _serialize_user(user: User) -> UserOut:
         org_out = OrganizationOut(
             id=org.id,
             name=org.name,
+            city=org.city,
+            district=org.district,
+            country=org.country,
+            lat=float(org.lat) if org.lat is not None else None,
+            lon=float(org.lon) if org.lon is not None else None,
             capabilities=CapabilityFlags(
                 can_supply_raw_material=org.can_supply_raw_material,
                 can_process_material=org.can_process_material,

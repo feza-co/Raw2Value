@@ -1,13 +1,55 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { useMemo } from 'react'
 import { useCockpitStore } from '@/store/cockpit.store'
+import { useAuth } from '@/hooks/useAuth'
+import { useProcessors } from '@/hooks/useProcessors'
 import ProfitDisplay from '@/components/domain/ProfitDisplay'
 import ConfidenceRing from '@/components/domain/ConfidenceRing'
 import Co2Gauge from '@/components/domain/Co2Gauge'
 import RouteAlternatives from '@/components/domain/RouteAlternatives'
 import BuyerMatchList from '@/components/domain/BuyerMatchList'
+import RouteMap from '@/components/domain/RouteMap'
+import ProcessorCard from '@/components/domain/ProcessorCard'
+import { lookupCityCoords, COUNTRY_DEFAULT_CITY } from '@/utils/constants'
 
 export default function ResultPanel() {
   const result = useCockpitStore((s) => s.lastResult)
+  const lastPayload = useCockpitStore((s) => s.lastPayload)
+  const { user } = useAuth()
+
+  // Origin: org koordinatı varsa onu, yoksa şehir lookup
+  const origin = useMemo(() => {
+    const org = user?.organization
+    if (org?.lat != null && org?.lon != null) {
+      return { lat: org.lat, lon: org.lon, label: org.city ?? org.name }
+    }
+    if (lastPayload?.origin_city) {
+      const c = lookupCityCoords(lastPayload.origin_city)
+      if (c) return { lat: c.lat, lon: c.lon, label: lastPayload.origin_city }
+    }
+    return null
+  }, [user, lastPayload])
+
+  // Destination: target_city → ülke default şehri lookup
+  const destination = useMemo(() => {
+    if (!lastPayload) return null
+    const city = lastPayload.target_city
+      || COUNTRY_DEFAULT_CITY[lastPayload.target_country]
+    const c = lookupCityCoords(city)
+    if (!c) return null
+    return { lat: c.lat, lon: c.lon, label: city }
+  }, [lastPayload])
+
+  const { data: nearby } = useProcessors({
+    lat: origin?.lat,
+    lon: origin?.lon,
+    radius_km: 100,
+    material: lastPayload?.raw_material,
+    enabled: Boolean(result && origin),
+  })
+
+  const processors = nearby?.results ?? []
+  const topProcessor = processors[0] ?? null
 
   return (
     <div className="h-full overflow-y-auto p-8 bg-slate-50">
@@ -51,6 +93,45 @@ export default function ResultPanel() {
               <div className="flex-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <Co2Gauge co2Kg={result.co2_kg} />
               </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+              <div className="flex items-center justify-between mb-5">
+                <p className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest">
+                  Rota Haritası
+                </p>
+                <p className="font-mono text-[11px] text-slate-400">
+                  {origin?.label ?? '—'} → {topProcessor?.name ?? 'işleyici aranıyor'} → {destination?.label ?? '—'}
+                </p>
+              </div>
+              <RouteMap
+                origin={origin}
+                destination={destination}
+                processors={processors}
+                selectedProcessor={topProcessor}
+              />
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+              <div className="flex items-center justify-between mb-6">
+                <p className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest">
+                  Yakındaki İşleyiciler (100 km)
+                </p>
+                <p className="font-mono text-[11px] text-slate-400">
+                  {processors.length} tesis · K3 (Haversine + bbox)
+                </p>
+              </div>
+              {processors.length === 0 ? (
+                <p className="font-body text-sm text-slate-400">
+                  Bu materyal için 100 km içinde işleyici bulunamadı.
+                </p>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {processors.slice(0, 4).map((p) => (
+                    <ProcessorCard key={p.id} processor={p} />
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
