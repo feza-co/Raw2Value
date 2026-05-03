@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Raw2Value AI | Dashboard</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #FAF9F6;
+      color: #2D323A;
+    }
+    
+    /* Custom Circular Progress Bar using CSS */
+    .radial-progress {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: conic-gradient(#6B8E78 92%, rgba(255,255,255,0.1) 0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .radial-progress::before {
+      content: "";
+      position: absolute;
+      width: 84px;
+      height: 84px;
+      background-color: #2D323A; /* Matches bg-r2v-charcoal */
+      border-radius: 50%;
+    }
+    .radial-progress-text {
+      position: relative;
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: white;
+    }
+  </style>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'r2v-base': '#FAF9F6',
+            'r2v-surface': '#EFEBE6',
+            'r2v-charcoal': '#2D323A',
+            'r2v-earth': '#4A3C31',
+            'r2v-terracotta': '#C05C41',
+            'r2v-green': '#6B8E78'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-r2v-base text-r2v-charcoal flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-72 bg-white border-r border-r2v-charcoal/5 flex flex-col hidden md:flex z-20">
+    <div class="h-16 flex items-center px-6 border-b border-r2v-charcoal/5">
+      <a class="text-r2v-charcoal font-bold text-xl flex items-center gap-2 tracking-tight" href="index.html">
+        <i data-lucide="boxes" class="w-6 h-6 text-r2v-terracotta"></i>
+        Raw2Value <span class="font-light">AI</span>
+      </a>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto py-4">
+      <ul class="space-y-1">
+        <li>
+          <a href="#" class="flex items-center gap-3 px-6 py-3 text-r2v-charcoal/70 hover:bg-r2v-surface transition-colors">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            <span class="font-medium text-sm">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-6 py-3 text-r2v-charcoal/70 hover:bg-r2v-surface transition-colors">
+            <i data-lucide="flask-conical" class="w-5 h-5"></i>
+            <span class="font-medium text-sm">Material Analyzer</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-6 py-3 bg-r2v-surface border-l-4 border-r2v-terracotta text-r2v-charcoal transition-colors">
+            <i data-lucide="target" class="w-5 h-5 text-r2v-terracotta"></i>
+            <span class="font-medium text-sm">AI Decision Cockpit</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-6 py-3 text-r2v-charcoal/70 hover:bg-r2v-surface transition-colors">
+            <i data-lucide="map" class="w-5 h-5"></i>
+            <span class="font-medium text-sm">GeoCarbon Map</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-6 py-3 text-r2v-charcoal/70 hover:bg-r2v-surface transition-colors">
+            <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+            <span class="font-medium text-sm">What-if Simulator</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-6 py-3 text-r2v-charcoal/70 hover:bg-r2v-surface transition-colors">
+            <i data-lucide="file-signature" class="w-5 h-5"></i>
+            <span class="font-medium text-sm">Offer Builder</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-6 py-3 text-r2v-charcoal/70 hover:bg-r2v-surface transition-colors">
+            <i data-lucide="book-check" class="w-5 h-5"></i>
+            <span class="font-medium text-sm">Raw Material Passport</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-6 py-3 text-r2v-charcoal/70 hover:bg-r2v-surface transition-colors">
+            <i data-lucide="brain-circuit" class="w-5 h-5"></i>
+            <span class="font-medium text-sm">AI Evidence</span>
+          </a>
+        </li>
+      </ul>
+      
+      <div class="mt-8 px-6 text-xs font-semibold text-r2v-charcoal/40 uppercase tracking-widest mb-2">Ayarlar</div>
+      <ul class="space-y-1">
+        <li>
+          <a href="#" class="flex items-center gap-3 px-6 py-3 text-r2v-charcoal/70 hover:bg-r2v-surface transition-colors">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+            <span class="font-medium text-sm">Admin</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT WRAPPER -->
+  <div class="flex-1 flex flex-col h-screen overflow-hidden">
+    
+    <!-- TOPBAR -->
+    <header class="h-16 bg-white/80 backdrop-blur border-b border-r2v-charcoal/5 flex items-center justify-between px-8 z-10 shrink-0">
+      
+      <!-- Search -->
+      <div class="flex items-center w-96 bg-r2v-surface rounded-full px-4 py-2 border border-transparent focus-within:border-r2v-charcoal/20 transition-colors">
+        <i data-lucide="search" class="w-4 h-4 text-r2v-charcoal/50"></i>
+        <input type="text" placeholder="Senaryo veya hammadde ara..." class="bg-transparent border-none focus:ring-0 text-sm text-r2v-charcoal w-full ml-2 placeholder:text-r2v-charcoal/40 outline-none"/>
+      </div>
+
+      <!-- Right Actions -->
+      <div class="flex items-center gap-6">
+        <button class="relative text-r2v-charcoal/60 hover:text-r2v-charcoal transition-colors">
+          <i data-lucide="bell" class="w-5 h-5"></i>
+          <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-r2v-terracotta rounded-full border-2 border-white"></span>
+        </button>
+        
+        <div class="h-6 w-px bg-r2v-charcoal/10"></div>
+        
+        <div class="flex items-center gap-3 cursor-pointer group">
+          <div class="text-right">
+            <p class="text-sm font-semibold text-r2v-charcoal group-hover:text-r2v-terracotta transition-colors">Ahmet Yılmaz</p>
+            <p class="text-xs text-r2v-charcoal/50 font-medium">İşleyici (Processor)</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-r2v-earth/10 flex items-center justify-center text-r2v-earth font-bold">
+            AY
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="flex-1 overflow-y-auto bg-r2v-base p-8">
+      
+      <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <div>
+          <h1 class="text-3xl font-light tracking-tight text-r2v-charcoal mb-1">AI Decision Cockpit</h1>
+          <p class="text-sm text-r2v-charcoal/60 font-light">Senaryolarınızı yapılandırın ve en kârlı/sürdürülebilir işleme rotasını keşfedin.</p>
+        </div>
+
+        <!-- 1. Top Summary (Girdi Özeti) -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-r2v-charcoal/5 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-r2v-surface flex items-center justify-center text-r2v-earth">
+              <i data-lucide="mountain" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-xs text-r2v-charcoal/50 font-medium uppercase tracking-wider">Hammadde</p>
+              <p class="font-semibold text-r2v-charcoal">Pomza</p>
+            </div>
+          </div>
+          
+          <div class="h-10 w-px bg-r2v-charcoal/5 hidden md:block"></div>
+          
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-r2v-surface flex items-center justify-center text-r2v-earth">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-xs text-r2v-charcoal/50 font-medium uppercase tracking-wider">Kaynak</p>
+              <p class="font-semibold text-r2v-charcoal">Nevşehir, TR71</p>
+            </div>
+          </div>
+          
+          <div class="h-10 w-px bg-r2v-charcoal/5 hidden md:block"></div>
+          
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-r2v-surface flex items-center justify-center text-r2v-earth">
+              <i data-lucide="weight" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-xs text-r2v-charcoal/50 font-medium uppercase tracking-wider">Tonaj</p>
+              <p class="font-semibold text-r2v-charcoal">100 ton</p>
+            </div>
+          </div>
+          
+          <div class="h-10 w-px bg-r2v-charcoal/5 hidden md:block"></div>
+          
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-r2v-surface flex items-center justify-center text-r2v-earth">
+              <i data-lucide="award" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-xs text-r2v-charcoal/50 font-medium uppercase tracking-wider">Kalite</p>
+              <p class="font-semibold text-r2v-charcoal">A Sınıfı</p>
+            </div>
+          </div>
+
+          <div class="h-10 w-px bg-r2v-charcoal/5 hidden md:block"></div>
+          
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-r2v-surface flex items-center justify-center text-r2v-terracotta">
+              <i data-lucide="globe" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-xs text-r2v-charcoal/50 font-medium uppercase tracking-wider">Hedef Pazar</p>
+              <p class="font-semibold text-r2v-charcoal">Almanya</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- LEFT COLUMN (2/3) -->
+          <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Main Output Card -->
+            <div class="bg-r2v-charcoal text-white rounded-3xl p-8 shadow-md relative overflow-hidden">
+              <!-- Decorative background element -->
+              <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+              
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center relative z-10 gap-8">
+                
+                <div class="flex-1">
+                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-r2v-green/20 text-r2v-green border border-r2v-green/30 text-xs font-semibold uppercase tracking-widest mb-4">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i> Optimal Rota
+                  </div>
+                  <h2 class="text-4xl md:text-5xl font-light mb-6">Mikronize Pomza</h2>
+                  
+                  <div class="flex items-center gap-8">
+                    <div>
+                      <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Tahmini Net Kâr</p>
+                      <p class="text-3xl font-mono text-white">418.000 TL</p>
+                    </div>
+                    <div>
+                      <p class="text-white/50 text-xs uppercase tracking-wider mb-1">Değer Artışı</p>
+                      <p class="text-3xl font-semibold text-r2v-green flex items-center gap-2">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i> +%43
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Circular Progress -->
+                <div class="flex flex-col items-center justify-center shrink-0 bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur-sm shadow-inner">
+                  <div class="radial-progress shadow-[0_0_15px_rgba(107,142,120,0.3)]">
+                    <span class="radial-progress-text font-mono">92</span>
+                  </div>
+                  <p class="mt-4 text-xs text-white/60 font-medium uppercase tracking-widest text-center">AI Güven Skoru</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alternative Routes Table -->
+            <div class="bg-white rounded-3xl p-8 shadow-sm border border-r2v-charcoal/5">
+              <div class="flex justify-between items-end mb-6">
+                <div>
+                  <h3 class="text-xl font-medium text-r2v-charcoal">Alternatif Rotalar</h3>
+                  <p class="text-sm text-r2v-charcoal/50 font-light mt-1">Sistem tarafından elenen diğer üretim olasılıkları.</p>
+                </div>
+                <button class="text-r2v-terracotta text-sm font-medium hover:underline flex items-center gap-1">
+                  Detaylı Karşılaştırma <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="text-xs font-semibold text-r2v-charcoal/50 uppercase tracking-widest border-b border-r2v-charcoal/10">
+                      <th class="pb-3 px-4 font-medium">Rota</th>
+                      <th class="pb-3 px-4 font-medium text-right">Kâr (TL)</th>
+                      <th class="pb-3 px-4 font-medium text-right">CO2 (Ton)</th>
+                      <th class="pb-3 px-4 font-medium">Süre</th>
+                      <th class="pb-3 px-4 font-medium">Risk</th>
+                      <th class="pb-3 px-4 font-medium text-center">Seçim</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-sm">
+                    <!-- Row 1 (Optimal) -->
+                    <tr class="border-b border-r2v-charcoal/5 bg-r2v-green/5 hover:bg-r2v-green/10 transition-colors cursor-pointer">
+                      <td class="py-4 px-4 font-semibold text-r2v-charcoal flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-r2v-green shadow-[0_0_5px_#6B8E78]"></div> Mikronize Pomza
+                      </td>
+                      <td class="py-4 px-4 font-mono text-right text-r2v-charcoal">418.000</td>
+                      <td class="py-4 px-4 font-mono text-right text-r2v-green">25.3</td>
+                      <td class="py-4 px-4 text-r2v-charcoal/70">12 Gün</td>
+                      <td class="py-4 px-4">
+                        <span class="px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-medium border border-green-200">Düşük</span>
+                      </td>
+                      <td class="py-4 px-4 text-center">
+                        <input type="radio" name="route" checked class="w-4 h-4 text-r2v-terracotta focus:ring-r2v-terracotta border-gray-300">
+                      </td>
+                    </tr>
+                    <!-- Row 2 -->
+                    <tr class="border-b border-r2v-charcoal/5 hover:bg-r2v-surface transition-colors cursor-pointer">
+                      <td class="py-4 px-4 font-medium text-r2v-charcoal/80 flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-transparent border border-r2v-charcoal/30"></div> Bims Agregası
+                      </td>
+                      <td class="py-4 px-4 font-mono text-right text-r2v-charcoal/80">302.000</td>
+                      <td class="py-4 px-4 font-mono text-right text-r2v-charcoal/80">18.1</td>
+                      <td class="py-4 px-4 text-r2v-charcoal/70">5 Gün</td>
+                      <td class="py-4 px-4">
+                        <span class="px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-medium border border-green-200">Düşük</span>
+                      </td>
+                      <td class="py-4 px-4 text-center">
+                        <input type="radio" name="route" class="w-4 h-4 text-r2v-terracotta focus:ring-r2v-terracotta border-gray-300">
+                      </td>
+                    </tr>
+                    <!-- Row 3 -->
+                    <tr class="border-b border-r2v-charcoal/5 hover:bg-r2v-surface transition-colors cursor-pointer">
+                      <td class="py-4 px-4 font-medium text-r2v-charcoal/80 flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-transparent border border-r2v-charcoal/30"></div> Filtrasyon Medyası
+                      </td>
+                      <td class="py-4 px-4 font-mono text-right text-r2v-charcoal/80">350.000</td>
+                      <td class="py-4 px-4 font-mono text-right text-r2v-terracotta">42.5</td>
+                      <td class="py-4 px-4 text-r2v-charcoal/70">18 Gün</td>
+                      <td class="py-4 px-4">
+                        <span class="px-2 py-1 rounded-md bg-yellow-100 text-yellow-700 text-xs font-medium border border-yellow-200">Orta</span>
+                      </td>
+                      <td class="py-4 px-4 text-center">
+                        <input type="radio" name="route" class="w-4 h-4 text-r2v-terracotta focus:ring-r2v-terracotta border-gray-300">
+                      </td>
+                    </tr>
+                    <!-- Row 4 -->
+                    <tr class="hover:bg-r2v-surface transition-colors cursor-pointer">
+                      <td class="py-4 px-4 font-medium text-r2v-charcoal/80 flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full bg-transparent border border-r2v-charcoal/30"></div> Ham Satış
+                      </td>
+                      <td class="py-4 px-4 font-mono text-right text-r2v-charcoal/80">180.000</td>
+                      <td class="py-4 px-4 font-mono text-right text-r2v-charcoal/80">5.2</td>
+                      <td class="py-4 px-4 text-r2v-charcoal/70">1 Gün</td>
+                      <td class="py-4 px-4">
+                        <span class="px-2 py-1 rounded-md bg-red-100 text-red-700 text-xs font-medium border border-red-200">Yüksek (Kayıp)</span>
+                      </td>
+                      <td class="py-4 px-4 text-center">
+                        <input type="radio" name="route" class="w-4 h-4 text-r2v-terracotta focus:ring-r2v-terracotta border-gray-300">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN (1/3) -->
+          <div class="space-y-6">
+            
+            <!-- Live Data / Context -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-white rounded-2xl p-5 shadow-sm border border-r2v-charcoal/5">
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-xs text-r2v-charcoal/50 uppercase font-medium">EUR/TRY (Canlı)</p>
+                  <div class="w-2 h-2 rounded-full bg-r2v-green animate-pulse"></div>
+                </div>
+                <p class="text-2xl font-mono text-r2v-charcoal font-semibold">34.85</p>
+              </div>
+              
+              <div class="bg-white rounded-2xl p-5 shadow-sm border border-r2v-charcoal/5">
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-xs text-r2v-charcoal/50 uppercase font-medium">Enerji Endeksi</p>
+                  <i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i>
+                </div>
+                <p class="text-2xl font-mono text-r2v-charcoal font-semibold">142.3</p>
+              </div>
+            </div>
+
+            <!-- Logistics Summary -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-r2v-charcoal/5">
+              <h3 class="text-lg font-medium text-r2v-charcoal mb-4 flex items-center gap-2">
+                <i data-lucide="truck" class="w-5 h-5 text-r2v-earth"></i> Lojistik Özeti
+              </h3>
+              
+              <div class="space-y-4">
+                <div class="flex justify-between items-center border-b border-r2v-charcoal/5 pb-3">
+                  <span class="text-sm text-r2v-charcoal/60">Toplam Mesafe</span>
+                  <span class="font-mono text-r2v-charcoal font-medium">3,240 km</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-r2v-charcoal/5 pb-3">
+                  <span class="text-sm text-r2v-charcoal/60">Tahmini Navlun</span>
+                  <span class="font-mono text-r2v-charcoal font-medium">4,200 EUR</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-r2v-charcoal/60">En Yakın İşleyici</span>
+                  <span class="text-sm font-medium text-r2v-charcoal text-right">Ürgüp Tesisleri<br><span class="text-xs text-r2v-charcoal/40 font-normal">12 km mesafe</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Buyer Matching -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-r2v-charcoal/5">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-r2v-charcoal flex items-center gap-2">
+                  <i data-lucide="users" class="w-5 h-5 text-r2v-earth"></i> Alıcı Eşleşmeleri
+                </h3>
+                <span class="px-2 py-1 bg-r2v-surface rounded text-xs font-medium text-r2v-charcoal">Almanya</span>
+              </div>
+              
+              <div class="space-y-3">
+                
+                <!-- Match 1 -->
+                <div class="p-3 rounded-xl bg-r2v-base border border-r2v-charcoal/5 flex items-center justify-between group hover:border-r2v-terracotta/50 cursor-pointer transition-colors">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-r2v-charcoal/10 text-xs font-bold text-r2v-charcoal">T</div>
+                    <div>
+                      <p class="text-sm font-medium text-r2v-charcoal">TechPumice GmbH</p>
+                      <p class="text-xs text-r2v-charcoal/50">Berlin</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-mono text-r2v-green font-semibold">%94</p>
+                    <p class="text-[10px] uppercase tracking-wider text-r2v-charcoal/40">Eşleşme</p>
+                  </div>
+                </div>
+
+                <!-- Match 2 -->
+                <div class="p-3 rounded-xl bg-white border border-transparent hover:bg-r2v-base flex items-center justify-between cursor-pointer transition-colors">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-r2v-surface flex items-center justify-center border border-r2v-charcoal/5 text-xs font-bold text-r2v-charcoal">B</div>
+                    <div>
+                      <p class="text-sm font-medium text-r2v-charcoal">BuildMat AG</p>
+                      <p class="text-xs text-r2v-charcoal/50">Münih</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-mono text-r2v-charcoal font-medium">%88</p>
+                    <p class="text-[10px] uppercase tracking-wider text-r2v-charcoal/40">Eşleşme</p>
+                  </div>
+                </div>
+
+                <!-- Match 3 -->
+                <div class="p-3 rounded-xl bg-white border border-transparent hover:bg-r2v-base flex items-center justify-between cursor-pointer transition-colors">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-r2v-surface flex items-center justify-center border border-r2v-charcoal/5 text-xs font-bold text-r2v-charcoal">G</div>
+                    <div>
+                      <p class="text-sm font-medium text-r2v-charcoal">GreenBlock Co.</p>
+                      <p class="text-xs text-r2v-charcoal/50">Hamburg</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-mono text-r2v-charcoal font-medium">%72</p>
+                    <p class="text-[10px] uppercase tracking-wider text-r2v-charcoal/40">Eşleşme</p>
+                  </div>
+                </div>
+
+              </div>
+              
+              <button class="w-full mt-4 py-2 border border-r2v-charcoal/10 rounded-xl text-sm font-medium text-r2v-charcoal hover:bg-r2v-surface transition-colors">
+                Tümünü Gör (14)
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

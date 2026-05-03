@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-r2v-base: #FAF9F6;
+  --color-r2v-surface: #EFEBE6;
+  --color-r2v-charcoal: #2D323A;
+  --color-r2v-earth: #4A3C31;
+  --color-r2v-terracotta: #C05C41;
+  --color-r2v-green: #6B8E78;
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--color-r2v-base);
+    color: var(--color-r2v-charcoal);
+  }
+}
