@@ -52,13 +52,19 @@ export default function ResultPanel() {
   const processors = nearby?.results ?? []
   const topProcessor = processors[0] ?? null
 
-  // Karayolu polyline (deniz/hava'da düz çizgi fallback)
+  // Karayolu polyline — origin → destination (en optimize HGV rotası).
+  // İşleyici waypoint olarak GÖNDERİLMEZ: ORS bazı yakın noktalarda 404
+  // veriyor (snap fail). Processor harita üstünde ayrı pin olarak gösteriliyor.
   const routePayload = useMemo(() => {
     if (!origin || !destination || !lastPayload) return null
-    const points = [origin, ...(topProcessor ? [topProcessor] : []), destination]
-      .map((p) => ({ lat: p.lat, lon: p.lon }))
-    return { points, transport_mode: lastPayload.transport_mode }
-  }, [origin, destination, topProcessor, lastPayload])
+    return {
+      points: [
+        { lat: origin.lat, lon: origin.lon },
+        { lat: destination.lat, lon: destination.lon },
+      ],
+      transport_mode: lastPayload.transport_mode,
+    }
+  }, [origin, destination, lastPayload])
 
   const { data: routeData } = useRoute(routePayload, Boolean(result))
 

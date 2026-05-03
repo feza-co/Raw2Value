@@ -11,5 +11,7 @@ export const useRoute = (payload: RouteRequest | null, enabled = true) =>
     ],
     queryFn: () => routeService.build(payload as RouteRequest),
     enabled: enabled && Boolean(payload && payload.points.length >= 2),
-    staleTime: 30 * 60_000,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: 1,
   })

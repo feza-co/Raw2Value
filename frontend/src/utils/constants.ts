@@ -11,11 +11,10 @@ export const QUALITY_GRADES = [
   { value: 'unknown', label: 'Bilinmiyor' },
 ] as const
 
+// MVP: yalnızca karayolu (TIR). Diğer modlar gelecekte; deniz/hava/demiryolu
+// için OSR Directions yok, ML evidence sadece kara üzerinde kalibre edildi.
 export const TRANSPORT_MODES = [
-  { value: 'kara', label: 'Kara', co2Hint: '0.100 kg CO₂/ton-km' },
-  { value: 'deniz', label: 'Deniz', co2Hint: '0.015 kg CO₂/ton-km' },
-  { value: 'demiryolu', label: 'Demiryolu', co2Hint: '0.030 kg CO₂/ton-km' },
-  { value: 'hava', label: 'Hava', co2Hint: '0.500 kg CO₂/ton-km' },
+  { value: 'kara', label: 'Kara (TIR)', co2Hint: '0.100 kg CO₂/ton-km · gerçek karayolu rotası (OpenRouteService)' },
 ] as const
 
 export const TARGET_COUNTRIES = [
@@ -36,13 +35,18 @@ export const NEVŞEHIR_COORDS = { lat: 37.9738, lon: 34.6565 }
 // origin/destination noktası için fallback.
 export const CITY_COORDS: Record<string, { lat: number; lon: number }> = {
   // TR
+  antalya: { lat: 36.8969, lon: 30.7133 },
   nevsehir: { lat: 38.6939, lon: 34.6857 },
   acigol: { lat: 38.5478, lon: 34.5028 },
   istanbul: { lat: 41.0082, lon: 28.9784 },
   izmir: { lat: 38.4192, lon: 27.1287 },
   ankara: { lat: 39.9334, lon: 32.8597 },
+  kayseri: { lat: 38.7220, lon: 35.4881 },
+  aksaray: { lat: 38.3687, lon: 34.0370 },
   // DE
+  duisburg: { lat: 51.4344, lon: 6.7623 },   // Avrupa'nın en büyük iç limanı
   hamburg: { lat: 53.5511, lon: 9.9937 },
+  bremen: { lat: 53.0793, lon: 8.8017 },
   berlin: { lat: 52.52, lon: 13.405 },
   // NL
   rotterdam: { lat: 51.9244, lon: 4.4777 },
@@ -51,7 +55,7 @@ export const CITY_COORDS: Record<string, { lat: number; lon: number }> = {
 
 export const COUNTRY_DEFAULT_CITY: Record<string, string> = {
   TR: 'istanbul',
-  DE: 'hamburg',
+  DE: 'duisburg',  // Avrupa'nın en büyük iç limanı, ihracat dağıtım hub'ı
   NL: 'rotterdam',
 }
 

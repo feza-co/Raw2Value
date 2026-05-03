@@ -31,13 +31,15 @@ from ..deps import get_current_user
 from ..schemas.analyze import AnalyzeRequest, AnalyzeResponseOut, FxUsed
 from ..services.fx_service import get_current_fx
 from ..services.history_service import build_record, save_analyze
+from ..services.match_enrichment import enrich_match_results
 from ..services.ml_service import run_analyze
 
 router = APIRouter(prefix="/api", tags=["analyze"])
 _logger = structlog.get_logger("analyze")
 
 _DEFAULT_TARGET_CITY = {
-    "DE": "Hamburg",
+    # Avrupa'nın en büyük iç limanı + hammadde dağıtım hub'ı (Duisport).
+    "DE": "Duisburg",
     "NL": "Rotterdam",
     "TR": "İstanbul",
 }
@@ -95,6 +97,44 @@ async def analyze_endpoint(
 
     t0 = time.perf_counter()
     response = await run_analyze(ml_payload)
+
+    # Match score zenginleştirme — DB'deki processor org koordinatlarını
+    # kullanarak her match için distinct distance + carbon hesapla, scorer'ı
+    # yeniden çağır. ML inference'ı override etmez; yalnızca match_results
+    # sırasını ve component skorlarını gerçekçi hâle getirir.
+    try:
+        enriched = await enrich_match_results(
+            db,
+            matches=[m.model_dump() for m in response.match_results],
+            raw_material=ml_payload.raw_material,
+            origin_city=ml_payload.origin_city,
+            target_country=ml_payload.target_country,
+            target_city=ml_payload.target_city,
+            tonnage=ml_payload.tonnage,
+            transport_mode=ml_payload.transport_mode,
+            predicted_profit_try=response.expected_profit_try,
+            quality=ml_payload.quality,
+            priority=ml_payload.priority,
+        )
+        if enriched:
+            from raw2value_ml.schemas import MatchResult as _MR
+
+            response = response.model_copy(
+                update={
+                    "match_results": [
+                        _MR(
+                            processor_name=m["processor_name"],
+                            buyer_name=m["buyer_name"],
+                            score=m["score"],
+                            components=m["components"],
+                        )
+                        for m in enriched
+                    ]
+                }
+            )
+    except Exception as exc:  # noqa: BLE001
+        _logger.warning("match_enrichment_skipped", error=repr(exc))
+
     duration_ms = int((time.perf_counter() - t0) * 1000)
 
     record = build_record(

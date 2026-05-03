@@ -7,7 +7,8 @@ export const analyzeSchema = z.object({
   origin_city: z.string().min(1),
   target_country: z.enum(['TR', 'DE', 'NL']),
   target_city: z.string().optional(),
-  transport_mode: z.enum(['kara', 'deniz', 'demiryolu', 'hava']),
+  // MVP: yalnızca karayolu. Backend diğer modları kabul ediyor ama UI sadece kara.
+  transport_mode: z.enum(['kara']),
   priority: z.enum(['max_profit', 'low_carbon', 'fast_delivery']),
   input_mode: z.enum(['basic', 'advanced']),
   moisture_pct: z.number().min(0).max(100).optional(),

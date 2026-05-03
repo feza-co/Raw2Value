@@ -1,4 +1,4 @@
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
 import { analyzeSchema, type AnalyzeFormValues } from '@/utils/validators'
@@ -23,7 +23,7 @@ export default function AnalysisForm() {
       quality: 'A',
       origin_city: orgCity,
       target_country: 'DE',
-      target_city: 'Hamburg',
+      target_city: 'Duisburg',
       transport_mode: 'kara',
       priority: 'max_profit',
       input_mode: 'basic',
@@ -36,6 +36,14 @@ export default function AnalysisForm() {
   useEffect(() => {
     if (orgCity) setValue('origin_city', orgCity, { shouldDirty: false })
   }, [orgCity, setValue])
+
+  // Senaryo slider'larının canlı değerleri — rozet için.
+  const fxPct = useWatch({ control, name: 'fx_scenario_pct' }) ?? 0
+  const costPct = useWatch({ control, name: 'cost_scenario_pct' }) ?? 0
+  const fmtPct = (v: number) => {
+    const p = Math.round(v * 100)
+    return p > 0 ? `+%${p}` : p < 0 ? `%${p}` : '%0'
+  }
 
   const onSubmit = (values: AnalyzeFormValues) => {
     analyze({
@@ -150,7 +158,7 @@ export default function AnalysisForm() {
           name="transport_mode"
           control={control}
           render={({ field }) => (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               {TRANSPORT_MODES.map((m) => (
                 <button
                   key={m.value}
@@ -233,9 +241,23 @@ export default function AnalysisForm() {
             </div>
           </div>
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-            <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">
-              Kur Senaryosu
-            </label>
+            <div className="flex items-center justify-between mb-3">
+              <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest">
+                Kur Senaryosu
+              </label>
+              <span
+                className={clsx(
+                  'font-mono font-bold text-xs px-2.5 py-1 rounded-md border',
+                  fxPct === 0
+                    ? 'bg-white text-slate-500 border-slate-200'
+                    : fxPct > 0
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-rose-50 text-rose-700 border-rose-200',
+                )}
+              >
+                {fmtPct(fxPct)}
+              </span>
+            </div>
             <input
               {...register('fx_scenario_pct', { valueAsNumber: true })}
               type="range"
@@ -249,11 +271,29 @@ export default function AnalysisForm() {
               <span>%0</span>
               <span>+%20</span>
             </div>
+            <p className="font-body text-[11px] text-slate-400 mt-2">
+              USD/TRY canlı kura uygulanan göreli sapma. +%10 → kâr beklentisi
+              TL bazında artar.
+            </p>
           </div>
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-            <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">
-              Maliyet Senaryosu
-            </label>
+            <div className="flex items-center justify-between mb-3">
+              <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest">
+                Maliyet Senaryosu
+              </label>
+              <span
+                className={clsx(
+                  'font-mono font-bold text-xs px-2.5 py-1 rounded-md border',
+                  costPct === 0
+                    ? 'bg-white text-slate-500 border-slate-200'
+                    : costPct > 0
+                      ? 'bg-rose-50 text-rose-700 border-rose-200'
+                      : 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                )}
+              >
+                {fmtPct(costPct)}
+              </span>
+            </div>
             <input
               {...register('cost_scenario_pct', { valueAsNumber: true })}
               type="range"
@@ -267,6 +307,10 @@ export default function AnalysisForm() {
               <span>%0</span>
               <span>+%20</span>
             </div>
+            <p className="font-body text-[11px] text-slate-400 mt-2">
+              İşleme + lojistik maliyetlerine uygulanan sapma. +%10 → birim
+              maliyet artar, kâr azalır.
+            </p>
           </div>
         </div>
       )}
