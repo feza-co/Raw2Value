@@ -132,6 +132,45 @@ async def upsert_admin(session) -> User:
     return user
 
 
+async def upsert_demo_user(
+    session,
+    *,
+    email: str,
+    full_name: str,
+    password: str,
+    org_name: str,
+) -> User:
+    """Demo persona user — belirli organization'a bağlı.
+
+    Idempotent: email zaten varsa organization_id boşsa eşler, döner.
+    """
+    email = email.strip().lower()
+    org = (
+        await session.execute(
+            select(Organization).where(Organization.name == org_name)
+        )
+    ).scalar_one_or_none()
+    existing = (
+        await session.execute(select(User).where(User.email == email))
+    ).scalar_one_or_none()
+    if existing is not None:
+        if org is not None and existing.organization_id is None:
+            existing.organization_id = org.id
+            await session.flush()
+        return existing
+    user = User(
+        email=email,
+        full_name=full_name,
+        hashed_password=hash_password(password),
+        role="user",
+        is_active=True,
+        organization_id=org.id if org is not None else None,
+    )
+    session.add(user)
+    await session.flush()
+    return user
+
+
 async def upsert_org(session, *, spec: dict) -> Organization:
     existing = (
         await session.execute(
@@ -194,8 +233,19 @@ async def main() -> int:
         admin = await upsert_admin(session)
         for spec in _DEMO_ORGS:
             await upsert_org(session, spec=spec)
+        # Demo persona — Mehmet Amca / Doğa Pomza Ltd
+        mehmet = await upsert_demo_user(
+            session,
+            email="mehmet@dogapomza.tr",
+            full_name="Mehmet Yılmaz",
+            password="acigol2026",
+            org_name="Doğa Pomza Ltd",
+        )
         await session.commit()
-        print(f"seed_complete admin={admin.email} orgs={len(_DEMO_ORGS)}")
+        print(
+            f"seed_complete admin={admin.email} demo_user={mehmet.email} "
+            f"orgs={len(_DEMO_ORGS)}"
+        )
     return 0
 
 
