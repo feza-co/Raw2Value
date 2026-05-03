@@ -82,8 +82,12 @@ async def find_nearby_processors(
         if org.lat is None or org.lon is None:
             continue
         # ARRAY filtresi Python tarafında — sqlite/Postgres farkını kapatır.
+        # `material="pomza"` gibi hammadde adı route prefix'iyle eşleştirilir
+        # (ör. "pomza_micronized_pumice"). Tam route adı geldiyse (örn.
+        # "pomza_micronized_pumice") yine yakalar.
         if material and profile is not None:
-            if material not in (profile.processing_routes or []):
+            routes = profile.processing_routes or []
+            if not any(r == material or r.startswith(f"{material}_") for r in routes):
                 continue
         if min_capacity is not None and profile is not None:
             if (profile.capacity_ton_year or 0) < min_capacity:
