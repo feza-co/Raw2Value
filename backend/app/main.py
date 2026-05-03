@@ -15,11 +15,16 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
+from pathlib import Path
+
+from fastapi.staticfiles import StaticFiles
+
 from . import __version__
 from .api import (
     analyze,
     auth,
     evidence,
+    files as files_router,
     fx,
     health,
     history as history_router,
@@ -108,3 +113,13 @@ app.include_router(whatif.router)
 app.include_router(processors.router)
 app.include_router(organizations.router)
 app.include_router(history_router.router)
+app.include_router(files_router.router)
+
+# Static dosyalar — local FS upload backend için public URL.
+_uploads_dir = Path(settings.UPLOAD_DIR).resolve()
+_uploads_dir.mkdir(parents=True, exist_ok=True)
+app.mount(
+    "/static/uploads",
+    StaticFiles(directory=str(_uploads_dir)),
+    name="uploads",
+)
