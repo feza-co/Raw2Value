@@ -117,4 +117,33 @@ Backend test:
 cd backend && pytest tests/ -v
 ```
 
+### Troubleshooting — Docker
+
+**Port çakışması (5432 / 6379):** Yerel makinede zaten Postgres veya Redis çalışıyorsa `docker compose up` "bind: address already in use" hatası verir. Çözüm — dev override ile host portlarını kaydır:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+# host'tan db: localhost:5433, redis: localhost:6380
+# container içinden api: db:5432, redis:6379 (değişmez)
+```
+
+Hangi process tutuyor?
+
+```powershell
+# Windows
+netstat -ano | findstr :5432
+Get-Process -Id <PID>
+```
+
+```bash
+# Linux/Mac
+lsof -i :5432
+```
+
+**`backend/.env` yok:** İlk kuruluşta `cp backend/.env.example backend/.env` çalıştırılmamış olabilir. `JWT_SECRET` ve `TCMB_EVDS_API_KEY` placeholder kalsa da local dev için yeterlidir; TCMB anahtarı yoksa `/api/fx/current` fallback'e düşer (USD=45, EUR=52).
+
+**`models/*.pkl` Docker imajına alınmamış:** `.dockerignore` dosyasında `*.pkl` satırı varsa kaldır. Build context proje root'u olmalı (`docker-compose.yml`'de `context: .`).
+
+**ML warmup uzun sürüyor:** İlk `docker compose up` sonrası ~20–30 sn bekle; `/health` 503 dönerse `docker compose logs api -f` ile `ml_warmup_complete` mesajını ara.
+
 Detaylı dokümantasyon: `docs/MASTER_BACKEND_GELISTIRME_RAPORU_PART1.md` ve `PART2.md`.
