@@ -21,6 +21,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from raw2value_ml import AnalyzePayload, LiveFx
 
+from ..config import settings
+from ..core.rate_limit import limit as rate_limit
 from ..db.models import User
 from ..db.session import SessionLocal, get_db
 from ..deps import get_current_user
@@ -75,6 +77,7 @@ def _build_ml_payload(
     response_model=AnalyzeResponseOut,
     status_code=status.HTTP_200_OK,
 )
+@rate_limit(settings.RATE_LIMIT_ANALYZE)
 async def analyze_endpoint(
     request: Request,
     payload: AnalyzeRequest,
