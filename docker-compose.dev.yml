@@ -1,0 +1,28 @@
+# Geliştirme override'ı: `docker compose -f docker-compose.yml -f docker-compose.dev.yml up`
+# Yerel makinede zaten Postgres/Redis varsa host portları çakışmasın diye remap.
+# Container içi DNS isimleri (db:5432, redis:6379) DEĞİŞMEZ — api etkilenmez.
+
+services:
+  api:
+    environment:
+      APP_DEBUG: "true"
+      LOG_LEVEL: DEBUG
+    # Hot-reload için kod volume mount + uvicorn --reload.
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/scripts:/app/scripts
+    command: >
+      uvicorn app.main:app
+      --host 0.0.0.0 --port 8000
+      --reload
+      --reload-dir /app/app
+
+  db:
+    # Yerel Postgres 5432'yi tutuyorsa host'ta 5433'ten erişilir; container içi 5432.
+    ports:
+      - "5433:5432"
+
+  redis:
+    # Yerel Redis çakışmasın diye 6380.
+    ports:
+      - "6380:6379"
