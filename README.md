@@ -200,7 +200,7 @@ cd backend && pytest tests/ -v
   ```bash
   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
   
-```
+
   *(Host'tan DB: localhost:5433, Redis: localhost:6380 olur. Container içi değişmez).*
 - **TCMB API Key Hatası:** `backend/.env` dosyasında `JWT_SECRET` ve `TCMB_EVDS_API_KEY` placeholder kalsa da lokal dev için yeterlidir. Anahtar yoksa sistem `/api/fx/current` fallback değerlerine (USD=45, EUR=52) düşerek çalışır.
 - **Warmup Gecikmesi:** Docker `up` komutundan sonra ML modellerinin belleğe yüklenmesi (~20-30 saniye) sürebilir. Bu sürede `/health` servisi 503 döner. `docker compose logs api -f` ile `ml_warmup_complete` mesajını arayın.
