@@ -16,7 +16,7 @@ export default function WhatIfChart({ results }: Props) {
       <BarChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
         <XAxis dataKey="name" tick={{ fontFamily: 'var(--font-body)', fontSize: 11 }} />
         <YAxis tickFormatter={(v: number) => `₺${(v / 1_000_000).toFixed(1)}M`} tick={{ fontFamily: 'var(--font-mono)', fontSize: 10 }} />
-        <Tooltip formatter={(v: number) => formatTRY(v)} />
+        <Tooltip formatter={(v) => formatTRY(Number(v))} />
         <Bar dataKey="profit" fill="#C8973A" radius={[2, 2, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>

@@ -8,13 +8,13 @@ export const analyzeSchema = z.object({
   target_country: z.enum(['TR', 'DE', 'NL']),
   target_city: z.string().optional(),
   transport_mode: z.enum(['kara', 'deniz', 'demiryolu', 'hava']),
-  priority: z.enum(['max_profit', 'low_carbon', 'fast_delivery']).default('max_profit'),
-  input_mode: z.enum(['basic', 'advanced']).default('basic'),
+  priority: z.enum(['max_profit', 'low_carbon', 'fast_delivery']),
+  input_mode: z.enum(['basic', 'advanced']),
   moisture_pct: z.number().min(0).max(100).optional(),
   purity_pct: z.number().min(0).max(100).optional(),
   particle_size_class: z.string().optional(),
-  fx_scenario_pct: z.number().min(-0.2).max(0.2).default(0),
-  cost_scenario_pct: z.number().min(-0.2).max(0.2).default(0),
+  fx_scenario_pct: z.number().min(-0.2).max(0.2),
+  cost_scenario_pct: z.number().min(-0.2).max(0.2),
 })
 
 export const loginSchema = z.object({
