@@ -5,8 +5,9 @@ Response = ML AnalyzeResponse + meta alanlar (request_id, fx_used, duration_ms).
 
 Kaynak: MASTER_BACKEND_GELISTIRME_RAPORU_PART1.md §9.7.
 """
-from __future__ import annotations
-
+# `from __future__ import annotations` BİLEREK eklenmedi — Pydantic v2 + FastAPI
+# AnalyzeRequest field annotation'larını eager resolve etmeli, aksi halde
+# "name 'AnalyzeRequest' is not defined" ForwardRef hatası.
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -79,3 +80,9 @@ class WhatIfResponse(BaseModel):
     results: list[WhatIfResultRow]
     base_fx: FxUsed
     duration_ms: int
+
+
+# Forward-ref resolution: `from __future__ import annotations` lazy yaptığı için
+# Pydantic v2 + FastAPI WhatIfRequest.base_payload'ı serialize ederken
+# AnalyzeRequest ForwardRef'ini bulamıyor — açıkça rebuild gerekiyor.
+WhatIfRequest.model_rebuild()

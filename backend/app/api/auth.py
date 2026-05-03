@@ -2,7 +2,6 @@
 
 Kaynak: MASTER_BACKEND_GELISTIRME_RAPORU_PART1.md §9.3-9.5.
 """
-from __future__ import annotations
 
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm

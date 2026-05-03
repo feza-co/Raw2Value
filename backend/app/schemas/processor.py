@@ -1,5 +1,4 @@
 """/api/processors/nearby response schemas."""
-from __future__ import annotations
 
 from typing import Literal
 

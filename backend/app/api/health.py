@@ -2,7 +2,6 @@
 
 Kaynak: MASTER_BACKEND_GELISTIRME_RAPORU_PART1.md §9.1, §9.2.
 """
-from __future__ import annotations
 
 import time
 

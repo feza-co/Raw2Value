@@ -10,8 +10,10 @@ Akış:
 Kaynak: MASTER_BACKEND_GELISTIRME_RAPORU_PART1.md §9.7,
         MASTER_BACKEND_GELISTIRME_RAPORU_PART2.md §18 ADIM 5.
 """
-from __future__ import annotations
-
+# `from __future__ import annotations` KULLANILMAZ — FastAPI endpoint
+# fonksiyonlarının parametre annotation'ları (örn. payload: AnalyzeRequest)
+# Pydantic 2.9 + Python 3.11 birleşiminde TypeAdapter ile eager resolve
+# edildiğinde lazy string annotation ForwardRef hatası veriyor.
 import asyncio
 import time
 

@@ -1,5 +1,4 @@
 """Public model evidence endpoint — jüri ve şeffaflık paneli için."""
-from __future__ import annotations
 
 from typing import Any
 

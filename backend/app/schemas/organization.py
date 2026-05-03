@@ -2,7 +2,6 @@
 
 Kaynak: MASTER_BACKEND_GELISTIRME_RAPORU_PART2.md §9.11-9.14.
 """
-from __future__ import annotations
 
 import uuid
 from datetime import datetime
