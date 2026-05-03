@@ -83,3 +83,38 @@ pytest ml/tests/ -v
 ## Sözleşme
 
 Backend tarafıyla `analyze(payload) → AnalyzeResponse` sözleşmesi sabittir. Detay: `docs/master_model_egitim_raporu.md` §11.3.
+
+## Backend (FastAPI)
+
+Tek komutla tüm stack:
+
+```bash
+cp backend/.env.example backend/.env
+docker compose up -d --build
+docker compose exec api alembic upgrade head
+docker compose exec api python scripts/seed_demo.py
+# → http://localhost:8000/docs
+```
+
+Lokal dev (Docker'sız):
+
+```bash
+pip install -e .                                          # ML paketi
+pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+cd backend && uvicorn app.main:app --reload
+# Postgres + Redis env'lerini .env'de ayarla
+```
+
+QA smoke (G4 gate):
+
+```bash
+bash backend/scripts/qa_smoke.sh    # 7/7 OK olmalı
+```
+
+Backend test:
+
+```bash
+cd backend && pytest tests/ -v
+```
+
+Detaylı dokümantasyon: `docs/MASTER_BACKEND_GELISTIRME_RAPORU_PART1.md` ve `PART2.md`.
