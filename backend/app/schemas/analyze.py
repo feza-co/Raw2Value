@@ -45,6 +45,8 @@ class FxUsed(BaseModel):
 class AnalyzeResponseOut(AnalyzeResponse):
     """ML response + backend meta alanları."""
 
+    model_config = ConfigDict(protected_namespaces=())
+
     request_id: str
     fx_used: FxUsed
     duration_ms: int

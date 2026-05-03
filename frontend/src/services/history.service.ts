@@ -7,7 +7,7 @@ export const historyService = {
     return res.data
   },
 
-  async getDetail(recordId: string): Promise<AnalysisRecordDetail> {
+  async getDetail(recordId: number): Promise<AnalysisRecordDetail> {
     const res = await api.get<AnalysisRecordDetail>(`/api/history/${recordId}`)
     return res.data
   },

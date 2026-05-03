@@ -8,12 +8,17 @@ interface Props {
 export default function ProfitDisplay({ profit, upliftPct }: Props) {
   return (
     <div>
-      <p className="font-display text-[clamp(2.5rem,5vw,4rem)] text-ink leading-none tracking-tight">
+      <p className="font-display font-black text-[clamp(2.5rem,4vw,3.5rem)] text-slate-900 leading-none tracking-tight">
         {formatTRY(profit)}
       </p>
-      <p className="font-body text-sm mt-1" style={{ color: upliftPct >= 0 ? '#3D7A4E' : '#8B3A3A' }}>
+      <div className="mt-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border" style={{ 
+        backgroundColor: upliftPct >= 0 ? '#F0FDF4' : '#FEF2F2',
+        color: upliftPct >= 0 ? '#166534' : '#991B1B',
+        borderColor: upliftPct >= 0 ? '#DCFCE7' : '#FEE2E2'
+      }}>
+        <span className="mr-1">{upliftPct >= 0 ? '↗' : '↘'}</span>
         {formatPct(upliftPct, true)} değer artışı
-      </p>
+      </div>
     </div>
   )
 }

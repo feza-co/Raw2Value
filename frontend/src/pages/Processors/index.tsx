@@ -19,16 +19,31 @@ export default function Processors() {
 
   return (
     <div className="max-w-5xl mx-auto px-8 py-12">
-      <p className="font-body text-xs text-stone-300 uppercase tracking-widest mb-6">Yakın İşlemciler</p>
-      <h1 className="font-display font-light text-ink text-4xl mb-8">İşlemci Haritası</h1>
+      <div className="mb-12">
+        <p className="font-body text-sm font-semibold text-amber-600 uppercase tracking-widest mb-3">Yakın İşlemciler</p>
+        <h1 className="font-display font-black text-slate-900 text-4xl">İşlemci Haritası</h1>
+      </div>
 
-      <ProcessorMap processors={processors} />
+      <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden mb-12">
+        <ProcessorMap processors={processors} />
+      </div>
 
-      <div className="mt-8 border-t border-stone-100">
+      <div>
+        <h2 className="font-display font-bold text-slate-800 text-2xl mb-6">Listelenen İşlemciler</h2>
         {isLoading ? (
-          <p className="font-body text-sm text-stone-300 animate-pulse mt-4">Yükleniyor…</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[1,2].map(i => (
+              <div key={i} className="bg-slate-100 animate-pulse h-48 rounded-3xl" />
+            ))}
+          </div>
+        ) : processors.length === 0 ? (
+          <div className="bg-white rounded-3xl p-12 text-center border border-slate-100">
+            <p className="font-body text-slate-500 font-medium">Yakınınızda işlemci bulunamadı.</p>
+          </div>
         ) : (
-          processors.map((p) => <ProcessorCard key={p.id} processor={p} />)
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {processors.map((p) => <ProcessorCard key={p.id} processor={p} />)}
+          </div>
         )}
       </div>
     </div>

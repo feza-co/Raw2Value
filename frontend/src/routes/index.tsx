@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Outlet } from 'react-router-dom'
 import { ProtectedRoute, PublicOnlyRoute } from './guards'
 import PublicShell from '@/components/layout/PublicShell'
 import AppShell from '@/components/layout/AppShell'
@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
       { path: '/', element: wrap(<Landing />) },
       { path: '/evidence', element: wrap(<Evidence />) },
       {
-        element: <PublicOnlyRoute><></></PublicOnlyRoute>,
+        element: <PublicOnlyRoute><Outlet /></PublicOnlyRoute>,
         children: [
           { path: '/login', element: wrap(<Login />) },
           { path: '/register', element: wrap(<Register />) },

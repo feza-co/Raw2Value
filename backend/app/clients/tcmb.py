@@ -1,7 +1,7 @@
-"""TCMB EVDS client — günlük USD/EUR alış kuru.
+"""TCMB EVDS client — gunluk USD/EUR alis kuru.
 
-Tenacity ile 3 deneme exponential backoff. Hata durumunda servis katmanı
-(`fx_service.get_current_fx`) fallback'a düşer.
+Tenacity ile 3 deneme exponential backoff. Hata durumunda servis katmani
+(`fx_service.get_current_fx`) fallback'a duser.
 
 Kaynak: MASTER_BACKEND_GELISTIRME_RAPORU_PART2.md §10.1.
 """
@@ -17,11 +17,11 @@ from ..config import settings
 
 
 class TcmbError(Exception):
-    """TCMB EVDS çağrısı 3 denemeden sonra başarısız oldu."""
+    """TCMB EVDS cagrisi 3 denemeden sonra basarisiz oldu."""
 
 
 class TcmbClient:
-    """EVDS'den USD/TRY ve EUR/TRY günlük kuru alır."""
+    """EVDS'den USD/TRY ve EUR/TRY gunluk kuru alir."""
 
     def __init__(
         self,
@@ -48,13 +48,13 @@ class TcmbClient:
         reraise=True,
     )
     async def get_fx(self) -> dict[str, Any]:
-        """USD/TRY ve EUR/TRY için son günün kapanışını döner.
+        """USD/TRY ve EUR/TRY icin son gunun kapanisini doner.
 
         Returns:
             `{"usd_try": float, "eur_try": float, "last_updated": "DD-MM-YYYY"}`
 
         Raises:
-            TcmbError — yanıt eksik/parse edilemezse.
+            TcmbError — yanit eksik/parse edilemezse.
         """
         today = datetime.now(timezone.utc).date()
         # Hafta sonu / tatilde son veri T-1 ya da daha eski olabilir.
@@ -72,9 +72,9 @@ class TcmbClient:
         data = response.json()
         items = data.get("items") or []
         if not items:
-            raise TcmbError("TCMB items boş döndü")
+            raise TcmbError("TCMB items bos dondu")
 
-        # En yeni veri en sonda; tutar None olabilir (tatil günleri).
+        # En yeni veri en sonda; tutar None olabilir (tatil gunleri).
         last_valid = next(
             (
                 row
@@ -84,13 +84,13 @@ class TcmbClient:
             None,
         )
         if last_valid is None:
-            raise TcmbError("Son 10 günde geçerli kur bulunamadı")
+            raise TcmbError("Son 10 gunde gecerli kur bulunamadi")
 
         try:
             usd_try = float(last_valid["TP_DK_USD_A_YTL"])
             eur_try = float(last_valid["TP_DK_EUR_A_YTL"])
         except (TypeError, ValueError) as exc:
-            raise TcmbError(f"Kur değeri parse edilemedi: {exc}") from exc
+            raise TcmbError(f"Kur degeri parse edilemedi: {exc}") from exc
 
         return {
             "usd_try": usd_try,

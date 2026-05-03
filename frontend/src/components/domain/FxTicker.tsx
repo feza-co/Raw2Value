@@ -3,14 +3,14 @@ import { clsx } from 'clsx'
 
 interface Props {
   compact?: boolean
-  dark?: boolean
+  dark?: boolean // Deprecated, kept for API compatibility
 }
 
-export default function FxTicker({ compact, dark }: Props) {
+export default function FxTicker({ compact }: Props) {
   const { data, isFetching } = useFx()
 
-  const textColor = dark ? 'text-stone-300' : 'text-stone-300'
-  const valueColor = dark ? 'text-parchment' : 'text-charcoal'
+  const textColor = 'text-slate-400'
+  const valueColor = 'text-slate-700'
 
   if (!data) {
     return (
@@ -26,7 +26,7 @@ export default function FxTicker({ compact, dark }: Props) {
         <span
           className={clsx(
             'w-1.5 h-1.5 rounded-full',
-            data.is_stale ? 'bg-warning' : 'bg-success',
+            data.is_stale ? 'bg-amber-500' : 'bg-emerald-500',
             !isFetching && !data.is_stale && 'animate-pulse',
           )}
         />
@@ -34,13 +34,13 @@ export default function FxTicker({ compact, dark }: Props) {
       </span>
       <span>
         <span className={textColor}>$1 = </span>
-        <span className={clsx('font-medium', valueColor)}>
+        <span className={clsx('font-bold', valueColor)}>
           ₺{data.usd_try.toFixed(2)}
         </span>
       </span>
       <span>
         <span className={textColor}>€1 = </span>
-        <span className={clsx('font-medium', valueColor)}>
+        <span className={clsx('font-bold', valueColor)}>
           ₺{data.eur_try.toFixed(2)}
         </span>
       </span>

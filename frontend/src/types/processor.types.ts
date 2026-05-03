@@ -1,15 +1,15 @@
 export interface NearbyProcessor {
   id: string
   name: string
-  city: string
-  district: string
+  city: string | null
+  district: string | null
   lat: number
   lon: number
   distance_km: number
   processing_routes: string[]
-  capacity_ton_year: number
+  capacity_ton_year: number | null
   certifications: string[]
-  unit_cost_try_per_ton: number
+  unit_cost_try_per_ton: number | null
   capabilities: {
     can_process_material: boolean
     has_storage: boolean

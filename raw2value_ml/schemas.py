@@ -71,6 +71,8 @@ class MatchResult(BaseModel):
 class ConfidenceBreakdown(BaseModel):
     """Veri + model güven skorları + uyarılar."""
 
+    model_config = ConfigDict(protected_namespaces=())
+
     data_confidence: int
     model_confidence: int
     overall: float

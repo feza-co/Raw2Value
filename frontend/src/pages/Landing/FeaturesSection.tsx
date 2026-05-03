@@ -31,25 +31,25 @@ const FEATURES = [
 export default function FeaturesSection() {
   return (
     <>
-      <DiagonalDivider fromColor="#1A1A1A" toColor="#F8F7F5" />
-      <section className="bg-parchment py-32">
+      <DiagonalDivider fromColor="#ffffff" toColor="#f8fafc" />
+      <section className="bg-slate-50 py-32">
         <div className="max-w-[1440px] mx-auto px-8 md:px-16 xl:px-24">
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-24 items-start">
             <div className="lg:sticky lg:top-32">
-              <p className="font-body text-xs text-stone-300 uppercase tracking-widest mb-6">Özellikler</p>
+              <p className="font-body text-sm font-semibold text-amber-600 uppercase tracking-widest mb-6">Özellikler</p>
               <h2
-                className="font-display font-light text-ink leading-tight"
-                style={{ fontSize: 'clamp(2.5rem, 5vw, 5rem)' }}
+                className="font-display font-black text-slate-900 leading-tight"
+                style={{ fontSize: 'clamp(3rem, 5vw, 5rem)' }}
               >
                 <RevealText text="Veri Odaklı Karar Motoru" />
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
               {FEATURES.map((f) => (
-                <div key={f.title}>
-                  <div className="w-8 h-px bg-amber mb-4" />
-                  <h3 className="font-body text-sm font-medium text-charcoal mb-2">{f.title}</h3>
-                  <p className="font-body text-sm text-stone-300 leading-relaxed">{f.desc}</p>
+                <div key={f.title} className="bg-white p-8 rounded-[2rem] shadow-lg shadow-slate-200/50 border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  <div className="w-12 h-1 bg-amber-500 mb-6 rounded-full" />
+                  <h3 className="font-body text-xl font-bold text-slate-900 mb-3">{f.title}</h3>
+                  <p className="font-body text-slate-600 leading-relaxed font-medium">{f.desc}</p>
                 </div>
               ))}
             </div>

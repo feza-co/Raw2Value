@@ -31,9 +31,14 @@ export default function AnalysisForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8 p-8 h-full overflow-y-auto">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8 p-8 h-full overflow-y-auto bg-white border-r border-slate-200 shadow-sm">
+      <div className="flex flex-col gap-2">
+        <h2 className="font-display font-black text-slate-900 text-2xl">Yeni Analiz</h2>
+        <p className="font-body text-sm text-slate-500 font-medium">Değerleme parametrelerini belirleyin</p>
+      </div>
+
       <div>
-        <p className="font-body text-xs text-stone-300 uppercase tracking-widest mb-4">Hammadde</p>
+        <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">Hammadde</label>
         <Controller
           name="raw_material"
           control={control}
@@ -45,36 +50,36 @@ export default function AnalysisForm() {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="font-body text-xs text-stone-300 uppercase tracking-widest block mb-2">Tonaj</label>
+          <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">Tonaj</label>
           <input
             {...register('tonnage', { valueAsNumber: true })}
             type="number"
             min={0.1}
             max={100000}
             step={0.1}
-            className="w-full border border-stone-100 bg-white px-4 py-3 font-body text-sm focus:outline-none focus:border-amber transition-colors duration-150"
+            className="w-full border border-slate-200 bg-slate-50 px-4 py-3.5 rounded-xl font-body text-sm focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all duration-300"
             placeholder="1000"
           />
-          {errors.tonnage && <p className="font-body text-xs text-danger mt-1">{errors.tonnage.message}</p>}
+          {errors.tonnage && <p className="font-body text-xs text-red-500 font-medium mt-1">{errors.tonnage.message}</p>}
         </div>
 
         <div>
-          <label className="font-body text-xs text-stone-300 uppercase tracking-widest block mb-2">Kalite</label>
+          <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">Kalite</label>
           <Controller
             name="quality"
             control={control}
             render={({ field }) => (
-              <div className="flex gap-1">
+              <div className="flex gap-2">
                 {QUALITY_GRADES.map((g) => (
                   <button
                     key={g.value}
                     type="button"
                     onClick={() => field.onChange(g.value)}
                     className={clsx(
-                      'flex-1 py-3 font-body text-sm border transition-colors duration-150',
+                      'flex-1 py-3.5 font-body font-semibold text-sm rounded-xl border transition-all duration-300',
                       field.value === g.value
-                        ? 'border-amber bg-amber text-white'
-                        : 'border-stone-100 text-charcoal hover:border-stone-300',
+                        ? 'border-amber-500 bg-amber-50 text-amber-700 shadow-sm'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-slate-100',
                     )}
                   >
                     {g.label}
@@ -87,33 +92,33 @@ export default function AnalysisForm() {
       </div>
 
       <div>
-        <label className="font-body text-xs text-stone-300 uppercase tracking-widest block mb-2">Çıkış Şehri</label>
+        <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">Çıkış Şehri</label>
         <input
           {...register('origin_city')}
           type="text"
-          className="w-full border border-stone-100 bg-white px-4 py-3 font-body text-sm focus:outline-none focus:border-amber transition-colors duration-150"
+          className="w-full border border-slate-200 bg-slate-50 px-4 py-3.5 rounded-xl font-body text-sm focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all duration-300"
           placeholder="Nevşehir"
         />
-        {errors.origin_city && <p className="font-body text-xs text-danger mt-1">{errors.origin_city.message}</p>}
+        {errors.origin_city && <p className="font-body text-xs text-red-500 font-medium mt-1">{errors.origin_city.message}</p>}
       </div>
 
       <div>
-        <label className="font-body text-xs text-stone-300 uppercase tracking-widest block mb-2">Hedef Ülke</label>
+        <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">Hedef Ülke</label>
         <Controller
           name="target_country"
           control={control}
           render={({ field }) => (
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               {TARGET_COUNTRIES.map((c) => (
                 <button
                   key={c.value}
                   type="button"
                   onClick={() => field.onChange(c.value)}
                   className={clsx(
-                    'flex-1 py-3 font-body text-sm border transition-colors duration-150',
+                    'flex-1 py-3.5 font-body font-semibold text-sm rounded-xl border transition-all duration-300',
                     field.value === c.value
-                      ? 'border-amber bg-amber text-white'
-                      : 'border-stone-100 text-charcoal hover:border-stone-300',
+                      ? 'border-amber-500 bg-amber-50 text-amber-700 shadow-sm'
+                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-slate-100',
                   )}
                 >
                   {c.label}
@@ -125,26 +130,26 @@ export default function AnalysisForm() {
       </div>
 
       <div>
-        <label className="font-body text-xs text-stone-300 uppercase tracking-widest block mb-2">Taşıma Modu</label>
+        <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">Taşıma Modu</label>
         <Controller
           name="transport_mode"
           control={control}
           render={({ field }) => (
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-2 gap-3">
               {TRANSPORT_MODES.map((m) => (
                 <button
                   key={m.value}
                   type="button"
                   onClick={() => field.onChange(m.value)}
                   className={clsx(
-                    'py-3 px-3 text-left font-body border transition-colors duration-150',
+                    'py-4 px-4 text-left rounded-xl font-body border transition-all duration-300',
                     field.value === m.value
-                      ? 'border-amber bg-amber/5'
-                      : 'border-stone-100 hover:border-stone-300',
+                      ? 'border-amber-500 bg-amber-50 shadow-sm'
+                      : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100',
                   )}
                 >
-                  <p className="text-sm text-charcoal">{m.label}</p>
-                  <p className="text-xs text-stone-300 mt-0.5">{m.co2Hint}</p>
+                  <p className={clsx("text-sm font-semibold mb-1", field.value === m.value ? 'text-amber-800' : 'text-slate-800')}>{m.label}</p>
+                  <p className={clsx("text-xs font-medium", field.value === m.value ? 'text-amber-600/70' : 'text-slate-500')}>{m.co2Hint}</p>
                 </button>
               ))}
             </div>
@@ -153,22 +158,22 @@ export default function AnalysisForm() {
       </div>
 
       <div>
-        <label className="font-body text-xs text-stone-300 uppercase tracking-widest block mb-2">Öncelik</label>
+        <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">Öncelik</label>
         <Controller
           name="priority"
           control={control}
           render={({ field }) => (
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               {PRIORITIES.map((p) => (
                 <button
                   key={p.value}
                   type="button"
                   onClick={() => field.onChange(p.value)}
                   className={clsx(
-                    'flex-1 py-3 font-body text-xs border transition-colors duration-150',
+                    'flex-1 py-3.5 font-body font-semibold text-xs rounded-xl border transition-all duration-300',
                     field.value === p.value
-                      ? 'border-amber bg-amber text-white'
-                      : 'border-stone-100 text-charcoal hover:border-stone-300',
+                      ? 'border-amber-500 bg-amber-50 text-amber-700 shadow-sm'
+                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-slate-100',
                   )}
                 >
                   {p.label}
@@ -182,38 +187,39 @@ export default function AnalysisForm() {
       <button
         type="button"
         onClick={() => setAdvanced((v) => !v)}
-        className="font-body text-xs text-stone-300 uppercase tracking-widest text-left hover:text-amber transition-colors duration-150"
+        className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest text-left hover:text-amber-600 transition-colors duration-200 flex items-center gap-2"
       >
-        {advanced ? '− Gelişmiş' : '+ Gelişmiş'}
+        <span className="w-4 h-4 flex items-center justify-center rounded-full bg-slate-100 text-slate-400">{advanced ? '−' : '+'}</span>
+        Gelişmiş Parametreler
       </button>
 
       {advanced && (
-        <div className="flex flex-col gap-4 border-t border-stone-100 pt-6">
+        <div className="flex flex-col gap-5 border-t border-slate-100 pt-6 animate-in slide-in-from-top-4 fade-in duration-300">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="font-body text-xs text-stone-300 uppercase tracking-widest block mb-2">Nem (%)</label>
+              <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">Nem (%)</label>
               <input
                 {...register('moisture_pct', { valueAsNumber: true })}
                 type="number"
                 min={0}
                 max={100}
-                className="w-full border border-stone-100 bg-white px-4 py-3 font-body text-sm focus:outline-none focus:border-amber"
+                className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl font-body text-sm focus:outline-none focus:border-amber-500"
               />
             </div>
             <div>
-              <label className="font-body text-xs text-stone-300 uppercase tracking-widest block mb-2">Saflık (%)</label>
+              <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-2">Saflık (%)</label>
               <input
                 {...register('purity_pct', { valueAsNumber: true })}
                 type="number"
                 min={0}
                 max={100}
-                className="w-full border border-stone-100 bg-white px-4 py-3 font-body text-sm focus:outline-none focus:border-amber"
+                className="w-full border border-slate-200 bg-slate-50 px-4 py-3 rounded-xl font-body text-sm focus:outline-none focus:border-amber-500"
               />
             </div>
           </div>
-          <div>
-            <label className="font-body text-xs text-stone-300 uppercase tracking-widest block mb-2">
-              Kur Senaryosu ({'{'}0{'}'}%)
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">
+              Kur Senaryosu
             </label>
             <input
               {...register('fx_scenario_pct', { valueAsNumber: true })}
@@ -221,12 +227,17 @@ export default function AnalysisForm() {
               min={-0.2}
               max={0.2}
               step={0.01}
-              className="w-full accent-amber"
+              className="w-full accent-amber-500"
             />
+            <div className="flex justify-between text-xs font-medium text-slate-400 mt-2">
+              <span>-%20</span>
+              <span>%0</span>
+              <span>+%20</span>
+            </div>
           </div>
-          <div>
-            <label className="font-body text-xs text-stone-300 uppercase tracking-widest block mb-2">
-              Maliyet Senaryosu ({'{'}0{'}'}%)
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <label className="font-body text-xs font-bold text-slate-500 uppercase tracking-widest block mb-3">
+              Maliyet Senaryosu
             </label>
             <input
               {...register('cost_scenario_pct', { valueAsNumber: true })}
@@ -234,8 +245,13 @@ export default function AnalysisForm() {
               min={-0.2}
               max={0.2}
               step={0.01}
-              className="w-full accent-amber"
+              className="w-full accent-amber-500"
             />
+            <div className="flex justify-between text-xs font-medium text-slate-400 mt-2">
+              <span>-%20</span>
+              <span>%0</span>
+              <span>+%20</span>
+            </div>
           </div>
         </div>
       )}
@@ -243,7 +259,7 @@ export default function AnalysisForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full py-5 bg-amber text-white font-body text-sm tracking-wide hover:bg-amber-dark transition-colors duration-150 disabled:opacity-50 mt-auto"
+        className="w-full py-4 rounded-xl bg-slate-900 text-white font-body font-semibold text-lg hover:bg-slate-800 shadow-xl shadow-slate-900/20 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:hover:translate-y-0 mt-auto"
         style={{ cursor: isPending ? 'progress' : 'pointer' }}
       >
         {isPending ? 'Analiz ediliyor…' : 'Analiz Et'}

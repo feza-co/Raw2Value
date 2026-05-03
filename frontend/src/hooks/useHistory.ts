@@ -12,9 +12,9 @@ export const useHistory = (filters: HistoryFilters = {}) =>
     initialPageParam: 1,
   })
 
-export const useHistoryDetail = (recordId: string) =>
+export const useHistoryDetail = (recordId: number | null) =>
   useQuery({
     queryKey: ['history', 'detail', recordId],
-    queryFn: () => historyService.getDetail(recordId),
-    enabled: !!recordId,
+    queryFn: () => historyService.getDetail(recordId as number),
+    enabled: recordId !== null,
   })
