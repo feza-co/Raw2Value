@@ -1,18 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-r2v-base: #FAF9F6;
-  --color-r2v-surface: #EFEBE6;
-  --color-r2v-charcoal: #2D323A;
+  --color-r2v-base: #FAFAFA;
+  --color-r2v-surface: #F1F1EE;
+  --color-r2v-line: #E5E5E2;
+  --color-r2v-ink: #111111;
+  --color-r2v-muted: #6B6B6B;
+  --color-r2v-charcoal: #111111;
   --color-r2v-earth: #4A3C31;
-  --color-r2v-terracotta: #C05C41;
-  --color-r2v-green: #6B8E78;
+  --color-r2v-terracotta: #C0392B;
+  --color-r2v-green: #2F5D3A;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 @layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
     background-color: var(--color-r2v-base);
-    color: var(--color-r2v-charcoal);
+    color: var(--color-r2v-ink);
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  ::selection {
+    background-color: var(--color-r2v-ink);
+    color: var(--color-r2v-base);
+  }
+}
+
+@layer utilities {
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  .tracking-tightest {
+    letter-spacing: -0.045em;
+  }
+
+  .swiss-rule {
+    border-color: var(--color-r2v-line);
   }
 }

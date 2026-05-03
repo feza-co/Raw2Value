@@ -1,294 +1,444 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-// Pumice/volcanic rock fractal noise texture encoded as SVG data URI
-const PUMICE_TEXTURE = `url("data:image/svg+xml,${encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240">' +
-  '<filter id="p"><feTurbulence type="fractalNoise" baseFrequency="0.78 0.85" numOctaves="5" seed="9" stitchTiles="stitch"/>' +
-  '<feColorMatrix type="matrix" values="0.12 0 0 0 0.54 0.12 0 0 0 0.48 0.12 0 0 0 0.40 0 0 0 1 0"/></filter>' +
-  '<rect width="240" height="240" filter="url(#p)"/></svg>'
-)}")`;
-
 export default function LandingPage() {
+  const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
-    const handleScroll = () => {
-      const header = document.getElementById('main-header');
-      const navContainer = document.getElementById('nav-container');
-      const navHalo = document.getElementById('nav-halo');
-      const navBg = document.getElementById('nav-bg');
-      const headerInner = document.getElementById('header-inner');
-      const topBanner = document.getElementById('top-banner');
-      
-      const scrollY = window.scrollY;
-      
-      if (!header || !navContainer || !navHalo || !navBg || !headerInner || !topBanner) return;
-
-      if (scrollY > 50) {
-        topBanner.style.marginTop = `-${topBanner.offsetHeight}px`;
-        
-        navContainer.classList.add('pt-4');
-        navContainer.classList.remove('pt-0', 'px-0');
-        navContainer.classList.add('px-4');
-        
-        header.classList.remove('max-w-full');
-        header.classList.add('max-w-4xl');
-        
-        navBg.classList.remove('bg-transparent', 'rounded-none');
-        navBg.classList.add('bg-white/95', 'rounded-full', 'shadow-md');
-        
-        navHalo.classList.remove('opacity-0', 'rounded-none');
-        navHalo.classList.add('opacity-100', 'rounded-full');
-        
-        headerInner.classList.remove('py-5', 'px-6');
-        headerInner.classList.add('py-2', 'px-8');
-
-      } else {
-        topBanner.style.marginTop = '0px';
-
-        navContainer.classList.remove('pt-4', 'px-4');
-        navContainer.classList.add('pt-0', 'px-0');
-        
-        header.classList.remove('max-w-4xl');
-        header.classList.add('max-w-full');
-        
-        navBg.classList.remove('bg-white/95', 'rounded-full', 'shadow-md');
-        navBg.classList.add('bg-transparent', 'rounded-none');
-        
-        navHalo.classList.remove('opacity-100', 'rounded-full');
-        navHalo.classList.add('opacity-0', 'rounded-none');
-        
-        headerInner.classList.remove('py-2', 'px-8');
-        headerInner.classList.add('py-5', 'px-6');
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   return (
-    <div
-      className="antialiased overflow-x-hidden relative"
-      style={{ backgroundColor: '#8a7a6a', backgroundImage: PUMICE_TEXTURE, backgroundSize: '240px 240px' }}
-    >
-      {/* Top Banner */}
-      <div id="top-banner" className="bg-r2v-charcoal text-[#FAF9F6] text-center py-2 text-xs font-medium tracking-wide transition-all duration-500">
-        <a className="hover:text-r2v-terracotta transition-colors flex items-center justify-center gap-2" href="#">
-          TR71 Bölgesi Akıllı Tedarik Zinciri Karar Motoru Canlı Yayında
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" strokeLinecap="round" strokeLinejoin="round"></path>
-          </svg>
-        </a>
+    <div className="min-h-screen bg-r2v-base text-r2v-ink antialiased font-sans">
+      {/* Top meta bar */}
+      <div className="border-b border-r2v-line bg-r2v-base">
+        <div className="max-w-[1440px] mx-auto px-6 md:px-10 h-9 flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted">
+          <span>TR71 / Kapadokya</span>
+          <span className="hidden md:inline">Hackathon 2026 — Kategori 03 — Akıllı Tedarik Zinciri</span>
+          <span>v0.4.0</span>
+        </div>
       </div>
 
-      {/* Floating Navbar */}
-      <div id="nav-container" className="fixed top-8 left-0 right-0 z-50 flex justify-center transition-all duration-500 px-0 pt-0">
-        <header id="main-header" className="relative w-full max-w-full transition-all duration-500">
-          <div id="nav-halo" className="absolute -inset-y-1 -inset-x-2 bg-r2v-base/40 rounded-none opacity-0 backdrop-blur-md transition-all duration-500 -z-20 border border-r2v-charcoal/5 shadow-sm"></div>
-          <div id="nav-bg" className="absolute inset-0 bg-transparent rounded-none transition-all duration-500 -z-10"></div>
-          
-          <div id="header-inner" className="px-6 py-5 flex justify-between items-center transition-all duration-500 relative z-10 w-full">
-            <a className="text-r2v-charcoal hover:text-r2v-terracotta font-bold text-xl flex items-center gap-2 tracking-tight transition-colors duration-300" href="#" id="logo-text">
-              <svg className="w-6 h-6 text-r2v-terracotta" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path><circle cx="12" cy="12" r="5" fill="#FAF9F6"></circle></svg>
-              Raw2Value
-            </a>
-            
-            <nav className="hidden md:flex items-center" id="nav-links">
-              <a href="#modeller" className="px-5 text-r2v-charcoal/80 hover:text-r2v-charcoal text-sm font-medium transition-colors">Modeller</a>
-              <div className="h-4 w-px bg-r2v-charcoal/20 nav-separator transition-colors duration-300"></div>
-              <a href="#cockpit" className="px-5 text-r2v-charcoal/80 hover:text-r2v-charcoal text-sm font-medium transition-colors">Cockpit</a>
-              <div className="h-4 w-px bg-r2v-charcoal/20 nav-separator transition-colors duration-300"></div>
-              <a href="#kanit" className="px-5 text-r2v-charcoal/80 hover:text-r2v-charcoal text-sm font-medium transition-colors">Model Kanıtı</a>
-              <div className="h-4 w-px bg-r2v-charcoal/20 nav-separator transition-colors duration-300"></div>
-              <a href="#pilot" className="px-5 text-r2v-charcoal/80 hover:text-r2v-charcoal text-sm font-medium transition-colors">Pilot Program</a>
-            </nav>
-
-            <div className="flex items-center gap-4">
-              {/* IMPORTANT: Link to the Dashboard application */}
-              <Link to="/dashboard" id="nav-btn" className="bg-r2v-charcoal text-white px-6 py-2 rounded-full font-medium hover:bg-r2v-charcoal/90 transition-colors text-sm shadow-sm">
-                Sisteme Giriş
-              </Link>
+      {/* Navbar */}
+      <header
+        className={`sticky top-0 z-50 bg-r2v-base/90 backdrop-blur-sm transition-shadow ${
+          scrolled ? 'border-b border-r2v-line shadow-[0_1px_0_0_rgba(0,0,0,0.04)]' : 'border-b border-transparent'
+        }`}
+      >
+        <div className="max-w-[1440px] mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-7 h-7 bg-r2v-ink flex items-center justify-center">
+              <div className="w-3 h-3 bg-r2v-terracotta" />
             </div>
-          </div>
-        </header>
-      </div>
+            <span className="text-[15px] font-semibold tracking-tight">Raw2Value</span>
+            <span className="hidden md:inline text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted ml-2">
+              Decision Engine
+            </span>
+          </Link>
+
+          <nav className="hidden md:flex items-center gap-8 text-sm">
+            <a href="#models" className="text-r2v-ink/70 hover:text-r2v-ink transition-colors">Modeller</a>
+            <a href="#evidence" className="text-r2v-ink/70 hover:text-r2v-ink transition-colors">Kanıtlar</a>
+            <a href="#pipeline" className="text-r2v-ink/70 hover:text-r2v-ink transition-colors">Pipeline</a>
+            <a href="#pilot" className="text-r2v-ink/70 hover:text-r2v-ink transition-colors">Pilot</a>
+          </nav>
+
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-2 bg-r2v-ink text-r2v-base px-4 py-2 text-sm font-medium hover:bg-r2v-terracotta transition-colors"
+          >
+            Sisteme Giriş
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M5 12h14M13 5l7 7-7 7" strokeLinecap="square" strokeLinejoin="miter" />
+            </svg>
+          </Link>
+        </div>
+      </header>
 
       <main>
-        {/* Floating Boxed Hero Section */}
-        <div className="pt-32 pb-12 px-4 md:px-8">
-          <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden rounded-[2.5rem] max-w-[1400px] mx-auto shadow-2xl">
-            <div className="absolute inset-0 z-0 bg-r2v-charcoal">
-              <img alt="Raw2Value AI Operations" className="w-full h-full object-cover object-center opacity-75" src="assets/hero_kapadokya.png"/>
-              <div className="absolute inset-0 bg-gradient-to-t from-r2v-charcoal/80 via-r2v-charcoal/40 to-transparent"></div>
-              <div className="absolute inset-x-0 top-0 h-2/3 bg-gradient-to-b from-r2v-terracotta/20 to-transparent mix-blend-overlay"></div>
-              <div className="absolute inset-0 bg-r2v-earth/20 mix-blend-multiply"></div>
-            </div>
-            
-            <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-10">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/30 bg-white/10 backdrop-blur text-white text-xs font-medium mb-8 shadow-sm">
-                <svg className="w-4 h-4 text-r2v-terracotta" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                TR71 Akıllı Karar Motoru
+        {/* HERO — Swiss grid */}
+        <section className="border-b border-r2v-line">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-10 pt-20 md:pt-28 pb-16 md:pb-24">
+            <div className="grid grid-cols-12 gap-x-6 md:gap-x-8">
+              <div className="col-span-12 md:col-span-2 mb-10 md:mb-0">
+                <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-r2v-muted">
+                  01 — Manifesto
+                </div>
               </div>
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white tracking-tight leading-[1.05]">
-                Don't sell the rock.<br/><span className="font-medium text-r2v-base drop-shadow-lg">Sell the value.</span>
-              </h1>
-              <p className="mt-8 text-lg md:text-xl text-r2v-base/90 font-light max-w-2xl mx-auto drop-shadow-md">
-                Kapadokya hammaddeleri için ham satıştan katma değerli rotaya geçişi optimize eden tedarik zinciri karar motoru.
-              </p>
-            </div>
-            
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/80 flex flex-col items-center gap-2 z-10">
-              <svg className="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" strokeLinecap="round" strokeLinejoin="round"></path>
-              </svg>
-            </div>
-          </section>
-        </div>
 
-        {/* Mission Statement Section */}
-        <section id="modeller" className="bg-r2v-surface py-32 px-6 border-y border-r2v-charcoal/5">
-          <div className="max-w-6xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light leading-[1.15] tracking-tight text-r2v-earth">
-              Raw2Value AI bir ilan platformu <span className="text-r2v-terracotta italic font-medium">değildir.</span><br/>
-              Katma değerli işleme rotası öneren<br/>
-              ML tabanlı bir <span className="font-semibold text-r2v-charcoal">karar motorudur.</span>
-            </h2>
-            
-            <div className="mt-24 text-left grid md:grid-cols-3 gap-8">
-              <div className="bg-r2v-base p-10 rounded-[2rem] shadow-sm border border-r2v-charcoal/5 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-r2v-terracotta/10 text-r2v-terracotta flex items-center justify-center rounded-xl mb-6">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+              <div className="col-span-12 md:col-span-10">
+                <h1 className="text-[clamp(3rem,9vw,9.5rem)] leading-[0.92] font-medium tracking-tightest text-r2v-ink">
+                  Don't sell <br />
+                  the rock.<br />
+                  <span className="text-r2v-terracotta">Sell the value.</span>
+                </h1>
+
+                <div className="mt-12 grid grid-cols-12 gap-x-6 md:gap-x-8">
+                  <div className="col-span-12 md:col-span-6">
+                    <p className="text-base md:text-lg leading-relaxed text-r2v-ink/80 max-w-xl">
+                      Kapadokya'nın üç hammaddesini — pomza, perlit, kabak çekirdeği —
+                      işleyip ihraç etmek için en kârlı rotayı, beklenen kârı (TRY),
+                      CO₂ maliyetini ve alıcı eşleşmesini öneren makine öğrenmesi
+                      tabanlı karar motoru.
+                    </p>
+                  </div>
+                  <div className="col-span-12 md:col-span-4 md:col-start-9 mt-8 md:mt-0">
+                    <div className="flex flex-col gap-4">
+                      <Link
+                        to="/dashboard"
+                        className="inline-flex items-center justify-between bg-r2v-ink text-r2v-base px-5 py-4 text-sm font-medium hover:bg-r2v-terracotta transition-colors"
+                      >
+                        <span>Karar Motorunu Aç</span>
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M5 12h14M13 5l7 7-7 7" strokeLinecap="square" />
+                        </svg>
+                      </Link>
+                      <a
+                        href="#evidence"
+                        className="inline-flex items-center justify-between border border-r2v-ink text-r2v-ink px-5 py-4 text-sm font-medium hover:bg-r2v-ink hover:text-r2v-base transition-colors"
+                      >
+                        <span>Model Kanıtları</span>
+                        <span className="font-mono text-xs">↓</span>
+                      </a>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-4 text-r2v-charcoal">Value Uplift Prediction</h3>
-                <p className="text-r2v-charcoal/70 font-light leading-relaxed">
-                  Hammadde ve işleme rotasına göre beklenen değer artışı ve net kârı tahmin eden regresyon modeli. Ham satış ile katma değerli ürün arasındaki gerçek farkı hesaplar.
-                </p>
               </div>
-              <div className="bg-r2v-base p-10 rounded-[2rem] shadow-sm border border-r2v-charcoal/5 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-r2v-green/10 text-r2v-green flex items-center justify-center rounded-xl mb-6">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+            </div>
+          </div>
+
+          {/* KPI strip */}
+          <div className="border-t border-r2v-line bg-r2v-surface">
+            <div className="max-w-[1440px] mx-auto px-6 md:px-10 grid grid-cols-2 md:grid-cols-4 divide-x divide-r2v-line">
+              {[
+                { k: '1.500', l: 'Eğitim Senaryosu', s: '120 gerçek + augmented' },
+                { k: 'R² 0.84', l: 'Profit Modeli', s: 'CatBoost holdout' },
+                { k: 'F1 0.78', l: 'Route Sınıflandırıcı', s: 'macro-F1' },
+                { k: '88', l: 'Test', s: 'pytest passing' },
+              ].map((m, i) => (
+                <div key={i} className="px-5 py-8 first:pl-0 md:px-8">
+                  <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted mb-3">
+                    0{i + 1} — {m.l}
+                  </div>
+                  <div className="text-3xl md:text-4xl font-medium tracking-tight text-r2v-ink">{m.k}</div>
+                  <div className="mt-2 text-xs text-r2v-muted">{m.s}</div>
                 </div>
-                <h3 className="text-xl font-semibold mb-4 text-r2v-charcoal">Route Recommendation</h3>
-                <p className="text-r2v-charcoal/70 font-light leading-relaxed">
-                  Pomza, perlit ve kabak çekirdeği için ham satıştan katma değerli alternatiflere en uygun işleme rotasını seçen sınıflandırıcı.
-                </p>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* MODELS — 3 columns */}
+        <section id="models" className="border-b border-r2v-line">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-20 md:py-28">
+            <div className="grid grid-cols-12 gap-x-6 md:gap-x-8 mb-16">
+              <div className="col-span-12 md:col-span-2">
+                <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-r2v-muted">
+                  02 — Modeller
+                </div>
               </div>
-              <div className="bg-r2v-base p-10 rounded-[2rem] shadow-sm border border-r2v-charcoal/5 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-r2v-earth/10 text-r2v-earth flex items-center justify-center rounded-xl mb-6">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+              <div className="col-span-12 md:col-span-10">
+                <h2 className="text-4xl md:text-6xl leading-[1.02] font-medium tracking-tightest max-w-3xl">
+                  Bir ilan platformu değil.<br />
+                  <span className="text-r2v-muted">Bir karar motoru.</span>
+                </h2>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 border-t border-r2v-line">
+              {[
+                {
+                  n: '01',
+                  t: 'Value Uplift',
+                  s: 'CatBoostRegressor',
+                  d: 'Hammadde ve işleme rotasına göre beklenen değer artışı ve net kârı (TRY) tahmin eder. RMSE 11.2M.',
+                  m: '39 feature · target=expected_profit_try',
+                },
+                {
+                  n: '02',
+                  t: 'Route Recommendation',
+                  s: 'CatBoostClassifier',
+                  d: 'Pomza, perlit ve kabak çekirdeği için ham satışa karşı katma değerli alternatifler arasından en uygun işleme rotasını seçer.',
+                  m: '10 trained class · macro-F1 0.78',
+                },
+                {
+                  n: '03',
+                  t: 'Buyer Match',
+                  s: 'Deterministic scorer',
+                  d: 'Lojistik mesafe, kapasite ve kaliteyi optimize ederek en kârlı Üretici–İşleyici–Alıcı kombinasyonunu sıralar.',
+                  m: '6 component · 3 ağırlık profili',
+                },
+              ].map((c, i) => (
+                <div
+                  key={i}
+                  className={`p-8 md:p-10 border-r2v-line ${
+                    i < 2 ? 'border-b md:border-b-0 md:border-r' : ''
+                  }`}
+                >
+                  <div className="flex items-baseline justify-between mb-8">
+                    <span className="text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted">
+                      Model {c.n}
+                    </span>
+                    <span className="text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-terracotta">
+                      {c.s}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-medium tracking-tight mb-4">{c.t}</h3>
+                  <p className="text-sm leading-relaxed text-r2v-ink/75 mb-8">{c.d}</p>
+                  <div className="pt-6 border-t border-r2v-line text-[11px] font-mono uppercase tracking-[0.16em] text-r2v-muted">
+                    {c.m}
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-4 text-r2v-charcoal">Supplier-Buyer Match</h3>
-                <p className="text-r2v-charcoal/70 font-light leading-relaxed">
-                  Lojistik mesafe, işletme kapasitesi ve hedeflenen kalite kriterlerini optimize ederek en kârlı Üretici–İşleyici–Alıcı kombinasyonunu sıralar.
-                </p>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* PIPELINE — vertical sequence */}
+        <section id="pipeline" className="border-b border-r2v-line bg-r2v-surface">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-20 md:py-28">
+            <div className="grid grid-cols-12 gap-x-6 md:gap-x-8 mb-16">
+              <div className="col-span-12 md:col-span-2">
+                <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-r2v-muted">
+                  03 — Pipeline
+                </div>
+              </div>
+              <div className="col-span-12 md:col-span-10">
+                <h2 className="text-4xl md:text-6xl leading-[1.02] font-medium tracking-tightest max-w-3xl">
+                  Excel'den karar çıktısına<br />
+                  <span className="text-r2v-muted">tek yönlü veri akışı.</span>
+                </h2>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-12 gap-x-6 md:gap-x-8">
+              <div className="hidden md:block md:col-span-2" />
+              <div className="col-span-12 md:col-span-10">
+                <div className="border-t border-r2v-ink">
+                  {[
+                    { n: '01', t: 'Master', s: 'data/master/raw2value_v4.xlsx', d: '16 sheet · single source of truth' },
+                    { n: '02', t: 'ETL', s: 'ml/src/etl.py', d: 'Excel → 12 parquet + distance lookup' },
+                    { n: '03', t: 'Augmentation', s: 'ml/src/augmentation.py', d: '120 → 1.500 satır · seed=42' },
+                    { n: '04', t: 'Training', s: 'ml/src/{train_profit,train_route}.py', d: 'CatBoost native categorical' },
+                    { n: '05', t: 'Inference', s: 'raw2value_ml/inference.py', d: 'analyze() — backend tek giriş noktası' },
+                  ].map((s, i) => (
+                    <div
+                      key={i}
+                      className="grid grid-cols-12 gap-x-6 py-6 border-b border-r2v-line items-baseline"
+                    >
+                      <div className="col-span-2 md:col-span-1 text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted">
+                        {s.n}
+                      </div>
+                      <div className="col-span-10 md:col-span-3 text-lg md:text-xl font-medium tracking-tight">
+                        {s.t}
+                      </div>
+                      <div className="col-span-12 md:col-span-4 mt-2 md:mt-0 font-mono text-xs text-r2v-terracotta break-all">
+                        {s.s}
+                      </div>
+                      <div className="col-span-12 md:col-span-4 mt-2 md:mt-0 text-sm text-r2v-ink/75">
+                        {s.d}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Model Lab / Grid Section */}
-        <section id="kanit" className="bg-r2v-surface py-24 px-6 border-y border-r2v-charcoal/5">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-r2v-charcoal/10 bg-white text-r2v-charcoal text-xs font-bold uppercase tracking-widest mb-6 shadow-sm">
-                AI Evidence
+        {/* EVIDENCE — proof grid */}
+        <section id="evidence" className="border-b border-r2v-line">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-20 md:py-28">
+            <div className="grid grid-cols-12 gap-x-6 md:gap-x-8 mb-16">
+              <div className="col-span-12 md:col-span-2">
+                <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-r2v-muted">
+                  04 — Kanıt
+                </div>
               </div>
-              <h2 className="text-3xl md:text-5xl font-light text-r2v-charcoal mb-6">Model Lab & Kanıtlar</h2>
-              <p className="text-lg text-r2v-charcoal/60 font-light max-w-2xl mx-auto">
-                Hackathon projelerinde güvenilirlik esastır. Modellerimizin doğruluğunu, ablation çalışmalarını ve feature importance skorlarını şeffafça sunuyoruz.
-              </p>
+              <div className="col-span-12 md:col-span-10">
+                <h2 className="text-4xl md:text-6xl leading-[1.02] font-medium tracking-tightest max-w-3xl">
+                  Şeffaf metrik.<br />
+                  <span className="text-r2v-muted">Reproducible sonuç.</span>
+                </h2>
+                <p className="mt-6 text-base md:text-lg text-r2v-ink/75 max-w-2xl">
+                  Hackathon projesinde güven, açıklanabilir kanıttan gelir.
+                  Random seed 42 ile her sonuç tekrar üretilebilir, ablation
+                  çalışmaları kuralların load-bearing olduğunu gösterir.
+                </p>
+              </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="bg-r2v-base p-8 rounded-3xl shadow-sm border border-r2v-charcoal/5">
-                <div className="w-14 h-14 bg-r2v-surface rounded-2xl flex items-center justify-center mb-6 text-r2v-earth">
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t border-l border-r2v-line">
+              {[
+                { t: 'Feature Importance', d: 'CatBoost feature importance + SHAP overlay. Maliyet, kur ve mesafenin kararlardaki ağırlığı.' },
+                { t: 'Ablation', d: 'TCMB kuru, CO₂, geo-distance çıkarıldığında tahminin nasıl bozulduğunu gösteren testler. |Δ FX| 66%.' },
+                { t: 'Target Leakage', d: '14 test ile expected_profit, route_label, value_uplift hiçbir input feature\'da olamaz garantisi.' },
+                { t: 'Reproducibility', d: 'numpy.default_rng(42), sklearn, catboost, xgboost — tek seed ile bit-for-bit aynı çıktı.' },
+              ].map((c, i) => (
+                <div key={i} className="p-8 border-r border-b border-r2v-line">
+                  <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted mb-6">
+                    Kanıt 0{i + 1}
+                  </div>
+                  <h3 className="text-xl font-medium tracking-tight mb-4 text-r2v-ink">{c.t}</h3>
+                  <p className="text-sm leading-relaxed text-r2v-ink/70">{c.d}</p>
                 </div>
-                <h4 className="text-lg font-semibold text-r2v-charcoal mb-3">Feature Importance</h4>
-                <p className="text-sm text-r2v-charcoal/70 font-light leading-relaxed">
-                  Maliyet, kur ve mesafe verilerinin model kararındaki ağırlığını SHAP ile şeffaf bir şekilde analiz edin. XGBoost ve LightGBM altyapısı.
-                </p>
-              </div>
-              <div className="bg-r2v-base p-8 rounded-3xl shadow-sm border border-r2v-charcoal/5">
-                <div className="w-14 h-14 bg-r2v-surface rounded-2xl flex items-center justify-center mb-6 text-r2v-earth">
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                </div>
-                <h4 className="text-lg font-semibold text-r2v-charcoal mb-3">Ablation Çalışması</h4>
-                <p className="text-sm text-r2v-charcoal/70 font-light leading-relaxed">
-                  Zorunlu kuralların (TCMB canlı kur, CO2) modelden çıkarıldığında tahmin başarısının (R²) nasıl düştüğünü kanıtlayan testler.
-                </p>
-              </div>
-              <div className="bg-r2v-base p-8 rounded-3xl shadow-sm border border-r2v-charcoal/5">
-                <div className="w-14 h-14 bg-r2v-surface rounded-2xl flex items-center justify-center mb-6 text-r2v-earth">
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                </div>
-                <h4 className="text-lg font-semibold text-r2v-charcoal mb-3">Veri Çoğaltma</h4>
-                <p className="text-sm text-r2v-charcoal/70 font-light leading-relaxed">
-                  120 gerçek referans satırı ve domain-informed synthetic augmentation ile üretilen 1.500 senaryo ile eğitilmiş modeller.
-                </p>
-              </div>
-              <div className="bg-r2v-base p-8 rounded-3xl shadow-sm border border-r2v-charcoal/5">
-                <div className="w-14 h-14 bg-r2v-surface rounded-2xl flex items-center justify-center mb-6 text-r2v-green">
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <h4 className="text-lg font-semibold text-r2v-charcoal mb-3">Yüksek Doğruluk</h4>
-                <p className="text-sm text-r2v-charcoal/70 font-light leading-relaxed">
-                  Baseline Random Forest modellerinin ötesinde, CatBoost ve XGBoost ile optimize edilmiş %84 üzeri R-kare skorları.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Massive CTA Blocks */}
-        <section className="bg-r2v-base max-w-[100%] px-6 py-24">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-6">
-            <Link to="/evidence" className="flex-1 bg-r2v-surface p-12 rounded-[2rem] flex flex-col justify-between group hover:shadow-lg transition-all border border-r2v-charcoal/5 h-64 relative overflow-hidden">
-              <div className="relative z-10">
-                <div className="text-sm font-semibold uppercase tracking-widest text-r2v-charcoal/50 mb-2">Dokümantasyon</div>
-                <h3 className="text-3xl font-light text-r2v-charcoal">Teknik Altyapı</h3>
-              </div>
-              <div className="relative z-10 self-end">
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-r2v-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        {/* RULES — K1/K2/K3 */}
+        <section className="border-b border-r2v-line">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-20 md:py-28">
+            <div className="grid grid-cols-12 gap-x-6 md:gap-x-8 mb-16">
+              <div className="col-span-12 md:col-span-2">
+                <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-r2v-muted">
+                  05 — Kural Uyumu
                 </div>
               </div>
-            </Link>
-            <Link to="/dashboard" className="flex-1 bg-r2v-charcoal p-12 rounded-[2rem] flex flex-col justify-between group hover:shadow-2xl hover:shadow-r2v-charcoal/20 transition-all h-64 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-r2v-terracotta/10 to-transparent"></div>
-              <div className="relative z-10">
-                <div className="text-sm font-semibold uppercase tracking-widest text-white/50 mb-2">Başlangıç</div>
-                <h3 className="text-3xl font-light text-white">Sistemi İncele</h3>
+              <div className="col-span-12 md:col-span-10">
+                <h2 className="text-4xl md:text-6xl leading-[1.02] font-medium tracking-tightest max-w-3xl">
+                  Üç zorunlu kural.<br />
+                  <span className="text-r2v-muted">Sıfır esneklik.</span>
+                </h2>
               </div>
-              <div className="relative z-10 self-end">
-                <div className="w-12 h-12 rounded-full bg-r2v-terracotta flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-r2v-line border border-r2v-line">
+              {[
+                {
+                  k: 'K1',
+                  t: 'Karbon',
+                  d: 'Hackathon resmi sabit faktörler — kara 0.100, deniz 0.015, hava 0.500, demiryolu 0.030 kg CO₂/ton-km. Stokastik üretim YOK.',
+                },
+                {
+                  k: 'K2',
+                  t: 'Kur',
+                  d: 'TCMB canlı USD/TRY, EUR/TRY her iki modelin input\'unda. Ablation without_fx |Δ| = %66 — load-bearing.',
+                },
+                {
+                  k: 'K3',
+                  t: 'Geo',
+                  d: 'ORS\'tan bağımsız precomputed lookup → Haversine fallback. Yeni şehir gelince geometrik mesafe devrede.',
+                },
+              ].map((r, i) => (
+                <div key={i} className="bg-r2v-base p-8 md:p-10">
+                  <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-r2v-line">
+                    <span className="text-3xl font-medium tracking-tight text-r2v-terracotta">{r.k}</span>
+                    <span className="text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted">
+                      Mandatory
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-medium tracking-tight mb-4">{r.t}</h3>
+                  <p className="text-sm leading-relaxed text-r2v-ink/75">{r.d}</p>
                 </div>
-              </div>
-            </Link>
+              ))}
+            </div>
           </div>
-        </div>
         </section>
 
+        {/* CTA */}
+        <section id="pilot">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-20 md:py-28">
+            <div className="grid grid-cols-12 gap-x-6 md:gap-x-8 items-end">
+              <div className="col-span-12 md:col-span-7">
+                <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-r2v-muted mb-6">
+                  06 — Şimdi
+                </div>
+                <h2 className="text-5xl md:text-7xl leading-[0.98] font-medium tracking-tightest">
+                  Hammaddeyi <br />
+                  değere çevir.
+                </h2>
+              </div>
+              <div className="col-span-12 md:col-span-5 mt-10 md:mt-0">
+                <div className="flex flex-col gap-3">
+                  <Link
+                    to="/dashboard"
+                    className="group flex items-center justify-between bg-r2v-ink text-r2v-base px-6 py-5 hover:bg-r2v-terracotta transition-colors"
+                  >
+                    <span className="text-base font-medium">Karar Motorunu Başlat</span>
+                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14M13 5l7 7-7 7" strokeLinecap="square" />
+                    </svg>
+                  </Link>
+                  <Link
+                    to="/dashboard/geo"
+                    className="group flex items-center justify-between border border-r2v-ink px-6 py-5 hover:bg-r2v-ink hover:text-r2v-base transition-colors"
+                  >
+                    <span className="text-base font-medium">Geo & Karbon Haritası</span>
+                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14M13 5l7 7-7 7" strokeLinecap="square" />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-r2v-charcoal text-white/70 py-20 px-6 text-sm rounded-t-[3rem] border-t border-white/5">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-          <div>
-            <a className="text-white font-bold text-2xl flex items-center gap-2 tracking-tight mb-6" href="#">
-              <svg className="w-6 h-6 text-r2v-terracotta" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path><circle cx="12" cy="12" r="5" fill="#FAF9F6"></circle></svg>
-              Raw2Value AI
-            </a>
-            <p className="mb-4 text-white/50 text-xs">© 2026 Kapadokya Hackathon<br/>Kategori 3: Akıllı Tedarik Zinciri.</p>
+      <footer className="border-t border-r2v-line bg-r2v-base">
+        <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-16">
+          <div className="grid grid-cols-12 gap-x-6 md:gap-x-8">
+            <div className="col-span-12 md:col-span-4 mb-10 md:mb-0">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-7 h-7 bg-r2v-ink flex items-center justify-center">
+                  <div className="w-3 h-3 bg-r2v-terracotta" />
+                </div>
+                <span className="text-[15px] font-semibold tracking-tight">Raw2Value</span>
+              </div>
+              <p className="text-sm text-r2v-muted max-w-xs leading-relaxed">
+                TR71 / Kapadokya 2026 Hackathon · Kategori 03 · Akıllı Tedarik Zinciri Karar Motoru.
+              </p>
+            </div>
+
+            <div className="col-span-6 md:col-span-2">
+              <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted mb-5">
+                Modeller
+              </div>
+              <ul className="space-y-3 text-sm">
+                <li><Link to="/dashboard" className="hover:text-r2v-terracotta transition-colors">Value Uplift</Link></li>
+                <li><Link to="/dashboard" className="hover:text-r2v-terracotta transition-colors">Route Reco</Link></li>
+                <li><Link to="/dashboard" className="hover:text-r2v-terracotta transition-colors">Buyer Match</Link></li>
+              </ul>
+            </div>
+
+            <div className="col-span-6 md:col-span-2">
+              <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted mb-5">
+                Sistem
+              </div>
+              <ul className="space-y-3 text-sm">
+                <li><Link to="/dashboard" className="hover:text-r2v-terracotta transition-colors">Dashboard</Link></li>
+                <li><Link to="/dashboard/geo" className="hover:text-r2v-terracotta transition-colors">Geo & Karbon</Link></li>
+                <li><a href="#evidence" className="hover:text-r2v-terracotta transition-colors">Evidence</a></li>
+              </ul>
+            </div>
+
+            <div className="col-span-12 md:col-span-4">
+              <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted mb-5">
+                Hammaddeler
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {['Pomza', 'Perlit', 'Kabak Çek.'].map((m) => (
+                  <div key={m} className="border border-r2v-line p-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted mb-1">
+                      {m === 'Kabak Çek.' ? 'Seed' : 'Mineral'}
+                    </div>
+                    <div className="text-sm font-medium tracking-tight">{m}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div>
-            <h5 className="font-semibold mb-6 text-white text-xs tracking-widest uppercase">Modeller</h5>
-            <ul className="space-y-3 font-medium">
-              <li><Link className="hover:text-white transition-colors" to="/dashboard">Value Uplift Model</Link></li>
-              <li><Link className="hover:text-white transition-colors" to="/dashboard">Route Recommendation</Link></li>
-            </ul>
+
+          <div className="mt-16 pt-6 border-t border-r2v-line flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-[11px] font-mono uppercase tracking-[0.18em] text-r2v-muted">
+            <span>© 2026 Raw2Value AI</span>
+            <span>Kapadokya Hackathon — Kategori 03</span>
+            <span>Build v0.4.0 — seed=42</span>
           </div>
         </div>
       </footer>
