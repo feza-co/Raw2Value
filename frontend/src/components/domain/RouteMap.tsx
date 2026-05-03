@@ -15,6 +15,10 @@ interface Props {
   destination: { lat: number; lon: number; label: string } | null
   processors: NearbyProcessor[]
   selectedProcessor?: NearbyProcessor | null
+  // ORS karayolu polyline'ı [[lon, lat], ...]. Yoksa nokta sırası
+  // ile düz çizgi çizilir (deniz/hava için doğru davranış).
+  routePath?: number[][] | null
+  routeSource?: 'ors_directions' | 'fallback_straight' | null
 }
 
 const mapStyle = {
@@ -48,7 +52,7 @@ const PIN_LABELS: Record<Coord['kind'], string> = {
   destination: 'Hedef',
 }
 
-export default function RouteMap({ origin, destination, processors, selectedProcessor }: Props) {
+export default function RouteMap({ origin, destination, processors, selectedProcessor, routePath, routeSource }: Props) {
   const coords: Coord[] = useMemo(() => {
     const out: Coord[] = []
     if (origin) out.push({ ...origin, kind: 'origin' })
@@ -79,13 +83,21 @@ export default function RouteMap({ origin, destination, processors, selectedProc
     return { longitude: centerLon, latitude: centerLat, zoom }
   }, [coords])
 
-  // Path: origin → processor → destination (varsa)
-  const pathCoords = coords.map((c) => [c.lon, c.lat])
-  const pathFeature = pathCoords.length >= 2 ? {
-    type: 'Feature' as const,
-    geometry: { type: 'LineString' as const, coordinates: pathCoords },
-    properties: {},
-  } : null
+  // Path: ORS Directions polyline geldiyse onu kullan, yoksa nokta sırası
+  // ile düz çizgi (deniz/hava transport için bu zaten doğru).
+  const pathCoords =
+    routePath && routePath.length >= 2
+      ? routePath
+      : coords.map((c) => [c.lon, c.lat])
+  const pathFeature =
+    pathCoords.length >= 2
+      ? {
+          type: 'Feature' as const,
+          geometry: { type: 'LineString' as const, coordinates: pathCoords },
+          properties: {},
+        }
+      : null
+  const isOrsRoute = routeSource === 'ors_directions'
 
   return (
     <div className="relative h-[420px] w-full overflow-hidden rounded-3xl border border-slate-200">
@@ -103,11 +115,12 @@ export default function RouteMap({ origin, destination, processors, selectedProc
             <Layer
               id="route-path-line"
               type="line"
+              layout={{ 'line-cap': 'round', 'line-join': 'round' }}
               paint={{
-                'line-color': '#d97706',
-                'line-width': 3,
-                'line-dasharray': [2, 2],
-                'line-opacity': 0.85,
+                'line-color': isOrsRoute ? '#0f766e' : '#d97706',
+                'line-width': isOrsRoute ? 4 : 3,
+                ...(isOrsRoute ? {} : { 'line-dasharray': [2, 2] as never }),
+                'line-opacity': 0.9,
               }}
             />
           </Source>

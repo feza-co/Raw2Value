@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { useCockpitStore } from '@/store/cockpit.store'
 import { useAuth } from '@/hooks/useAuth'
 import { useProcessors } from '@/hooks/useProcessors'
+import { useRoute } from '@/hooks/useRoute'
 import ProfitDisplay from '@/components/domain/ProfitDisplay'
 import ConfidenceRing from '@/components/domain/ConfidenceRing'
 import Co2Gauge from '@/components/domain/Co2Gauge'
@@ -50,6 +51,16 @@ export default function ResultPanel() {
 
   const processors = nearby?.results ?? []
   const topProcessor = processors[0] ?? null
+
+  // Karayolu polyline (deniz/hava'da düz çizgi fallback)
+  const routePayload = useMemo(() => {
+    if (!origin || !destination || !lastPayload) return null
+    const points = [origin, ...(topProcessor ? [topProcessor] : []), destination]
+      .map((p) => ({ lat: p.lat, lon: p.lon }))
+    return { points, transport_mode: lastPayload.transport_mode }
+  }, [origin, destination, topProcessor, lastPayload])
+
+  const { data: routeData } = useRoute(routePayload, Boolean(result))
 
   return (
     <div className="h-full overflow-y-auto p-8 bg-slate-50">
@@ -109,7 +120,16 @@ export default function ResultPanel() {
                 destination={destination}
                 processors={processors}
                 selectedProcessor={topProcessor}
+                routePath={routeData?.coordinates ?? null}
+                routeSource={routeData?.source ?? null}
               />
+              {routeData && (
+                <p className="font-mono text-[11px] text-slate-400 mt-3">
+                  {routeData.source === 'ors_directions'
+                    ? `Karayolu: ${(routeData.distance_m / 1000).toFixed(0)} km · ${(routeData.duration_s / 3600).toFixed(1)} saat (OpenRouteService)`
+                    : 'Düz çizgi (kara dışı taşıma modu veya rota bulunamadı)'}
+                </p>
+              )}
             </div>
 
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
