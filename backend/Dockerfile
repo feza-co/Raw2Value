@@ -11,7 +11,12 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 COPY backend/requirements.txt /build/requirements.txt
-RUN pip wheel --wheel-dir /wheels -r /build/requirements.txt
+COPY pyproject.toml /build/pyproject.toml
+# Backend deps + ML paketinin runtime bağımlılıkları (joblib/pandas/numpy/catboost…)
+RUN pip wheel --wheel-dir /wheels -r /build/requirements.txt \
+ && pip wheel --wheel-dir /wheels \
+      "joblib" "pandas==2.2.*" "numpy==1.26.*" "scikit-learn==1.4.*" \
+      "catboost==1.2.*" "pyarrow"
 
 # ---- runtime ----
 FROM python:3.11-slim AS runtime
