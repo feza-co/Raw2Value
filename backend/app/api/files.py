@@ -2,7 +2,6 @@
 
 Kaynak: MASTER_BACKEND_GELISTIRME_RAPORU_PART2.md §9.17.
 """
-from __future__ import annotations
 
 import uuid
 

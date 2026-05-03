@@ -5,7 +5,6 @@ reddediyor; demo/test ortamlarında qa@test.local kullanılabilir olmalı.
 
 Kaynak: MASTER_BACKEND_GELISTIRME_RAPORU_PART1.md §9.3-9.5.
 """
-from __future__ import annotations
 
 import re
 import uuid

@@ -1,5 +1,4 @@
 """FX endpoint — public (auth gerekmez)."""
-from __future__ import annotations
 
 from fastapi import APIRouter
 

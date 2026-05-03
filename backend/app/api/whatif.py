@@ -1,5 +1,4 @@
 """/api/what-if — base payload + senaryolar paralel çalışır."""
-from __future__ import annotations
 
 import asyncio
 import time

@@ -2,7 +2,6 @@
 
 Kaynak: MASTER_BACKEND_GELISTIRME_RAPORU_PART1.md §9.6.
 """
-from __future__ import annotations
 
 from datetime import datetime
 from typing import Literal
