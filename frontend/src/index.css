@@ -2,15 +2,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-r2v-base: #FAFAFA;
-  --color-r2v-surface: #F1F1EE;
-  --color-r2v-line: #E5E5E2;
-  --color-r2v-ink: #111111;
-  --color-r2v-muted: #6B6B6B;
-  --color-r2v-charcoal: #111111;
+  --color-r2v-base: #FBFBFA;
+  --color-r2v-surface: #F2F0EC;
+  --color-r2v-soft: #F7F6F3;
+  --color-r2v-line: #E6E3DD;
+  --color-r2v-ink: #1F2226;
+  --color-r2v-muted: #6B6F76;
+  --color-r2v-charcoal: #2D323A;
   --color-r2v-earth: #4A3C31;
-  --color-r2v-terracotta: #C0392B;
-  --color-r2v-green: #2F5D3A;
+  --color-r2v-terracotta: #C05C41;
+  --color-r2v-green: #6B8E78;
 
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
@@ -26,13 +27,33 @@
   body {
     font-family: var(--font-sans);
     background-color: var(--color-r2v-base);
-    color: var(--color-r2v-ink);
+    color: var(--color-r2v-charcoal);
+    font-size: 16px;
+    line-height: 1.55;
     font-feature-settings: "ss01", "cv11";
   }
 
   ::selection {
-    background-color: var(--color-r2v-ink);
-    color: var(--color-r2v-base);
+    background-color: var(--color-r2v-terracotta);
+    color: #fff;
+  }
+
+  /* Smoother range slider */
+  input[type='range']::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 9999px;
+    background: var(--color-r2v-charcoal);
+    cursor: pointer;
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 9999px;
+    background: var(--color-r2v-charcoal);
+    cursor: pointer;
+    border: none;
   }
 }
 
@@ -42,10 +63,25 @@
   }
 
   .tracking-tightest {
-    letter-spacing: -0.045em;
+    letter-spacing: -0.04em;
   }
 
-  .swiss-rule {
-    border-color: var(--color-r2v-line);
+  .card-soft {
+    background-color: #fff;
+    border: 1px solid var(--color-r2v-line);
+    border-radius: 1.25rem;
+    box-shadow: 0 1px 2px rgba(31, 34, 38, 0.04);
+  }
+
+  .btn-primary {
+    background-color: var(--color-r2v-charcoal);
+    color: #fff;
+    border-radius: 9999px;
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-r2v-terracotta);
   }
 }
