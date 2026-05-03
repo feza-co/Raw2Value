@@ -18,6 +18,10 @@ os.environ.setdefault("JWT_SECRET", "test-secret-min-32-chars-needed-here")
 os.environ.setdefault("APP_ENV", "test")
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
+# slowapi Redis'e ulaşmaya çalışmasın; testlerde rate limit kapalı.
+os.environ.setdefault("RATE_LIMIT_ENABLED", "false")
+# Prometheus instrumentator multi-test ortamında double-register'da patlar.
+os.environ.setdefault("PROMETHEUS_ENABLED", "false")
 
 import pytest
 import pytest_asyncio

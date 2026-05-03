@@ -11,6 +11,9 @@ from typing import AsyncIterator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from . import __version__
 from .api import (
@@ -26,10 +29,12 @@ from .api import (
 )
 from .config import settings
 from .core.cache import close_redis
-from .services.ml_service import warmup_ml
 from .core.middleware import AccessLogMiddleware, RequestIdMiddleware
+from .core.rate_limit import limiter
+from .core.security_headers import SecurityHeadersMiddleware
 from .exceptions import register_exception_handlers
 from .logging import configure_logging, get_logger
+from .services.ml_service import warmup_ml
 
 configure_logging(level=settings.LOG_LEVEL, as_json=(settings.LOG_FORMAT == "json"))
 logger = get_logger("app")
@@ -55,6 +60,24 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 
+# Slowapi state binding'i — limiter decorator'larının çalışması için zorunlu.
+app.state.limiter = limiter
+
+
+async def _rate_limit_handler(request, exc: RateLimitExceeded):
+    from .exceptions import _problem_details
+
+    return _problem_details(
+        request=request,
+        status_code=429,
+        code="rate_limited",
+        title="Too Many Requests",
+        detail=str(exc.detail) if exc.detail else "Rate limit exceeded",
+    )
+
+
+app.add_exception_handler(RateLimitExceeded, _rate_limit_handler)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
@@ -64,10 +87,17 @@ app.add_middleware(
 )
 # AccessLog en dışta — RequestId tarafından bind edilen context'i kullanmalı.
 # Starlette middleware execution order: en son eklenen önce çalışır.
+app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(AccessLogMiddleware)
 app.add_middleware(RequestIdMiddleware)
+app.add_middleware(SlowAPIMiddleware)
 
 register_exception_handlers(app)
+
+if settings.PROMETHEUS_ENABLED:
+    Instrumentator().instrument(app).expose(
+        app, endpoint="/metrics", include_in_schema=False
+    )
 
 app.include_router(health.router)
 app.include_router(auth.router)
