@@ -47,11 +47,11 @@ type SelectProps<T extends string> = {
 function Select<T extends string>({ label, value, options, onChange }: SelectProps<T>) {
   return (
     <div className="mb-8">
-      <label className="text-[10px] font-bold text-r2v-charcoal/50 uppercase tracking-widest block mb-2">{label}</label>
+      <label className="font-mono text-[11px] font-medium text-[#0a0a0a] uppercase tracking-widest block mb-2">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as T)}
-        className="w-full bg-transparent border-b-2 border-r2v-charcoal/10 focus:border-r2v-charcoal pb-2 text-lg font-light text-r2v-charcoal outline-none cursor-pointer appearance-none"
+        className="w-full bg-transparent border-b-2 border-[#0a0a0a] focus:ring-0 pb-2 text-lg font-medium text-[#0a0a0a] outline-none cursor-pointer appearance-none"
       >
         {(Object.entries(options) as [T, string][]).map(([k, v]) => (
           <option key={k} value={k}>{v}</option>
@@ -67,16 +67,16 @@ function TextInput({ label, value, onChange, placeholder, type = 'text', suffix 
 }) {
   return (
     <div className="mb-8">
-      <label className="text-[10px] font-bold text-r2v-charcoal/50 uppercase tracking-widest block mb-2">{label}</label>
-      <div className="flex items-center border-b-2 border-r2v-charcoal/10 focus-within:border-r2v-charcoal transition-colors pb-2">
+      <label className="font-mono text-[11px] font-medium text-[#0a0a0a] uppercase tracking-widest block mb-2">{label}</label>
+      <div className="flex items-center border-b-2 border-[#0a0a0a] focus-within:border-[#1d4fd6] transition-colors pb-2">
         <input
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full bg-transparent border-none focus:ring-0 p-0 text-lg font-light text-r2v-charcoal placeholder:text-r2v-charcoal/20 outline-none"
+          className="w-full bg-transparent border-none focus:ring-0 p-0 text-lg font-medium text-[#0a0a0a] placeholder:text-[#6b6b6b] outline-none"
         />
-        {suffix && <span className="text-xs font-bold text-r2v-charcoal/30 uppercase tracking-widest ml-2">{suffix}</span>}
+        {suffix && <span className="font-mono text-xs font-semibold text-[#6b6b6b] uppercase tracking-widest ml-2">{suffix}</span>}
       </div>
     </div>
   );
@@ -145,24 +145,28 @@ export default function MaterialAnalyzer() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12 pb-12">
-      {/* Header */}
-      <div className="border-b border-r2v-charcoal/20 pb-6 mb-12 flex justify-between items-end">
+    <div className="max-w-7xl mx-auto space-y-12 pb-12 bg-white">
+      {/* Header — Swiss eyebrow */}
+      <div className="border-b-2 border-[#0a0a0a] pb-6 mb-12 flex justify-between items-end gap-6 flex-wrap">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight text-r2v-charcoal mb-2">Material Analyzer</h1>
-          <p className="text-base text-r2v-charcoal/60 font-normal">Hammadde ve rota bilgilerini girerek AI analizini başlatın.</p>
+          <div className="flex items-center gap-4 mb-3">
+            <span className="bg-[#d6342a] text-white text-xs font-semibold font-mono px-2.5 py-1 tracking-wider">01</span>
+            <span className="font-mono text-sm font-medium tracking-wider text-[#0a0a0a]">Material Analyzer</span>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tightest text-[#0a0a0a] mb-3 leading-[0.96]">Hammadde Girişi.</h1>
+          <p className="text-base text-[#2a2a2a] font-normal max-w-2xl">Hammadde ve rota bilgilerini girerek AI analizini başlatın.</p>
         </div>
-        <div className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-r2v-charcoal/40">
+        <div className="hidden md:flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-widest text-[#6b6b6b]">
           <FlaskConical className="w-4 h-4" /> Lab Modülü Aktif
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
 
-        {/* COLUMN 1: Hammadde & Menşei */}
+        {/* COLUMN 1 */}
         <div className="lg:col-span-4">
-          <h3 className="text-sm font-bold text-r2v-charcoal uppercase tracking-widest mb-8 flex items-center gap-2">
-            <MapPin className="w-4 h-4" /> Menşei ve Hammadde
+          <h3 className="font-mono text-xs font-semibold text-[#0a0a0a] uppercase tracking-widest mb-8 flex items-center gap-2 pb-3 border-b border-[#0a0a0a]">
+            <MapPin className="w-4 h-4 text-[#d6342a]" /> Menşei ve Hammadde
           </h3>
 
           <Select label="Hammadde Tipi" value={rawMaterial} options={MATERIAL_LABELS} onChange={setRawMaterial} />
@@ -171,27 +175,27 @@ export default function MaterialAnalyzer() {
           <Select label="Kalite Sınıfı" value={quality} options={QUALITY_LABELS} onChange={setQuality} />
         </div>
 
-        {/* COLUMN 2: Lojistik & Öncelik */}
-        <div className="lg:col-span-4 md:border-l border-r2v-charcoal/10 md:pl-8">
-          <h3 className="text-sm font-bold text-r2v-charcoal uppercase tracking-widest mb-8 flex items-center gap-2">
-            <Package className="w-4 h-4" /> Lojistik ve Hedef
+        {/* COLUMN 2 */}
+        <div className="lg:col-span-4 lg:border-l-2 lg:border-[#0a0a0a] lg:pl-12">
+          <h3 className="font-mono text-xs font-semibold text-[#0a0a0a] uppercase tracking-widest mb-8 flex items-center gap-2 pb-3 border-b border-[#0a0a0a]">
+            <Package className="w-4 h-4 text-[#1d4fd6]" /> Lojistik ve Hedef
           </h3>
 
           <Select label="Hedef Ülke" value={targetCountry} options={COUNTRY_LABELS} onChange={setTargetCountry} />
           <Select label="Taşıma Modu" value={transportMode} options={TRANSPORT_LABELS} onChange={setTransportMode} />
           <Select label="Optimizasyon Önceliği" value={priority} options={PRIORITY_LABELS} onChange={setPriority} />
 
-          <div className="pt-4 mt-4 border-t border-r2v-charcoal/10">
-            <h4 className="text-[10px] font-bold text-r2v-charcoal/40 uppercase tracking-widest mb-6">Fiziksel Parametreler (Opsiyonel)</h4>
+          <div className="pt-4 mt-4 border-t-2 border-[#0a0a0a]">
+            <h4 className="font-mono text-[11px] font-medium text-[#6b6b6b] uppercase tracking-widest mb-6">Fiziksel Parametreler (Opsiyonel)</h4>
             <TextInput label="Nem Oranı" value={moisturePct} onChange={setMoisturePct} type="number" suffix="%" placeholder="12" />
             <TextInput label="Saflık Oranı" value={purityPct} onChange={setPurityPct} type="number" suffix="%" placeholder="95" />
             <TextInput label="Tane Boyutu Sınıfı" value={particleSizeClass} onChange={setParticleSizeClass} placeholder="Örn: mikronize, 0-5mm" />
           </div>
         </div>
 
-        {/* COLUMN 3: Lab Raporu & Aksiyon */}
-        <div className="lg:col-span-4 md:border-l border-r2v-charcoal/10 md:pl-8 flex flex-col h-full">
-          <h3 className="text-sm font-bold text-r2v-charcoal uppercase tracking-widest mb-8">
+        {/* COLUMN 3 */}
+        <div className="lg:col-span-4 lg:border-l-2 lg:border-[#0a0a0a] lg:pl-12 flex flex-col">
+          <h3 className="font-mono text-xs font-semibold text-[#0a0a0a] uppercase tracking-widest mb-8 pb-3 border-b border-[#0a0a0a]">
             Laboratuvar Raporu
           </h3>
 
@@ -200,37 +204,37 @@ export default function MaterialAnalyzer() {
               onClick={!uploaded && !isUploading ? handleUpload : undefined}
               className={`w-full aspect-square md:aspect-auto md:h-64 flex flex-col items-center justify-center border-2 border-dashed transition-all cursor-pointer ${
                 uploaded
-                  ? 'border-r2v-green bg-r2v-green/5'
+                  ? 'border-[#1f7a3a] bg-white'
                   : isUploading
-                  ? 'border-r2v-charcoal/30 bg-white/50'
-                  : 'border-r2v-charcoal/20 bg-white/30 hover:border-r2v-charcoal/50 hover:bg-white/60'
+                  ? 'border-[#0a0a0a] bg-white'
+                  : 'border-[#0a0a0a] bg-white hover:bg-[#f4f4f4]'
               }`}
             >
               {uploaded ? (
                 <>
-                  <FileCheck2 className="w-12 h-12 text-r2v-green mb-4" />
-                  <p className="text-sm font-bold text-r2v-charcoal uppercase tracking-widest">Rapor Yüklendi</p>
-                  <p className="text-[10px] font-mono text-r2v-charcoal/50 mt-2">NVSHR-LAB-042.pdf</p>
+                  <FileCheck2 className="w-12 h-12 text-[#1f7a3a] mb-4" />
+                  <p className="font-mono text-sm font-bold text-[#0a0a0a] uppercase tracking-widest">Rapor Yüklendi</p>
+                  <p className="font-mono text-[10px] text-[#6b6b6b] mt-2 tracking-wide">NVSHR-LAB-042.pdf</p>
                 </>
               ) : isUploading ? (
                 <>
-                  <div className="w-8 h-8 border-2 border-r2v-charcoal border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-xs font-bold text-r2v-charcoal uppercase tracking-widest animate-pulse">İşleniyor...</p>
+                  <div className="w-8 h-8 border-2 border-[#0a0a0a] border-t-transparent rounded-full animate-spin mb-4"></div>
+                  <p className="font-mono text-xs font-bold text-[#0a0a0a] uppercase tracking-widest animate-pulse">İşleniyor...</p>
                 </>
               ) : (
                 <>
-                  <UploadCloud className="w-10 h-10 text-r2v-charcoal/30 mb-4" />
-                  <p className="text-xs font-bold text-r2v-charcoal uppercase tracking-widest text-center px-6">
+                  <UploadCloud className="w-10 h-10 text-[#0a0a0a] mb-4" />
+                  <p className="font-mono text-xs font-bold text-[#0a0a0a] uppercase tracking-widest text-center px-6">
                     PDF Analiz Raporunu Sürükleyin
                   </p>
-                  <p className="text-[10px] text-r2v-charcoal/40 font-bold tracking-widest uppercase mt-4">veya tıklayıp seçin</p>
+                  <p className="font-mono text-[10px] text-[#6b6b6b] font-medium tracking-widest uppercase mt-4">veya tıklayıp seçin</p>
                 </>
               )}
             </div>
           </div>
 
           {error && (
-            <div className="mt-6 p-4 bg-r2v-terracotta/10 border border-r2v-terracotta/30 text-sm text-r2v-terracotta font-medium">
+            <div className="mt-6 p-4 bg-white border-2 border-[#d6342a] text-sm text-[#d6342a] font-medium">
               {error}
             </div>
           )}
@@ -239,21 +243,21 @@ export default function MaterialAnalyzer() {
             <button
               onClick={handleAnalyze}
               disabled={isAnalyzing}
-              className="w-full bg-r2v-charcoal text-white h-16 flex items-center justify-center gap-3 hover:bg-r2v-charcoal/90 transition-colors disabled:opacity-70"
+              className="w-full bg-[#0a0a0a] text-white h-16 flex items-center justify-center gap-3 hover:bg-[#d6342a] transition-colors disabled:opacity-70"
             >
               {isAnalyzing ? (
-                <span className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                <span className="font-mono text-xs font-medium uppercase tracking-widest flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   AI Modeli Çalışıyor...
                 </span>
               ) : (
                 <>
-                  <span className="text-xs font-bold uppercase tracking-widest">Analizi Başlat ve Rota Çıkar</span>
+                  <span className="font-mono text-xs font-medium uppercase tracking-widest">Analizi Başlat ve Rota Çıkar</span>
                   <ChevronRight className="w-4 h-4" />
                 </>
               )}
             </button>
-            <p className="text-[10px] font-mono text-center text-r2v-charcoal/40 mt-4">
+            <p className="font-mono text-[10px] text-center text-[#6b6b6b] mt-4 tracking-wide">
               *Değer artışı, rota önerisi ve alıcı eşleşmesi için 3 AI modeli çalışır.
             </p>
           </div>

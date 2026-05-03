@@ -129,9 +129,9 @@ export default function GeoCarbonMap() {
 
   if (!request || !result) {
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] gap-6 bg-r2v-soft">
-        <p className="text-base text-r2v-charcoal/70 font-medium">Henüz analiz yapılmadı.</p>
-        <Link to="/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-r2v-charcoal text-white text-sm font-semibold rounded-full hover:bg-r2v-terracotta transition-colors shadow-sm">
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] gap-6 bg-white">
+        <p className="text-2xl text-[#0a0a0a] font-bold tracking-tightest">Henüz analiz yapılmadı.</p>
+        <Link to="/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-[#0a0a0a] text-white font-mono text-xs uppercase tracking-widest font-medium hover:bg-[#1d4fd6] transition-colors">
           Analize Dön <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
@@ -154,24 +154,25 @@ export default function GeoCarbonMap() {
   const activeCity = route.waypoints[activeWp];
 
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden bg-r2v-soft">
+    <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden bg-white">
 
-      {/* Header strip */}
-      <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-r2v-line bg-white gap-4 flex-wrap">
-        <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-lg font-semibold tracking-tight text-r2v-charcoal">GeoCarbon Map</h1>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-r2v-soft border border-r2v-line text-xs font-semibold text-r2v-charcoal">
+      {/* Header strip — Swiss */}
+      <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b-2 border-[#0a0a0a] bg-white gap-4 flex-wrap">
+        <div className="flex items-center gap-4 flex-wrap">
+          <span className="bg-[#1f7a3a] text-white text-xs font-semibold font-mono px-2.5 py-1 tracking-wider">GEO</span>
+          <h1 className="text-xl font-bold tracking-tightest text-[#0a0a0a]">GeoCarbon Map</h1>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#0a0a0a] font-mono text-xs font-medium uppercase tracking-wider text-[#0a0a0a]">
             {MODE_ICON[transportMode]}
             {MODE_LABEL[transportMode]}
           </div>
-          <span className="text-sm text-r2v-muted font-medium">
+          <span className="text-sm text-[#6b6b6b] font-medium">
             {request.origin_city} → {route.waypoints.at(-1)?.label}
           </span>
         </div>
         <div className="text-right">
-          <div className="text-xs font-semibold uppercase tracking-wide text-r2v-muted">Toplam Scope 3</div>
-          <div className="text-xl font-semibold tracking-tight text-r2v-charcoal">
-            {totalCO2.toLocaleString('tr-TR')} <span className="text-sm font-medium text-r2v-muted">kg CO₂</span>
+          <div className="font-mono text-[11px] font-medium uppercase tracking-widest text-[#6b6b6b]">Toplam Scope 3</div>
+          <div className="text-2xl font-bold tracking-tightest text-[#0a0a0a] tabular-nums">
+            {totalCO2.toLocaleString('tr-TR')} <span className="text-sm font-medium text-[#6b6b6b]">kg CO₂</span>
           </div>
         </div>
       </div>
@@ -339,47 +340,47 @@ export default function GeoCarbonMap() {
             </text>
           </svg>
 
-          {/* Floating active-waypoint tooltip */}
+          {/* Floating active-waypoint tooltip — Swiss */}
           {activeCity && (
-            <div className="absolute bottom-5 left-5 bg-white/95 backdrop-blur border border-r2v-line rounded-2xl px-5 py-3.5 shadow-lg max-w-[220px]">
-              <div className="text-xs font-semibold uppercase tracking-wide text-r2v-muted mb-1">Seçili Nokta</div>
-              <div className="text-base font-semibold text-r2v-charcoal tracking-tight">{activeCity.label}</div>
-              <div className="text-xs text-r2v-muted mt-0.5">{activeCity.sub}</div>
+            <div className="absolute bottom-5 left-5 bg-white border-2 border-[#0a0a0a] px-5 py-3.5 max-w-[220px]">
+              <div className="font-mono text-[11px] font-medium uppercase tracking-widest text-[#6b6b6b] mb-1">Seçili Nokta</div>
+              <div className="text-base font-bold text-[#0a0a0a] tracking-tight">{activeCity.label}</div>
+              <div className="font-mono text-xs text-[#6b6b6b] mt-0.5 tracking-wide">{activeCity.sub}</div>
             </div>
           )}
         </div>
 
         {/* Right panel — CO2 breakdown + tips */}
-        <div className="w-80 xl:w-[340px] shrink-0 border-l border-r2v-line overflow-y-auto bg-white flex flex-col">
+        <div className="w-80 xl:w-[340px] shrink-0 border-l-2 border-[#0a0a0a] overflow-y-auto bg-white flex flex-col">
 
           {/* CO2 Breakdown */}
-          <div className="p-6 border-b border-r2v-line">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-r2v-muted mb-5">Emisyon Dağılımı</h2>
+          <div className="p-6 border-b-2 border-[#0a0a0a]">
+            <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-[#0a0a0a] mb-5 pb-3 border-b border-[#0a0a0a]">Emisyon Dağılımı</h2>
             <div className="space-y-5">
               {segments.map(({ label, kg, pct, alert }) => (
                 <div key={label}>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-semibold text-r2v-charcoal flex items-center gap-1.5">
-                      {alert && <AlertTriangle className="w-3.5 h-3.5 text-r2v-terracotta" />}
+                    <span className="text-sm font-bold text-[#0a0a0a] flex items-center gap-1.5">
+                      {alert && <AlertTriangle className="w-3.5 h-3.5 text-[#d6342a]" />}
                       {label}
                     </span>
-                    <span className="font-mono text-sm font-bold text-r2v-charcoal">{kg.toLocaleString('tr-TR')} kg</span>
+                    <span className="font-mono text-sm font-bold text-[#0a0a0a]">{kg.toLocaleString('tr-TR')} kg</span>
                   </div>
-                  <div className="h-2 bg-r2v-soft rounded-full overflow-hidden">
+                  <div className="h-2 bg-[#f4f4f4] border border-[#e6e6e6] overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-700 ${alert ? 'bg-r2v-terracotta' : 'bg-r2v-green'}`}
+                      className={`h-full transition-all duration-700 ${alert ? 'bg-[#d6342a]' : 'bg-[#1f7a3a]'}`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <div className="text-xs text-r2v-muted mt-1.5 font-medium">%{pct.toFixed(1)} toplam</div>
+                  <div className="font-mono text-xs text-[#6b6b6b] mt-1.5 tracking-wide">%{pct.toFixed(1)} toplam</div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Mode comparison */}
-          <div className="p-6 border-b border-r2v-line">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-r2v-muted mb-4">Mod Karşılaştırması</h2>
+          <div className="p-6 border-b-2 border-[#0a0a0a]">
+            <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-[#0a0a0a] mb-4 pb-3 border-b border-[#0a0a0a]">Mod Karşılaştırması</h2>
             <div className="space-y-3">
               {[
                 { mode: 'deniz',      factor: 0.015, label: 'Deniz',  icon: Ship },
@@ -391,15 +392,15 @@ export default function GeoCarbonMap() {
                 const barW = (factor / 0.5) * 100;
                 return (
                   <div key={mode} className={`flex items-center gap-2.5 ${isCurrent ? 'opacity-100' : 'opacity-55'}`}>
-                    <Icon className={`w-4 h-4 shrink-0 ${isCurrent ? 'text-r2v-terracotta' : 'text-r2v-muted'}`} />
-                    <span className={`text-sm font-semibold w-12 ${isCurrent ? 'text-r2v-charcoal' : 'text-r2v-charcoal/70'}`}>{label}</span>
-                    <div className="flex-1 h-2 bg-r2v-soft rounded-full overflow-hidden">
+                    <Icon className={`w-4 h-4 shrink-0 ${isCurrent ? 'text-[#d6342a]' : 'text-[#6b6b6b]'}`} />
+                    <span className={`text-sm font-bold w-12 ${isCurrent ? 'text-[#0a0a0a]' : 'text-[#2a2a2a]'}`}>{label}</span>
+                    <div className="flex-1 h-2 bg-[#f4f4f4] border border-[#e6e6e6] overflow-hidden">
                       <div
-                        className={`h-full rounded-full ${isCurrent ? 'bg-r2v-terracotta' : 'bg-r2v-charcoal/40'}`}
+                        className={`h-full ${isCurrent ? 'bg-[#d6342a]' : 'bg-[#0a0a0a]/40'}`}
                         style={{ width: `${barW}%` }}
                       />
                     </div>
-                    <span className="font-mono text-xs text-r2v-charcoal/70 w-20 text-right">{factor} kg/t·km</span>
+                    <span className="font-mono text-xs text-[#2a2a2a] w-20 text-right">{factor} kg/t·km</span>
                   </div>
                 );
               })}
@@ -407,24 +408,24 @@ export default function GeoCarbonMap() {
           </div>
 
           {/* Waypoint list */}
-          <div className="p-6 border-b border-r2v-line">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-r2v-muted mb-4">Rota Noktaları</h2>
+          <div className="p-6 border-b-2 border-[#0a0a0a]">
+            <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-[#0a0a0a] mb-4 pb-3 border-b border-[#0a0a0a]">Rota Noktaları</h2>
             <div className="space-y-1">
               {route.waypoints.map((wp, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveWp(i)}
-                  className={`w-full flex items-center gap-3 p-2.5 rounded-2xl transition-colors text-left ${activeWp === i ? 'bg-r2v-soft' : 'hover:bg-r2v-soft/60'}`}
+                  className={`w-full flex items-center gap-3 p-2.5 transition-colors text-left ${activeWp === i ? 'bg-[#f4f4f4] border border-[#0a0a0a]' : 'hover:bg-[#f4f4f4]'}`}
                 >
-                  <div className={`w-6 h-6 rounded-full shrink-0 border-2 flex items-center justify-center ${
-                    i === 0 ? 'bg-r2v-charcoal border-r2v-charcoal' :
-                    i === route.waypoints.length - 1 ? 'border-current' : 'bg-white border-r2v-line'
+                  <div className={`w-6 h-6 shrink-0 border-2 flex items-center justify-center ${
+                    i === 0 ? 'bg-[#0a0a0a] border-[#0a0a0a]' :
+                    i === route.waypoints.length - 1 ? 'border-current' : 'bg-white border-[#0a0a0a]'
                   }`} style={{ borderColor: i > 0 && i < route.waypoints.length - 1 ? undefined : route.color }}>
                     <span className="text-[9px] font-mono font-bold text-white">{i === 0 ? '●' : ''}</span>
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-r2v-charcoal truncate">{wp.label}</div>
-                    <div className="text-xs text-r2v-muted">{wp.sub}</div>
+                    <div className="text-sm font-bold text-[#0a0a0a] truncate">{wp.label}</div>
+                    <div className="font-mono text-xs text-[#6b6b6b] tracking-wide">{wp.sub}</div>
                   </div>
                 </button>
               ))}
@@ -433,28 +434,28 @@ export default function GeoCarbonMap() {
 
           {/* Optimization tips */}
           <div className="p-6 flex-1">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-r2v-muted mb-4">Optimizasyon</h2>
+            <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-[#0a0a0a] mb-4 pb-3 border-b border-[#0a0a0a]">Optimizasyon</h2>
             <div className="space-y-4">
-              <div className="flex gap-3 p-3.5 bg-r2v-green/5 border border-r2v-green/20 rounded-2xl">
-                <Leaf className="w-4 h-4 text-r2v-green shrink-0 mt-0.5" />
+              <div className="flex gap-3 p-3.5 bg-white border-2 border-[#1f7a3a]">
+                <Leaf className="w-4 h-4 text-[#1f7a3a] shrink-0 mt-0.5" />
                 <div>
-                  <div className="text-sm font-semibold text-r2v-charcoal">Denizyolu Seç</div>
-                  <p className="text-xs text-r2v-charcoal/70 mt-1 leading-relaxed">Karayoluna göre %85 daha az CO₂. CBAM maliyetini minimize eder.</p>
+                  <div className="text-sm font-bold text-[#0a0a0a]">Denizyolu Seç</div>
+                  <p className="text-xs text-[#2a2a2a] mt-1 leading-relaxed">Karayoluna göre %85 daha az CO₂. CBAM maliyetini minimize eder.</p>
                 </div>
               </div>
-              <div className="flex gap-3 p-3.5 bg-r2v-green/5 border border-r2v-green/20 rounded-2xl">
-                <Leaf className="w-4 h-4 text-r2v-green shrink-0 mt-0.5" />
+              <div className="flex gap-3 p-3.5 bg-white border-2 border-[#1f7a3a]">
+                <Leaf className="w-4 h-4 text-[#1f7a3a] shrink-0 mt-0.5" />
                 <div>
-                  <div className="text-sm font-semibold text-r2v-charcoal">Toplu Sevkiyat</div>
-                  <p className="text-xs text-r2v-charcoal/70 mt-1 leading-relaxed">Tonaj artışı lojistik karbonu ton başına orantısız düşürür.</p>
+                  <div className="text-sm font-bold text-[#0a0a0a]">Toplu Sevkiyat</div>
+                  <p className="text-xs text-[#2a2a2a] mt-1 leading-relaxed">Tonaj artışı lojistik karbonu ton başına orantısız düşürür.</p>
                 </div>
               </div>
               {(transportMode === 'hava' || transportMode === 'kara') && (
-                <div className="flex gap-3 p-3.5 bg-r2v-terracotta/8 border border-r2v-terracotta/25 rounded-2xl">
-                  <AlertTriangle className="w-4 h-4 text-r2v-terracotta shrink-0 mt-0.5" />
+                <div className="flex gap-3 p-3.5 bg-white border-2 border-[#d6342a]">
+                  <AlertTriangle className="w-4 h-4 text-[#d6342a] shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-sm font-semibold text-r2v-terracotta">Yüksek Emisyon Modu</div>
-                    <p className="text-xs text-r2v-charcoal/70 mt-1 leading-relaxed">What-if simülatöründe alternatif modları deneyin.</p>
+                    <div className="text-sm font-bold text-[#d6342a]">Yüksek Emisyon Modu</div>
+                    <p className="text-xs text-[#2a2a2a] mt-1 leading-relaxed">What-if simülatöründe alternatif modları deneyin.</p>
                   </div>
                 </div>
               )}

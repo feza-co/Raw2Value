@@ -42,11 +42,11 @@ export default function WhatifSimulator() {
 
   if (!request || !result) {
     return (
-      <div className="max-w-7xl mx-auto pt-24 flex flex-col items-center gap-6">
-        <p className="text-r2v-charcoal/60 text-base">Önce bir analiz yapmanız gerekiyor.</p>
+      <div className="max-w-7xl mx-auto pt-24 flex flex-col items-center gap-6 bg-white">
+        <p className="text-[#0a0a0a] text-2xl font-bold tracking-tightest">Önce bir analiz yapmanız gerekiyor.</p>
         <Link
           to="/dashboard/material"
-          className="flex items-center gap-2 px-6 py-3 bg-r2v-charcoal text-white text-xs font-bold uppercase tracking-widest hover:bg-r2v-charcoal/90 transition-colors"
+          className="flex items-center gap-2 px-6 py-3 bg-[#0a0a0a] text-white font-mono text-xs font-medium uppercase tracking-widest hover:bg-[#d6342a] transition-colors"
         >
           Material Analyzer'a Git <ArrowRight className="w-4 h-4" />
         </Link>
@@ -88,29 +88,33 @@ export default function WhatifSimulator() {
   const baseCO2 = result.co2_kg;
   const baseRoute = result.recommended_route;
 
-  const chartData = results.map((r) => ({
+  const chartData = results.map((r: WhatIfResultRow) => ({
     name: r.scenario,
     kar: Math.round(r.expected_profit_try),
   }));
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-12 pb-12">
-      {/* Header */}
-      <div className="border-b-2 border-r2v-charcoal/10 pb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-r2v-charcoal mb-2">What-if Simulator</h1>
-        <p className="text-sm text-r2v-charcoal/60 font-normal">
+    <div className="max-w-[1400px] mx-auto space-y-12 pb-12 bg-white">
+      {/* Header — Swiss eyebrow */}
+      <div className="border-b-2 border-[#0a0a0a] pb-6">
+        <div className="flex items-center gap-4 mb-3">
+          <span className="bg-[#c97a17] text-white text-xs font-semibold font-mono px-2.5 py-1 tracking-wider">03</span>
+          <span className="font-mono text-sm font-medium tracking-wider text-[#0a0a0a]">What-if Simulator</span>
+        </div>
+        <h1 className="text-5xl md:text-6xl font-bold tracking-tightest text-[#0a0a0a] mb-3 leading-[0.96]">Senaryo Etkisi.</h1>
+        <p className="text-base text-[#2a2a2a] font-normal max-w-3xl">
           Döviz kuru, tonaj veya taşıma modu değişimlerinin kâr ve CO₂ üzerindeki etkisini simüle edin.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
         {/* LEFT: Controls */}
         <div className="lg:col-span-4">
-          <div className="flex justify-between items-end mb-8 border-b border-r2v-charcoal/20 pb-2">
-            <h3 className="text-lg font-bold text-r2v-charcoal tracking-tight">Senaryo Parametreleri</h3>
+          <div className="flex justify-between items-end mb-8 border-b-2 border-[#0a0a0a] pb-2">
+            <h3 className="text-2xl font-bold text-[#0a0a0a] tracking-tightest">Senaryo Parametreleri</h3>
             <button
               onClick={() => { setFxPct(0); setTonnageOverride(''); setTransportOverride(''); setScenarioName('Senaryo 1'); }}
-              className="text-[10px] font-bold uppercase tracking-widest text-r2v-charcoal/50 hover:text-r2v-terracotta flex items-center gap-1 transition-colors border border-r2v-charcoal/10 px-2 py-1 rounded"
+              className="font-mono text-[10px] font-medium uppercase tracking-widest text-[#6b6b6b] hover:text-[#d6342a] flex items-center gap-1 transition-colors border border-[#0a0a0a] px-2 py-1"
             >
               <RefreshCcw className="w-3 h-3" /> Sıfırla
             </button>
@@ -118,14 +122,14 @@ export default function WhatifSimulator() {
 
           {/* Scenario Name */}
           <div className="mb-6">
-            <label className="text-[10px] font-bold text-r2v-charcoal/60 uppercase tracking-widest block mb-2">Senaryo Adı</label>
-            <div className="border-b border-r2v-charcoal/20 pb-2">
+            <label className="font-mono text-[11px] font-medium text-[#0a0a0a] uppercase tracking-widest block mb-2">Senaryo Adı</label>
+            <div className="border-b-2 border-[#0a0a0a] pb-2">
               <input
                 type="text"
                 value={scenarioName}
                 onChange={(e) => setScenarioName(e.target.value)}
                 maxLength={50}
-                className="w-full bg-transparent border-none focus:ring-0 p-0 text-sm font-bold text-r2v-charcoal outline-none"
+                className="w-full bg-transparent border-none focus:ring-0 p-0 text-sm font-bold text-[#0a0a0a] outline-none"
               />
             </div>
           </div>
@@ -133,60 +137,60 @@ export default function WhatifSimulator() {
           {/* FX Scenario */}
           <div className="mb-6">
             <div className="flex justify-between items-end mb-2">
-              <label className="text-[10px] font-bold text-r2v-charcoal/60 uppercase tracking-widest flex items-center gap-1">
+              <label className="font-mono text-[11px] font-medium text-[#0a0a0a] uppercase tracking-widest flex items-center gap-1">
                 Kur Değişimi (FX) <Info className="w-3 h-3 opacity-50" />
               </label>
-              <div className="flex items-center gap-1 border-b border-r2v-charcoal/20 pb-0.5">
+              <div className="flex items-center gap-1 border-b-2 border-[#0a0a0a] pb-0.5">
                 <input
                   type="number"
                   value={(fxPct * 100).toFixed(0)}
                   onChange={(e) => setFxPct(Math.max(-20, Math.min(20, Number(e.target.value))) / 100)}
-                  className="w-14 text-right bg-transparent border-none focus:ring-0 p-0 text-sm font-mono font-bold text-r2v-charcoal"
+                  className="w-14 text-right bg-transparent border-none focus:ring-0 p-0 text-sm font-mono font-bold text-[#0a0a0a]"
                 />
-                <span className="text-[10px] text-r2v-charcoal/40 font-mono">%</span>
+                <span className="font-mono text-[10px] text-[#6b6b6b]">%</span>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-[9px] font-mono text-r2v-charcoal/30">-20</span>
+              <span className="font-mono text-[9px] text-[#6b6b6b]">-20</span>
               <input
                 type="range" min={-20} max={20} step={1}
                 value={fxPct * 100}
                 onChange={(e) => setFxPct(Number(e.target.value) / 100)}
-                className="flex-1 h-0.5 bg-r2v-charcoal/10 appearance-none cursor-pointer accent-r2v-charcoal"
+                className="flex-1 h-1 bg-[#e6e6e6] appearance-none cursor-pointer accent-[#0a0a0a]"
               />
-              <span className="text-[9px] font-mono text-r2v-charcoal/30">+20</span>
+              <span className="font-mono text-[9px] text-[#6b6b6b]">+20</span>
             </div>
-            <p className="text-[9px] text-r2v-charcoal/40 mt-1 font-mono">
+            <p className="font-mono text-[10px] text-[#6b6b6b] mt-1 tracking-wide">
               Baz kur: EUR {result.fx_used.eur_try.toFixed(2)} → {(result.fx_used.eur_try * (1 + fxPct)).toFixed(2)}
             </p>
           </div>
 
           {/* Tonnage Override */}
           <div className="mb-6">
-            <label className="text-[10px] font-bold text-r2v-charcoal/60 uppercase tracking-widest block mb-2">
+            <label className="font-mono text-[11px] font-medium text-[#0a0a0a] uppercase tracking-widest block mb-2">
               Tonaj Değişimi (opsiyonel)
             </label>
-            <div className="flex items-center border-b border-r2v-charcoal/20 pb-2">
+            <div className="flex items-center border-b-2 border-[#0a0a0a] pb-2">
               <input
                 type="number"
                 value={tonnageOverride}
                 onChange={(e) => setTonnageOverride(e.target.value)}
                 placeholder={`Mevcut: ${request.tonnage}`}
-                className="w-full bg-transparent border-none focus:ring-0 p-0 text-sm font-mono font-bold text-r2v-charcoal outline-none placeholder:text-r2v-charcoal/20"
+                className="w-full bg-transparent border-none focus:ring-0 p-0 text-sm font-mono font-bold text-[#0a0a0a] outline-none placeholder:text-[#6b6b6b]"
               />
-              <span className="text-[10px] text-r2v-charcoal/40 font-mono ml-2">TON</span>
+              <span className="font-mono text-[10px] text-[#6b6b6b] ml-2 uppercase tracking-widest">TON</span>
             </div>
           </div>
 
           {/* Transport Override */}
           <div className="mb-8">
-            <label className="text-[10px] font-bold text-r2v-charcoal/60 uppercase tracking-widest block mb-2">
+            <label className="font-mono text-[11px] font-medium text-[#0a0a0a] uppercase tracking-widest block mb-2">
               Taşıma Modu Değişimi (opsiyonel)
             </label>
             <select
               value={transportOverride}
               onChange={(e) => setTransportOverride(e.target.value as TransportMode | '')}
-              className="w-full bg-transparent border-b border-r2v-charcoal/20 pb-2 text-sm font-bold text-r2v-charcoal focus:ring-0 outline-none cursor-pointer"
+              className="w-full bg-transparent border-b-2 border-[#0a0a0a] pb-2 text-sm font-bold text-[#0a0a0a] focus:ring-0 outline-none cursor-pointer"
             >
               <option value="">— Mevcut tut ({TRANSPORT_LABELS[request.transport_mode]}) —</option>
               {(Object.entries(TRANSPORT_LABELS) as [TransportMode, string][]).map(([k, v]) => (
@@ -196,14 +200,14 @@ export default function WhatifSimulator() {
           </div>
 
           {/* Presets */}
-          <div className="pt-6 border-t border-r2v-charcoal/10">
-            <p className="text-[10px] font-bold text-r2v-charcoal/60 uppercase tracking-widest mb-4">Hazır Senaryolar</p>
+          <div className="pt-6 border-t-2 border-[#0a0a0a]">
+            <p className="font-mono text-[11px] font-medium text-[#0a0a0a] uppercase tracking-widest mb-4">Hazır Senaryolar</p>
             <div className="flex flex-wrap gap-2">
               {PRESETS.map((p) => (
                 <button
                   key={p.name}
                   onClick={() => applyPreset(p)}
-                  className="px-3 py-1.5 border border-r2v-charcoal/20 text-r2v-charcoal/60 text-[10px] font-bold uppercase tracking-widest rounded-sm hover:border-r2v-charcoal hover:text-r2v-charcoal transition-colors"
+                  className="px-3 py-1.5 border border-[#0a0a0a] text-[#0a0a0a] font-mono text-[10px] font-medium uppercase tracking-widest hover:bg-[#0a0a0a] hover:text-white transition-colors"
                 >
                   {p.name}
                 </button>
@@ -212,7 +216,7 @@ export default function WhatifSimulator() {
           </div>
 
           {error && (
-            <div className="mt-6 p-4 bg-r2v-terracotta/10 border border-r2v-terracotta/30 text-sm text-r2v-terracotta font-medium">
+            <div className="mt-6 p-4 bg-white border-2 border-[#d6342a] text-sm text-[#d6342a] font-medium">
               {error}
             </div>
           )}
@@ -220,7 +224,7 @@ export default function WhatifSimulator() {
           <button
             onClick={handleRun}
             disabled={isRunning}
-            className="w-full mt-8 bg-r2v-charcoal text-white h-12 flex items-center justify-center gap-2 hover:bg-r2v-charcoal/90 transition-colors disabled:opacity-70 text-xs font-bold uppercase tracking-widest"
+            className="w-full mt-8 bg-[#0a0a0a] text-white h-12 flex items-center justify-center gap-2 hover:bg-[#1d4fd6] transition-colors disabled:opacity-70 font-mono text-xs font-medium uppercase tracking-widest"
           >
             {isRunning ? (
               <>
@@ -237,52 +241,52 @@ export default function WhatifSimulator() {
           {/* Before vs After (if results exist) */}
           {results.length > 0 && (
             <div>
-              <h3 className="text-xl font-bold text-r2v-charcoal tracking-tight mb-6">Son Senaryo — Baz Karşılaştırması</h3>
+              <h3 className="text-2xl font-bold text-[#0a0a0a] tracking-tightest mb-6">Son Senaryo — Baz Karşılaştırması</h3>
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b-2 border-r2v-charcoal/20">
+                  <tr className="border-b-2 border-[#0a0a0a]">
                     <th className="py-2 w-1/4"></th>
-                    <th className="py-2 text-[10px] font-bold uppercase tracking-widest text-r2v-charcoal/50 w-1/4">Baz (Mevcut Analiz)</th>
-                    <th className="py-2 text-[10px] font-bold uppercase tracking-widest text-r2v-charcoal/30 text-center w-1/6">Değişim</th>
-                    <th className="py-2 text-[10px] font-bold uppercase tracking-widest text-r2v-charcoal w-1/4">Senaryo</th>
+                    <th className="py-2 font-mono text-[11px] font-medium uppercase tracking-widest text-[#6b6b6b] w-1/4">Baz (Mevcut Analiz)</th>
+                    <th className="py-2 font-mono text-[11px] font-medium uppercase tracking-widest text-[#6b6b6b] text-center w-1/6">Değişim</th>
+                    <th className="py-2 font-mono text-[11px] font-medium uppercase tracking-widest text-[#0a0a0a] w-1/4">Senaryo</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
-                  <tr className="border-b border-r2v-charcoal/10">
-                    <td className="py-4 text-[11px] font-bold uppercase tracking-widest text-r2v-charcoal/60">Önerilen Rota</td>
-                    <td className="py-4 font-bold text-r2v-charcoal text-sm">{baseRoute}</td>
-                    <td className="py-4 text-center text-r2v-charcoal/30"><ArrowRight className="w-4 h-4 mx-auto" /></td>
-                    <td className="py-4 font-bold text-r2v-charcoal text-sm">{results[0].recommended_route}</td>
+                  <tr className="border-b border-[#e6e6e6]">
+                    <td className="py-4 font-mono text-[11px] font-medium uppercase tracking-widest text-[#0a0a0a]">Önerilen Rota</td>
+                    <td className="py-4 font-bold text-[#2a2a2a] text-sm">{baseRoute}</td>
+                    <td className="py-4 text-center text-[#6b6b6b]"><ArrowRight className="w-4 h-4 mx-auto" /></td>
+                    <td className="py-4 font-bold text-[#0a0a0a] text-sm">{results[0].recommended_route}</td>
                   </tr>
-                  <tr className="border-b border-r2v-charcoal/5">
-                    <td className="py-3 text-[11px] font-bold uppercase tracking-widest text-r2v-charcoal/60">Beklenen Kâr (TL)</td>
-                    <td className="py-3 font-mono">{baseProfit.toLocaleString('tr-TR', { maximumFractionDigits: 0 })}</td>
-                    <td className={`py-3 text-center font-mono text-xs font-bold ${results[0].expected_profit_try > baseProfit ? 'text-r2v-green' : 'text-r2v-terracotta'}`}>
+                  <tr className="border-b border-[#e6e6e6]">
+                    <td className="py-3 font-mono text-[11px] font-medium uppercase tracking-widest text-[#0a0a0a]">Beklenen Kâr (TL)</td>
+                    <td className="py-3 font-mono text-[#2a2a2a] tabular-nums">{baseProfit.toLocaleString('tr-TR', { maximumFractionDigits: 0 })}</td>
+                    <td className={`py-3 text-center font-mono text-xs font-bold ${results[0].expected_profit_try > baseProfit ? 'text-[#1f7a3a]' : 'text-[#d6342a]'}`}>
                       {results[0].expected_profit_try > baseProfit
                         ? `+${(results[0].expected_profit_try - baseProfit).toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ↑`
                         : `${(results[0].expected_profit_try - baseProfit).toLocaleString('tr-TR', { maximumFractionDigits: 0 })} ↓`}
                     </td>
-                    <td className="py-3 font-mono font-bold text-r2v-charcoal">
+                    <td className="py-3 font-mono font-bold text-[#0a0a0a] tabular-nums">
                       {results[0].expected_profit_try.toLocaleString('tr-TR', { maximumFractionDigits: 0 })}
                     </td>
                   </tr>
-                  <tr className="border-b border-r2v-charcoal/5">
-                    <td className="py-3 text-[11px] font-bold uppercase tracking-widest text-r2v-charcoal/60">CO₂ (kg)</td>
-                    <td className="py-3 font-mono">{baseCO2.toLocaleString('tr-TR', { maximumFractionDigits: 1 })}</td>
-                    <td className={`py-3 text-center font-mono text-xs font-bold ${results[0].co2_kg < baseCO2 ? 'text-r2v-green' : 'text-r2v-terracotta'}`}>
+                  <tr className="border-b border-[#e6e6e6]">
+                    <td className="py-3 font-mono text-[11px] font-medium uppercase tracking-widest text-[#0a0a0a]">CO₂ (kg)</td>
+                    <td className="py-3 font-mono text-[#2a2a2a] tabular-nums">{baseCO2.toLocaleString('tr-TR', { maximumFractionDigits: 1 })}</td>
+                    <td className={`py-3 text-center font-mono text-xs font-bold ${results[0].co2_kg < baseCO2 ? 'text-[#1f7a3a]' : 'text-[#d6342a]'}`}>
                       {results[0].co2_kg < baseCO2
                         ? `${(((results[0].co2_kg - baseCO2) / baseCO2) * 100).toFixed(0)}% ↓`
                         : `+${(((results[0].co2_kg - baseCO2) / baseCO2) * 100).toFixed(0)}% ↑`}
                     </td>
-                    <td className="py-3 font-mono font-bold text-r2v-charcoal">
+                    <td className="py-3 font-mono font-bold text-[#0a0a0a] tabular-nums">
                       {results[0].co2_kg.toLocaleString('tr-TR', { maximumFractionDigits: 1 })}
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-3 text-[11px] font-bold uppercase tracking-widest text-r2v-charcoal/60">AI Güveni</td>
-                    <td className="py-3 font-mono">{(result.confidence.overall * 100).toFixed(0)}</td>
-                    <td className="py-3 text-center text-r2v-charcoal/30"><ArrowRight className="w-4 h-4 mx-auto" /></td>
-                    <td className="py-3 font-mono font-bold text-r2v-charcoal">{(results[0].confidence_overall * 100).toFixed(0)}</td>
+                    <td className="py-3 font-mono text-[11px] font-medium uppercase tracking-widest text-[#0a0a0a]">AI Güveni</td>
+                    <td className="py-3 font-mono text-[#2a2a2a] tabular-nums">{(result.confidence.overall * 100).toFixed(0)}</td>
+                    <td className="py-3 text-center text-[#6b6b6b]"><ArrowRight className="w-4 h-4 mx-auto" /></td>
+                    <td className="py-3 font-mono font-bold text-[#0a0a0a] tabular-nums">{(results[0].confidence_overall * 100).toFixed(0)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -291,17 +295,17 @@ export default function WhatifSimulator() {
 
           {/* Chart */}
           {chartData.length > 1 && (
-            <div className="border-t-2 border-r2v-charcoal/10 pt-8">
-              <h4 className="text-[11px] font-bold text-r2v-charcoal tracking-widest uppercase mb-1">Senaryo Kâr Karşılaştırması</h4>
-              <p className="text-[10px] font-mono text-r2v-charcoal/40 mb-6">Beklenen Kâr (TL)</p>
-              <div className="h-48 w-full">
+            <div className="border-t-2 border-[#0a0a0a] pt-8">
+              <h4 className="font-mono text-xs font-semibold text-[#0a0a0a] tracking-widest uppercase mb-1">Senaryo Kâr Karşılaştırması</h4>
+              <p className="font-mono text-[10px] text-[#6b6b6b] mb-6 tracking-wide">Beklenen Kâr (TL)</p>
+              <div className="h-48 w-full border-2 border-[#0a0a0a] p-3">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontFamily: 'monospace', fill: '#2D323A', opacity: 0.6 }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fontFamily: 'monospace', fill: '#2D323A', opacity: 0.5 }}
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontFamily: 'JetBrains Mono', fill: '#0a0a0a' }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fontFamily: 'JetBrains Mono', fill: '#6b6b6b' }}
                       tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} width={35} />
-                    <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ border: '1px solid #2D323A', borderRadius: 0, fontSize: '10px', fontFamily: 'monospace' }} />
-                    <Bar dataKey="kar" fill="#2D323A" fillOpacity={0.5} barSize={24} />
+                    <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ border: '2px solid #0a0a0a', borderRadius: 0, background: 'white', fontSize: '10px', fontFamily: 'JetBrains Mono' }} />
+                    <Bar dataKey="kar" fill="#1d4fd6" barSize={24} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -310,38 +314,38 @@ export default function WhatifSimulator() {
 
           {/* Scenario History Table */}
           {results.length > 0 && (
-            <div className="border-t-2 border-r2v-charcoal/10 pt-8">
-              <h3 className="text-xl font-bold text-r2v-charcoal tracking-tight mb-6">Senaryo Geçmişi</h3>
-              <div className="overflow-x-auto">
+            <div className="border-t-2 border-[#0a0a0a] pt-8">
+              <h3 className="text-2xl font-bold text-[#0a0a0a] tracking-tightest mb-6">Senaryo Geçmişi</h3>
+              <div className="overflow-x-auto border-2 border-[#0a0a0a]">
                 <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="text-[10px] font-bold text-r2v-charcoal/40 uppercase tracking-widest border-b border-r2v-charcoal/10">
-                      <th className="pb-3 pr-4">Senaryo</th>
-                      <th className="pb-3 px-4 text-right">Kâr (TL)</th>
-                      <th className="pb-3 px-4 text-right">CO₂ (kg)</th>
-                      <th className="pb-3 px-4">Rota</th>
-                      <th className="pb-3 px-4 text-center">Güven</th>
-                      <th className="pb-3 pl-4 text-center">Değişim</th>
+                  <thead className="bg-[#0a0a0a] text-white">
+                    <tr className="font-mono text-[11px] font-medium uppercase tracking-widest">
+                      <th className="py-3 px-4">Senaryo</th>
+                      <th className="py-3 px-4 text-right">Kâr (TL)</th>
+                      <th className="py-3 px-4 text-right">CO₂ (kg)</th>
+                      <th className="py-3 px-4">Rota</th>
+                      <th className="py-3 px-4 text-center">Güven</th>
+                      <th className="py-3 px-4 text-center">Değişim</th>
                     </tr>
                   </thead>
-                  <tbody className="text-xs">
-                    {results.map((row, i) => (
-                      <tr key={i} className="border-b border-r2v-charcoal/5 hover:bg-white/40 transition-colors">
-                        <td className="py-4 pr-4 font-bold text-r2v-charcoal">{row.scenario}</td>
-                        <td className="py-4 px-4 text-right font-mono text-r2v-charcoal">
+                  <tbody className="text-xs bg-white">
+                    {results.map((row: WhatIfResultRow, i: number) => (
+                      <tr key={i} className="border-t border-[#e6e6e6] hover:bg-[#f4f4f4] transition-colors">
+                        <td className="py-4 px-4 font-bold text-[#0a0a0a]">{row.scenario}</td>
+                        <td className="py-4 px-4 text-right font-mono text-[#0a0a0a] tabular-nums">
                           {row.expected_profit_try.toLocaleString('tr-TR', { maximumFractionDigits: 0 })}
                         </td>
-                        <td className="py-4 px-4 text-right font-mono text-r2v-charcoal">
+                        <td className="py-4 px-4 text-right font-mono text-[#0a0a0a] tabular-nums">
                           {row.co2_kg.toLocaleString('tr-TR', { maximumFractionDigits: 1 })}
                         </td>
-                        <td className="py-4 px-4 text-r2v-charcoal/80">{row.recommended_route}</td>
-                        <td className="py-4 px-4 text-center font-mono font-bold text-r2v-charcoal">
+                        <td className="py-4 px-4 text-[#2a2a2a]">{row.recommended_route}</td>
+                        <td className="py-4 px-4 text-center font-mono font-bold text-[#0a0a0a] tabular-nums">
                           {(row.confidence_overall * 100).toFixed(0)}
                         </td>
-                        <td className="py-4 pl-4 text-center">
+                        <td className="py-4 px-4 text-center">
                           {row.expected_profit_try > baseProfit
-                            ? <TrendingUp className="w-3 h-3 text-r2v-green mx-auto" />
-                            : <TrendingDown className="w-3 h-3 text-r2v-terracotta mx-auto" />}
+                            ? <TrendingUp className="w-3 h-3 text-[#1f7a3a] mx-auto" />
+                            : <TrendingDown className="w-3 h-3 text-[#d6342a] mx-auto" />}
                         </td>
                       </tr>
                     ))}
@@ -353,12 +357,12 @@ export default function WhatifSimulator() {
 
           {/* Empty state */}
           {results.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-              <Info className="w-8 h-8 text-r2v-charcoal/20" />
-              <p className="text-r2v-charcoal/50 text-sm font-medium">
+            <div className="flex flex-col items-center justify-center py-24 text-center gap-4 border-2 border-dashed border-[#0a0a0a]">
+              <Info className="w-8 h-8 text-[#0a0a0a]" />
+              <p className="text-[#0a0a0a] text-sm font-medium">
                 Parametreleri ayarlayın ve "Senaryoyu Çalıştır"a basın.
               </p>
-              <p className="text-r2v-charcoal/30 text-xs font-mono">
+              <p className="text-[#6b6b6b] font-mono text-xs tracking-wide">
                 Baz: {result.recommended_route} — {baseProfit.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} TL
               </p>
             </div>

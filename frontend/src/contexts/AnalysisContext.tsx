@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import type { AnalyzeRequest, AnalyzeResponseOut } from '../lib/types';
+import type { AnalyzeRequest, AnalyzeResponse } from '../lib/types';
+
+// Geriye dönük uyumluluk: eski isim ile alias.
+type AnalyzeResponseOut = AnalyzeResponse;
 
 interface AnalysisState {
   request: AnalyzeRequest | null;

@@ -1,27 +1,63 @@
 import { Link } from 'react-router-dom';
 import {
   ChevronDown, ArrowUpRight, ArrowDown, ArrowRight,
-  TrendingDown, TrendingUp, Trophy, Mountain, Factory, Globe2,
+  Trophy, Mountain, Factory, Globe2,
   LineChart, GitBranch, Network,
+  RefreshCw, Leaf, MapPin, Map, Locate,
 } from 'lucide-react';
 
-function Diamond() {
-  return <div className="w-4 h-4 bg-dapper-green transform rotate-45 rounded-sm shrink-0" />;
+/* ---------- Küçük yardımcı bileşenler ---------- */
+
+function Diamond({ className = 'bg-[#0a0a0a]' }: { className?: string }) {
+  return <div className={`w-3.5 h-3.5 ${className} transform rotate-45 rounded-[1px] shrink-0`} />;
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function NumPill({
+  num,
+  color = 'bg-[#0a0a0a]',
+}: {
+  num: string;
+  color?: string;
+}) {
   return (
-    <div className="flex items-center gap-2.5">
-      <Diamond />
-      <span className="font-semibold text-r2v-charcoal tracking-wide">{children}</span>
+    <span className={`inline-block ${color} text-white text-xs md:text-sm font-semibold font-mono px-2.5 py-1 tracking-wider`}>
+      {num}
+    </span>
+  );
+}
+
+function Eyebrow({
+  num,
+  numColor,
+  children,
+}: {
+  num: string;
+  numColor?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-4 font-mono text-sm md:text-base tracking-wider text-[#0a0a0a]">
+      <NumPill num={num} color={numColor} />
+      <span className="font-medium">{children}</span>
     </div>
   );
 }
 
+function HeadDot({ color = 'bg-[#0a0a0a]', label }: { color?: string; label: string }) {
+  return (
+    <div className="flex items-center gap-2.5 font-mono text-xs md:text-sm tracking-wider uppercase">
+      <Diamond className={color} />
+      <span>{label}</span>
+    </div>
+  );
+}
+
+/* ---------- Sayfa ---------- */
+
 export default function LandingPage() {
   return (
-    <div className="text-r2v-charcoal antialiased overflow-x-hidden">
-      {/* ─────────────── NAVIGATION ─────────────── */}
+    <div className="text-[#0a0a0a] antialiased overflow-x-hidden bg-white">
+      {/* ─────────────── NAVIGATION (KORUNDU) ─────────────── */}
       <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl bg-white rounded-lg shadow-sm px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -57,305 +93,427 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ─────────────── HERO (KORUNDU) ─────────────── */}
-      <header className="relative pt-40 pb-32 px-6 lg:px-16 max-w-[1440px] mx-auto min-h-screen flex flex-col justify-center">
+      {/* ============================================================
+          SLAYT 1 — KAPAK / HERO
+      ============================================================ */}
+      <header className="relative pt-40 pb-24 px-6 lg:px-16 max-w-[1440px] mx-auto min-h-screen flex flex-col justify-center bg-white">
+        {/* Kapak işareti — 4'lü grid */}
+        <div className="absolute top-32 right-6 lg:right-16 hidden md:grid grid-cols-2 grid-rows-2 w-[120px] h-[120px] border-2 border-[#0a0a0a]">
+          <div className="border border-[#0a0a0a] bg-white" />
+          <div className="border border-[#0a0a0a] bg-[#0a0a0a]" />
+          <div className="border border-[#0a0a0a] bg-[#1d4fd6]" />
+          <div className="border border-[#0a0a0a] bg-[#d6342a]" />
+        </div>
+
         <div className="mb-8">
-          <SectionLabel>Akıllı Tedarik Zinciri Karar Motoru</SectionLabel>
+          <Eyebrow num="01">Hammadde &nbsp;—&nbsp; Katma Değer</Eyebrow>
         </div>
 
-        <div className="max-w-4xl relative z-10">
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tightest text-r2v-charcoal leading-[1.1] mb-12">
-            Hammaddeyi <span className="font-serif-italic text-r2v-charcoal">değere</span><br />
-            çeviren karar<br />
-            motoru, Kapadokya için
-          </h1>
+        <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tightest text-[#0a0a0a] leading-[0.92] mb-10">
+          Raw2Value<br />
+          <span className="text-[#d6342a]">Yapay Zekâ.</span>
+        </h1>
 
-          <div className="max-w-md">
-            <p className="text-lg md:text-xl font-medium text-r2v-charcoal/85 mb-8 leading-snug">
-              Pomza, perlit ve kabak çekirdeği için en kârlı işleme rotasını, beklenen kârı (TRY) ve CO₂ maliyetini öneren ML pipeline.
-            </p>
-            <div className="flex items-center gap-4">
-              <a href="#problem" className="font-semibold text-r2v-charcoal">Daha fazlasını gör</a>
-              <a
-                href="#problem"
-                className="bg-dapper-green p-3 rounded hover:brightness-95 transition-all flex items-center justify-center"
-                aria-label="Aşağı kaydır"
-              >
-                <ArrowDown className="w-5 h-5 text-r2v-charcoal" strokeWidth={2.5} />
-              </a>
-            </div>
-          </div>
+        <p className="text-xl md:text-3xl text-[#2a2a2a] font-normal leading-snug max-w-4xl tracking-tight mb-12">
+          Kapadokya'nın hammaddesini değere bağlayan{' '}
+          <span className="text-[#1d4fd6] font-medium">zekâ katmanı.</span>
+        </p>
+
+        <div className="flex items-center gap-4">
+          <a href="#problem" className="font-semibold text-[#0a0a0a]">Daha fazlasını gör</a>
+          <a
+            href="#problem"
+            className="bg-dapper-green p-3 rounded hover:brightness-95 transition-all flex items-center justify-center"
+            aria-label="Aşağı kaydır"
+          >
+            <ArrowDown className="w-5 h-5 text-[#0a0a0a]" strokeWidth={2.5} />
+          </a>
         </div>
 
-        {/* Floating Evidence Card */}
-        <div className="hidden md:flex absolute right-6 lg:right-16 bottom-20 z-20 bg-white rounded-xl shadow-floating p-4 gap-6 max-w-sm">
-          <div className="flex-1 flex flex-col">
-            <p className="text-sm font-semibold text-r2v-charcoal mb-4 leading-tight">
-              %84 R² doğrulukla beklenen kâr tahmini, 1.500 senaryoda doğrulandı
-            </p>
-            <div className="flex items-center justify-between mt-auto">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-r2v-charcoal rounded-sm" />
-                <div className="w-3 h-3 bg-r2v-charcoal rounded-sm relative -left-1 top-1" />
-                <span className="font-bold text-xs">model_lab</span>
-              </div>
-              <Link
-                to="/dashboard"
-                className="bg-dapper-green p-1.5 rounded hover:brightness-95 transition-all"
-                aria-label="Modeli incele"
-              >
-                <ArrowUpRight className="w-3 h-3 text-r2v-charcoal" strokeWidth={2.5} />
-              </Link>
-            </div>
-          </div>
-          <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-amber-300 via-orange-400 to-red-500 flex items-center justify-center">
-            <span className="text-white font-bold text-3xl tracking-tight">84%</span>
-          </div>
-        </div>
-
-        <div className="absolute bottom-0 right-1/4 hidden md:flex">
-          <div className="w-12 h-12 bg-dapper-green opacity-50" />
-          <div className="w-12 h-12 bg-dapper-green" />
-        </div>
-
-        <div className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-l-full p-3 shadow-md items-center justify-center cursor-pointer">
-          <svg className="w-4 h-4 text-r2v-charcoal" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 21a9 9 0 1 1 9-9 9.01 9.01 0 0 1-9 9zm0-16.5a7.5 7.5 0 1 0 7.5 7.5A7.51 7.51 0 0 0 12 4.5zM12 16a4 4 0 1 1 4-4 4.005 4.005 0 0 1-4 4zm0-6.5a2.5 2.5 0 1 0 2.5 2.5A2.503 2.503 0 0 0 12 9.5z" />
-          </svg>
+        {/* Alt sağ köşe — sayfa numarası */}
+        <div className="absolute bottom-8 right-6 lg:right-16 font-mono text-sm tracking-wider text-[#6b6b6b]">
+          1 / 6
         </div>
       </header>
 
-      {/* ─────────────── 02 — PROBLEM ─────────────── */}
-      <section id="problem" className="py-24 px-6 lg:px-16 max-w-[1440px] mx-auto relative border-t border-gray-200">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex">
-          <div className="w-16 h-16 bg-dapper-green opacity-75" />
-          <div className="w-16 h-16 bg-dapper-green opacity-50" />
-          <div className="w-16 h-16 bg-dapper-green opacity-25" />
-        </div>
-
+      {/* ============================================================
+          SLAYT 2 — DEVASA POTANSİYEL, DEVASA KAYIP
+      ============================================================ */}
+      <section id="problem" className="py-24 px-6 lg:px-16 max-w-[1440px] mx-auto bg-white border-t-2 border-[#0a0a0a]">
         <div className="flex items-center justify-between flex-wrap gap-4 mb-12">
-          <div className="flex items-center gap-3">
-            <span className="bg-r2v-terracotta text-white text-xs font-bold px-2.5 py-1 rounded font-mono">02</span>
-            <span className="font-semibold text-r2v-charcoal text-lg">Devasa Potansiyel, Devasa Kayıp</span>
-          </div>
-          <div className="flex items-center gap-2 text-r2v-terracotta font-semibold">
-            <span className="w-2.5 h-2.5 rounded-full bg-r2v-terracotta" />
-            Masada Bırakılan Para
-          </div>
+          <Eyebrow num="02" numColor="bg-[#d6342a]">Devasa Potansiyel, Devasa Kayıp</Eyebrow>
+          <HeadDot color="bg-[#d6342a]" label="Masada Bırakılan Para" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
-          {/* SOL: Üretim payı */}
-          <div className="bg-white rounded-xl p-10 shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-widest text-r2v-muted mb-4">
+        {/* İki kolon: Üretim Gücümüz | Birim Fiyat Uçurumu */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_2px_1fr] gap-12 lg:gap-14 mb-12">
+          {/* SOL — Üretim Gücü */}
+          <div className="flex flex-col justify-center gap-3 py-2">
+            <div className="font-mono text-xs md:text-sm uppercase tracking-widest text-[#0a0a0a] font-medium">
               Dünya Pomza Üretiminde Türkiye
-            </p>
-            <div className="text-7xl md:text-9xl font-bold tracking-tightest text-blue-600 leading-none mb-6">
+            </div>
+            <div className="text-7xl md:text-9xl font-bold tracking-tightest text-[#1d4fd6] leading-[0.86] tabular-nums">
               %45,6
             </div>
-            <div className="flex items-center gap-2 mb-2">
-              <Trophy className="w-5 h-5 text-r2v-charcoal" />
-              <span className="text-xl font-bold text-r2v-charcoal">Dünya 1. Sırada</span>
+            <div className="flex items-center gap-3 text-2xl md:text-3xl font-bold text-[#0a0a0a] tracking-tight">
+              <Trophy className="w-7 h-7 text-[#1d4fd6]" strokeWidth={2} />
+              Dünya 1. Sırada
             </div>
-            <p className="text-sm text-r2v-muted">
-              Kaynak — USGS, 2025 · İhracat payı %31–40 — Volza, 2023–24
-            </p>
+            <div className="font-mono text-xs md:text-sm text-[#6b6b6b] tracking-wide leading-relaxed">
+              Kaynak — USGS, 2025<br />
+              İhracat payı %31–40 — Volza, 2023–24
+            </div>
           </div>
 
-          {/* SAĞ: Fiyat karşılaştırması */}
-          <div className="bg-white rounded-xl p-10 shadow-sm flex flex-col">
-            <p className="text-xs font-bold uppercase tracking-widest text-r2v-muted mb-4">
-              Ham Pomza İhracatı
-            </p>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-6xl md:text-7xl font-bold tracking-tightest text-r2v-terracotta">$91,7</span>
-              <span className="text-xl text-r2v-muted font-medium">/ton</span>
-            </div>
-            <p className="text-sm text-r2v-muted mb-8">
-              Kaynak — WITS (UN Comtrade), 2023
-            </p>
+          {/* Orta dikey çizgi */}
+          <div className="hidden lg:block w-[2px] bg-[#0a0a0a] self-stretch" />
 
-            <div className="flex items-center gap-2 mb-3">
-              <ArrowDown className="w-5 h-5 text-r2v-charcoal" strokeWidth={2.5} />
-              <span className="text-xs font-bold uppercase tracking-widest text-r2v-charcoal">
-                İşleme & Katma Değer
-              </span>
+          {/* SAĞ — Birim Fiyat Uçurumu */}
+          <div className="flex flex-col justify-center gap-2 py-2">
+            <div className="flex flex-col gap-1">
+              <div className="font-mono text-xs md:text-sm uppercase tracking-widest text-[#6b6b6b] font-medium">
+                Ham Pomza İhracatı
+              </div>
+              <div className="text-5xl md:text-7xl font-bold tracking-tightest text-[#d6342a] leading-[0.92] tabular-nums opacity-90">
+                $91,7
+                <span className="text-xl md:text-2xl font-medium text-[#6b6b6b] tracking-normal ml-2">/ ton</span>
+              </div>
+              <div className="font-mono text-xs md:text-sm text-[#6b6b6b] tracking-wide">
+                Kaynak — WITS (UN Comtrade), 2023
+              </div>
             </div>
 
-            <p className="text-xs font-bold uppercase tracking-widest text-green-700 mb-2">
-              Mikronize Pomza · İşlenmiş
-            </p>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-6xl md:text-7xl font-bold tracking-tightest text-green-700">$200–300</span>
-              <span className="text-xl text-r2v-muted font-medium">/ton</span>
+            <div className="flex items-center gap-3 my-4">
+              <ArrowDown className="w-7 h-7 text-[#0a0a0a]" strokeWidth={2.5} />
+              <div className="font-mono text-xs md:text-sm uppercase tracking-widest text-[#0a0a0a] font-medium">
+                İşleme &amp; Katma Değer
+              </div>
             </div>
-            <p className="text-sm text-r2v-muted mt-auto">
-              Kaynak — TradeKey B2B · Sektörel Pazar Verileri
-            </p>
+
+            <div className="flex flex-col gap-1">
+              <div className="font-mono text-xs md:text-sm uppercase tracking-widest text-[#1f7a3a] font-semibold">
+                Mikronize Pomza · İşlenmiş
+              </div>
+              <div className="text-5xl md:text-7xl font-bold tracking-tightest text-[#1f7a3a] leading-[0.92] tabular-nums">
+                $200–300
+                <span className="text-xl md:text-2xl font-medium text-[#6b6b6b] tracking-normal ml-2">/ ton</span>
+              </div>
+              <div className="font-mono text-xs md:text-sm text-[#6b6b6b] tracking-wide">
+                Kaynak — TradeKey B2B · Sektörel Pazar Verileri
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Alt slogan */}
-        <div className="border-t border-gray-300 pt-8">
-          <p className="text-xl md:text-3xl font-serif-italic text-r2v-charcoal leading-snug max-w-5xl">
+        {/* Kapanış vurgusu */}
+        <div className="border-t-2 border-[#0a0a0a] pt-6 max-w-5xl mx-auto text-center">
+          <p className="font-serif-italic text-lg md:text-2xl text-[#0a0a0a] leading-relaxed">
             Dünyanın yarısını üretiyoruz — ama ucuza ham satarak{' '}
-            <span className="not-italic font-bold text-r2v-terracotta">masada para bırakıyoruz.</span>{' '}
+            <span className="not-italic font-semibold text-[#d6342a]">masada para bırakıyoruz</span>.
             Çünkü üreticimiz kârlı rotayı hesaplayamıyor.
           </p>
         </div>
+
+        {/* Alt sağ — sayfa numarası */}
+        <div className="flex justify-end pt-8 mt-8 border-t border-[#e6e6e6] font-mono text-xs tracking-wider text-[#6b6b6b]">
+          02 / 06
+        </div>
       </section>
 
-      {/* ─────────────── 04 — ÇÖZÜM ─────────────── */}
-      <section id="solution" className="py-24 px-6 lg:px-16 max-w-[1440px] mx-auto border-t border-gray-200">
-        <div className="flex items-center justify-between flex-wrap gap-4 mb-10">
-          <div className="flex items-center gap-3">
-            <span className="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded font-mono">04</span>
-            <span className="font-semibold text-blue-600 text-lg">Çözüm</span>
+      {/* ============================================================
+          SLAYT 3 — İÇGÖRÜ / BİLGİ ASİMETRİSİ
+      ============================================================ */}
+      <section id="insight" className="py-24 px-6 lg:px-16 max-w-[1440px] mx-auto bg-white border-t-2 border-[#0a0a0a]">
+        <div className="mb-12">
+          <Eyebrow num="03" numColor="bg-[#c97a17]">İçgörü</Eyebrow>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          {/* SOL: Başlık */}
+          <div className="lg:col-span-5 flex flex-col gap-8">
+            <h2 className="text-5xl md:text-7xl font-bold tracking-tightest text-[#0a0a0a] leading-[0.94]">
+              Bilgi<br />
+              <span className="text-[#c97a17]">Asimetrisi.</span>
+            </h2>
+            <p className="text-xl md:text-2xl text-[#2a2a2a] leading-snug font-normal max-w-md">
+              Üretici kârlı rotayı biliyor —<br />
+              ama riski hesaplayamıyor.
+            </p>
+            <div className="h-1.5 bg-[#c97a17] w-48" />
+            <p className="font-mono text-sm text-[#6b6b6b] tracking-wide">
+              Kararlar veriyle değil, sezgiyle veriliyor.
+            </p>
           </div>
-          <div className="flex items-center gap-2 text-blue-600 font-semibold">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-            Karar Motoru
+
+          {/* SAĞ: Liste */}
+          <div className="lg:col-span-7">
+            <ul className="flex flex-col">
+              {/* 01 */}
+              <li className="grid grid-cols-[40px_72px_1fr_auto] items-center gap-6 py-7 border-y-2 border-[#0a0a0a] first:border-t-2 last:border-b-2 [&:not(:first-child)]:border-t-0">
+                <span className="font-mono text-base md:text-lg font-medium text-[#0a0a0a]">01</span>
+                <RefreshCw className="w-12 h-12 text-[#1d4fd6]" strokeWidth={1.6} />
+                <span className="text-2xl md:text-3xl font-medium text-[#0a0a0a] tracking-tight leading-snug">
+                  Kur dalgalanmaları
+                </span>
+                <span className="hidden md:block font-mono text-xs text-[#6b6b6b] tracking-wide text-right max-w-[280px]">
+                  Euro &amp; Dolar etkisi
+                </span>
+              </li>
+              {/* 02 */}
+              <li className="grid grid-cols-[40px_72px_1fr_auto] items-center gap-6 py-7 border-b border-[#0a0a0a]">
+                <span className="font-mono text-base md:text-lg font-medium text-[#0a0a0a]">02</span>
+                <Leaf className="w-12 h-12 text-[#0a0a0a]" strokeWidth={1.6} />
+                <span className="text-2xl md:text-3xl font-medium text-[#0a0a0a] tracking-tight leading-snug">
+                  Karbon ve lojistik maliyetleri
+                </span>
+                <span className="hidden md:block font-mono text-xs text-[#6b6b6b] tracking-wide text-right max-w-[280px]">
+                  Ton-kilometre · taşıma maliyeti
+                </span>
+              </li>
+              {/* 03 */}
+              <li className="grid grid-cols-[40px_72px_1fr_auto] items-center gap-6 py-7 border-b-2 border-[#0a0a0a]">
+                <span className="font-mono text-base md:text-lg font-medium text-[#0a0a0a]">03</span>
+                <MapPin className="w-12 h-12 text-[#d6342a]" strokeWidth={1.6} />
+                <span className="text-2xl md:text-3xl font-medium text-[#0a0a0a] tracking-tight leading-snug">
+                  En yakın doğru işleyiciyi bulamama
+                </span>
+                <span className="hidden md:block font-mono text-xs text-[#6b6b6b] tracking-wide text-right max-w-[280px]">
+                  Coğrafi körlük
+                </span>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <h2 className="text-5xl md:text-7xl font-bold tracking-tightest text-r2v-charcoal leading-[1.1] mb-6">
-          Pazar yeri değil,{' '}
-          <span className="text-blue-600">karar motoru.</span>
+        <div className="flex justify-end pt-8 mt-12 border-t border-[#e6e6e6] font-mono text-xs tracking-wider text-[#6b6b6b]">
+          03 / 06
+        </div>
+      </section>
+
+      {/* ============================================================
+          SLAYT 4 — ÇÖZÜM
+      ============================================================ */}
+      <section id="solution" className="py-24 px-6 lg:px-16 max-w-[1440px] mx-auto bg-white border-t-2 border-[#0a0a0a]">
+        <div className="flex items-center justify-between flex-wrap gap-4 mb-10">
+          <Eyebrow num="04" numColor="bg-[#1d4fd6]">Çözüm</Eyebrow>
+          <HeadDot color="bg-[#1d4fd6]" label="Karar Motoru" />
+        </div>
+
+        <h2 className="text-5xl md:text-7xl font-bold tracking-tightest text-[#0a0a0a] leading-[0.94] mb-6">
+          Pazar yeri değil, <span className="text-[#1d4fd6]">karar motoru.</span>
         </h2>
-        <p className="text-lg md:text-2xl text-r2v-charcoal/85 font-medium mb-16 max-w-3xl">
-          Hammaddeyi değil — <span className="font-bold text-r2v-charcoal">katma değeri</span> yönetin.
+        <p className="text-xl md:text-2xl text-[#2a2a2a] font-normal mb-14 max-w-3xl tracking-tight">
+          Hammaddeyi değil — <span className="font-semibold text-[#0a0a0a]">katma değeri</span> yönetin.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* 01 Kâr Tahmini */}
-          <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-            <div className="flex items-start justify-between mb-12">
-              <div className="w-12 h-12 bg-blue-600 rounded flex items-center justify-center">
-                <LineChart className="w-6 h-6 text-white" strokeWidth={2.5} />
+        {/* Üç kolonlu Swiss kart sistemi — kenarlıklı, gölgesiz */}
+        <div className="grid grid-cols-1 md:grid-cols-3 border-2 border-[#0a0a0a]">
+          {/* 01 — Kâr Tahmini */}
+          <div className="p-8 md:p-12 flex flex-col bg-white border-b-2 md:border-b-0 md:border-r-2 border-[#0a0a0a] min-h-[420px]">
+            <div className="flex items-start justify-between w-full mb-9">
+              <div className="w-16 h-16 bg-[#1d4fd6] flex items-center justify-center">
+                <LineChart className="w-8 h-8 text-white" strokeWidth={2} />
               </div>
-              <span className="text-2xl font-bold text-r2v-charcoal/30 font-mono">01</span>
+              <span className="font-mono text-3xl md:text-4xl font-bold text-[#1d4fd6] tracking-tightest">01</span>
             </div>
-            <h3 className="text-2xl font-bold text-r2v-charcoal mb-4 tracking-tight">Kâr Tahmini</h3>
-            <p className="text-base text-r2v-charcoal/75 leading-relaxed">
+            <h3 className="text-3xl md:text-4xl font-bold text-[#0a0a0a] tracking-tight leading-tight mb-5">
+              Kâr Tahmini
+            </h3>
+            <p className="text-base md:text-lg text-[#2a2a2a] leading-relaxed">
               Hangi rotanın ne kadar kâr getireceğini, eğitilmiş makine öğrenmesi modeli hesaplar.
             </p>
           </div>
 
-          {/* 02 Rota Önerisi */}
-          <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-            <div className="flex items-start justify-between mb-12">
-              <div className="w-12 h-12 bg-r2v-charcoal rounded flex items-center justify-center">
-                <GitBranch className="w-6 h-6 text-white" strokeWidth={2.5} />
+          {/* 02 — Rota Önerisi */}
+          <div className="p-8 md:p-12 flex flex-col bg-white border-b-2 md:border-b-0 md:border-r-2 border-[#0a0a0a] min-h-[420px]">
+            <div className="flex items-start justify-between w-full mb-9">
+              <div className="w-16 h-16 bg-[#0a0a0a] flex items-center justify-center">
+                <GitBranch className="w-8 h-8 text-white" strokeWidth={2} />
               </div>
-              <span className="text-2xl font-bold text-r2v-charcoal/30 font-mono">02</span>
+              <span className="font-mono text-3xl md:text-4xl font-bold text-[#0a0a0a] tracking-tightest">02</span>
             </div>
-            <h3 className="text-2xl font-bold text-r2v-charcoal mb-4 tracking-tight">Rota Önerisi</h3>
-            <p className="text-base text-r2v-charcoal/75 leading-relaxed">
+            <h3 className="text-3xl md:text-4xl font-bold text-[#0a0a0a] tracking-tight leading-tight mb-5">
+              Rota Önerisi
+            </h3>
+            <p className="text-base md:text-lg text-[#2a2a2a] leading-relaxed">
               Ham satış yerine, en yüksek katma değerli işlenmiş ürünü tavsiye eder.
             </p>
           </div>
 
-          {/* 03 B2B Eşleşme */}
-          <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-            <div className="flex items-start justify-between mb-12">
-              <div className="w-12 h-12 bg-green-700 rounded flex items-center justify-center">
-                <Network className="w-6 h-6 text-white" strokeWidth={2.5} />
+          {/* 03 — B2B Eşleşme */}
+          <div className="p-8 md:p-12 flex flex-col bg-white min-h-[420px]">
+            <div className="flex items-start justify-between w-full mb-9">
+              <div className="w-16 h-16 bg-[#1f7a3a] flex items-center justify-center">
+                <Network className="w-8 h-8 text-white" strokeWidth={2} />
               </div>
-              <span className="text-2xl font-bold text-r2v-charcoal/30 font-mono">03</span>
+              <span className="font-mono text-3xl md:text-4xl font-bold text-[#1f7a3a] tracking-tightest">03</span>
             </div>
-            <h3 className="text-2xl font-bold text-r2v-charcoal mb-4 tracking-tight">İşletmeden İşletmeye Eşleşme</h3>
-            <p className="text-base text-r2v-charcoal/75 leading-relaxed">
+            <h3 className="text-3xl md:text-4xl font-bold text-[#0a0a0a] tracking-tight leading-tight mb-5">
+              İşletmeden İşletmeye Eşleşme
+            </h3>
+            <p className="text-base md:text-lg text-[#2a2a2a] leading-relaxed">
               Üretici, işleyici ve alıcıyı skorlayarak en uygun zinciri kurar.
             </p>
           </div>
         </div>
+
+        <div className="flex justify-end pt-8 mt-12 border-t border-[#e6e6e6] font-mono text-xs tracking-wider text-[#6b6b6b]">
+          04 / 06
+        </div>
       </section>
 
-      {/* ─────────────── 06 — EKOSİSTEM ─────────────── */}
-      <section id="ecosystem" className="py-24 px-6 lg:px-16 max-w-[1440px] mx-auto border-t border-gray-200">
+      {/* ============================================================
+          SLAYT 5 — TEKNOLOJİK KANIT / CANLI VERİ
+      ============================================================ */}
+      <section id="models" className="py-24 px-6 lg:px-16 max-w-[1440px] mx-auto bg-white border-t-2 border-[#0a0a0a]">
+        <div className="mb-8">
+          <Eyebrow num="05">Canlı Veri, Gerçek Karar</Eyebrow>
+        </div>
+
+        <h2 className="text-4xl md:text-6xl font-bold tracking-tightest text-[#0a0a0a] leading-[0.96] mb-12">
+          Ekrandaki rakam değil, <span className="text-[#1d4fd6]">karara giden veri.</span>
+        </h2>
+
+        <ul className="flex flex-col">
+          {/* 01 — TCMB */}
+          <li className="grid grid-cols-[40px_80px_1fr_auto] items-start md:items-center gap-6 py-8 border-y-2 border-[#0a0a0a]">
+            <span className="font-mono text-base md:text-lg font-medium text-[#0a0a0a]">01</span>
+            <RefreshCw className="w-14 h-14 text-[#1d4fd6]" strokeWidth={1.6} />
+            <div className="flex flex-col gap-2">
+              <div className="text-xl md:text-2xl font-medium text-[#0a0a0a] tracking-tight">
+                Canlı kur, sadece ekranda durmaz —
+              </div>
+              <div className="text-base md:text-lg text-[#2a2a2a] leading-relaxed">
+                Modelin kararını ve hesaplanan kârı anında değiştirir.
+              </div>
+            </div>
+            <div className="hidden md:block font-mono text-xs text-[#1d4fd6] tracking-wide text-right max-w-[280px] leading-relaxed">
+              Türkiye Cumhuriyet<br />
+              Merkez Bankası — Veri Sistemi
+            </div>
+          </li>
+
+          {/* 02 — OSM Rota */}
+          <li className="grid grid-cols-[40px_80px_1fr_auto] items-start md:items-center gap-6 py-8 border-b border-[#0a0a0a]">
+            <span className="font-mono text-base md:text-lg font-medium text-[#0a0a0a]">02</span>
+            <Map className="w-14 h-14 text-[#0a0a0a]" strokeWidth={1.6} />
+            <div className="flex flex-col gap-2">
+              <div className="text-xl md:text-2xl font-medium text-[#0a0a0a] tracking-tight">
+                Kuş uçuşu değil, gerçek yol mesafesi —
+              </div>
+              <div className="text-base md:text-lg text-[#2a2a2a] leading-relaxed">
+                Karbon ayak izi resmi katsayılarla, ton-kilometre üzerinden hesaplanır.
+              </div>
+            </div>
+            <div className="hidden md:block font-mono text-xs text-[#6b6b6b] tracking-wide text-right max-w-[280px] leading-relaxed">
+              Açık Kaynaklı Rota<br />
+              Servisi — Mesafe Matrisi
+            </div>
+          </li>
+
+          {/* 03 — Konum */}
+          <li className="grid grid-cols-[40px_80px_1fr_auto] items-start md:items-center gap-6 py-8 border-b-2 border-[#0a0a0a]">
+            <span className="font-mono text-base md:text-lg font-medium text-[#0a0a0a]">03</span>
+            <Locate className="w-14 h-14 text-[#1f7a3a]" strokeWidth={1.6} />
+            <div className="flex flex-col gap-2">
+              <div className="text-xl md:text-2xl font-medium text-[#0a0a0a] tracking-tight">
+                Karbon hesabından bağımsız —
+              </div>
+              <div className="text-base md:text-lg text-[#2a2a2a] leading-relaxed">
+                Konum tabanlı en yakın işleyici tesis tespiti.
+              </div>
+            </div>
+            <div className="hidden md:block font-mono text-xs text-[#1f7a3a] tracking-wide text-right max-w-[280px] leading-relaxed">
+              Açık Sokak Haritası —<br />
+              Adres ve Konum Servisi
+            </div>
+          </li>
+        </ul>
+
+        <div className="flex justify-end pt-8 mt-12 border-t border-[#e6e6e6] font-mono text-xs tracking-wider text-[#6b6b6b]">
+          05 / 06
+        </div>
+      </section>
+
+      {/* ============================================================
+          SLAYT 6 — EKOSİSTEM & KAPANIŞ
+      ============================================================ */}
+      <section id="ecosystem" className="py-24 px-6 lg:px-16 max-w-[1440px] mx-auto bg-white border-t-2 border-[#0a0a0a]">
         <div className="flex items-center justify-between flex-wrap gap-4 mb-10">
-          <div className="flex items-center gap-3">
-            <span className="bg-green-700 text-white text-xs font-bold px-2.5 py-1 rounded font-mono">06</span>
-            <span className="font-semibold text-green-700 text-lg">Kazanan Bir Ekosistem</span>
-          </div>
-          <div className="flex items-center gap-2 text-green-700 font-semibold">
-            <span className="w-2.5 h-2.5 rounded-full bg-green-700" />
-            Üç Taraf — Tek Zincir
-          </div>
+          <Eyebrow num="06" numColor="bg-[#1f7a3a]">Kazanan Bir Ekosistem</Eyebrow>
+          <HeadDot color="bg-[#1f7a3a]" label="Üç Taraf — Tek Zincir" />
         </div>
 
-        {/* Zincir kartı */}
-        <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr] gap-6 md:gap-4 items-center">
-            {/* Halka 1 */}
-            <div className="text-center flex flex-col items-center">
-              <span className="bg-r2v-terracotta text-white text-[11px] font-bold px-3 py-1.5 rounded font-mono uppercase tracking-widest mb-6">
-                Birinci Halka
-              </span>
-              <div className="w-20 h-20 rounded-full bg-r2v-soft border border-gray-200 flex items-center justify-center mb-6">
-                <Mountain className="w-10 h-10 text-r2v-charcoal" strokeWidth={1.5} />
-              </div>
-              <h3 className="text-2xl font-bold text-r2v-charcoal tracking-tight mb-2">
-                Hammadde<br />Üreticisi
-              </h3>
-              <p className="text-sm text-r2v-muted font-medium">
-                Pomza · Perlit · Çekirdek
-              </p>
-            </div>
+        {/* Zincir akışı — Swiss kenarlıklı */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr] items-center border-2 border-[#0a0a0a] mb-12">
+          {/* Halka 1 */}
+          <div className="text-center flex flex-col items-center gap-5 py-12 px-6 bg-white">
+            <span className="bg-[#d6342a] text-white text-[11px] font-medium px-3 py-1.5 font-mono uppercase tracking-widest">
+              Birinci Halka
+            </span>
+            <Mountain className="w-20 h-20 text-[#d6342a]" strokeWidth={1.6} />
+            <h3 className="text-2xl md:text-3xl font-bold text-[#0a0a0a] tracking-tight leading-tight">
+              Hammadde<br />Üreticisi
+            </h3>
+            <p className="font-mono text-xs text-[#6b6b6b] tracking-wide">
+              Pomza · perlit · çekirdek
+            </p>
+          </div>
 
-            <ArrowRight className="hidden md:block w-7 h-7 text-r2v-muted mx-auto" strokeWidth={2} />
+          {/* Ok */}
+          <div className="hidden md:flex items-center justify-center px-4 text-[#0a0a0a]">
+            <ArrowRight className="w-9 h-9" strokeWidth={1.6} />
+          </div>
 
-            {/* Halka 2 */}
-            <div className="text-center flex flex-col items-center">
-              <span className="bg-blue-600 text-white text-[11px] font-bold px-3 py-1.5 rounded font-mono uppercase tracking-widest mb-6">
-                İkinci Halka
-              </span>
-              <div className="w-20 h-20 rounded-full bg-r2v-soft border border-gray-200 flex items-center justify-center mb-6">
-                <Factory className="w-10 h-10 text-r2v-charcoal" strokeWidth={1.5} />
-              </div>
-              <h3 className="text-2xl font-bold text-r2v-charcoal tracking-tight mb-2">
-                İşleyici<br />Tesis
-              </h3>
-              <p className="text-sm text-r2v-muted font-medium">
-                Mikronize · Genleştirilmiş
-              </p>
-            </div>
+          {/* Halka 2 */}
+          <div className="text-center flex flex-col items-center gap-5 py-12 px-6 bg-white border-y-2 md:border-y-0 md:border-x-2 border-[#0a0a0a]">
+            <span className="bg-[#1d4fd6] text-white text-[11px] font-medium px-3 py-1.5 font-mono uppercase tracking-widest">
+              İkinci Halka
+            </span>
+            <Factory className="w-20 h-20 text-[#1d4fd6]" strokeWidth={1.6} />
+            <h3 className="text-2xl md:text-3xl font-bold text-[#0a0a0a] tracking-tight leading-tight">
+              İşleyici<br />Tesis
+            </h3>
+            <p className="font-mono text-xs text-[#6b6b6b] tracking-wide">
+              Mikronize · genleştirilmiş
+            </p>
+          </div>
 
-            <ArrowRight className="hidden md:block w-7 h-7 text-r2v-muted mx-auto" strokeWidth={2} />
+          {/* Ok */}
+          <div className="hidden md:flex items-center justify-center px-4 text-[#0a0a0a]">
+            <ArrowRight className="w-9 h-9" strokeWidth={1.6} />
+          </div>
 
-            {/* Halka 3 */}
-            <div className="text-center flex flex-col items-center">
-              <span className="bg-green-700 text-white text-[11px] font-bold px-3 py-1.5 rounded font-mono uppercase tracking-widest mb-6">
-                Üçüncü Halka
-              </span>
-              <div className="w-20 h-20 rounded-full bg-r2v-soft border border-gray-200 flex items-center justify-center mb-6">
-                <Globe2 className="w-10 h-10 text-r2v-charcoal" strokeWidth={1.5} />
-              </div>
-              <h3 className="text-2xl font-bold text-r2v-charcoal tracking-tight mb-2">
-                Küresel<br />Alıcı
-              </h3>
-              <p className="text-sm text-r2v-muted font-medium">
-                Almanya · Hollanda · İç Pazar
-              </p>
-            </div>
+          {/* Halka 3 */}
+          <div className="text-center flex flex-col items-center gap-5 py-12 px-6 bg-white">
+            <span className="bg-[#1f7a3a] text-white text-[11px] font-medium px-3 py-1.5 font-mono uppercase tracking-widest">
+              Üçüncü Halka
+            </span>
+            <Globe2 className="w-20 h-20 text-[#1f7a3a]" strokeWidth={1.6} />
+            <h3 className="text-2xl md:text-3xl font-bold text-[#0a0a0a] tracking-tight leading-tight">
+              Küresel<br />Alıcı
+            </h3>
+            <p className="font-mono text-xs text-[#6b6b6b] tracking-wide">
+              Almanya · Hollanda · iç pazar
+            </p>
           </div>
         </div>
 
-        {/* Alt slogan */}
-        <div className="pt-4">
-          <p className="text-3xl md:text-5xl font-bold tracking-tightest text-r2v-charcoal leading-[1.15]">
-            Biz <span className="line-through text-r2v-muted/60 font-normal">aracıları</span> değil,{' '}
-            <span className="text-r2v-terracotta">bilgisizliği</span> ortadan kaldırıyoruz.
-          </p>
-        </div>
-      </section>
+        {/* Kapanış sloganı */}
+        <p className="text-3xl md:text-5xl lg:text-6xl font-medium tracking-tightest text-[#0a0a0a] leading-[1.15]">
+          Biz{' '}
+          <span className="line-through decoration-[#d6342a] decoration-[4px] text-[#6b6b6b] font-normal">
+            aracıları
+          </span>{' '}
+          değil,<br />
+          <span className="font-bold text-[#d6342a]">bilgisizliği</span> ortadan kaldırıyoruz.
+        </p>
 
-      {/* ─────────────── CTA ─────────────── */}
-      <section id="models" className="py-24 px-6 lg:px-16 max-w-[1440px] mx-auto border-t border-gray-200">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* CTA — Karar Motoru / Geo */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-16">
           <Link
             to="/dashboard"
-            className="group relative overflow-hidden rounded-2xl bg-r2v-charcoal text-white p-10 md:p-14 flex flex-col justify-between min-h-[260px] hover:shadow-2xl transition-all"
+            className="group relative overflow-hidden rounded-2xl bg-[#0a0a0a] text-white p-10 md:p-14 flex flex-col justify-between min-h-[260px] hover:shadow-2xl transition-all"
           >
             <div className="absolute -top-20 -right-20 w-80 h-80 bg-dapper-green/30 rounded-full blur-3xl" />
             <div className="relative">
@@ -366,31 +524,35 @@ export default function LandingPage() {
             </div>
             <div className="relative self-end">
               <div className="w-14 h-14 rounded-xl bg-dapper-green flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <ArrowUpRight className="w-6 h-6 text-r2v-charcoal" strokeWidth={2.5} />
+                <ArrowUpRight className="w-6 h-6 text-[#0a0a0a]" strokeWidth={2.5} />
               </div>
             </div>
           </Link>
 
           <Link
             to="/dashboard/geo"
-            className="group rounded-2xl bg-white text-r2v-charcoal p-10 md:p-14 flex flex-col justify-between min-h-[260px] border border-gray-200 hover:shadow-lg transition-all"
+            className="group rounded-2xl bg-white text-[#0a0a0a] p-10 md:p-14 flex flex-col justify-between min-h-[260px] border-2 border-[#0a0a0a] hover:shadow-lg transition-all"
           >
             <div>
-              <div className="text-xs font-semibold uppercase tracking-widest text-r2v-muted mb-3">Görselleştirme</div>
+              <div className="text-xs font-semibold uppercase tracking-widest text-[#6b6b6b] mb-3">Görselleştirme</div>
               <h3 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight">
-                Geo & Karbon<br />Haritası
+                Geo &amp; Karbon<br />Haritası
               </h3>
             </div>
             <div className="self-end">
-              <div className="w-14 h-14 rounded-xl bg-r2v-charcoal flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 rounded-xl bg-[#0a0a0a] flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                 <ArrowUpRight className="w-6 h-6 text-white" strokeWidth={2.5} />
               </div>
             </div>
           </Link>
         </div>
+
+        <div className="flex justify-end pt-8 mt-12 border-t border-[#e6e6e6] font-mono text-xs tracking-wider text-[#6b6b6b]">
+          06 / 06
+        </div>
       </section>
 
-      {/* ─────────────── FOOTER ─────────────── */}
+      {/* ─────────────── FOOTER (KORUNDU) ─────────────── */}
       <footer id="about" className="bg-r2v-charcoal text-white/75 py-14 px-6 lg:px-16 mt-12">
         <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm">
           <span className="font-semibold text-white">Raw2Value · Kapadokya Hackathon — 2026</span>
