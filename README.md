@@ -85,3 +85,129 @@ graph TD
     Infer --> ModelRoute
     Infer --> Match
     Router <-->|API Calls| External
+```
+
+---
+
+## 🚀 Hızlı Başlangıç (Quick Start)
+
+### 1. ML Engine (Inference) Paketinin Kullanımı
+
+Geliştirdiğimiz makine öğrenmesi paketini projeye dahil etmek oldukça basittir:
+```python
+from raw2value_ml import analyze, AnalyzePayload, LiveFx
+
+# Veri yükünü (Payload) hazırlayın
+payload = AnalyzePayload(
+    raw_material="pomza",
+    tonnage=150,
+    quality="A",
+    origin_city="Nevşehir",
+    target_country="DE",
+    target_city="Hamburg",
+    transport_mode="kara",
+    priority="max_profit",
+    input_mode="basic",
+    live_fx=LiveFx(usd_try=45.05, eur_try=52.67, last_updated="2026-05-02"),
+)
+
+# Tahminleri (Inference) alın
+response = analyze(payload)
+
+print(f"Önerilen Rota: {response.recommended_route}")
+print(f"Beklenen Kâr: ₺{response.expected_profit_try:,.2f}")
+print(f"CO2 Ayak İzi: {response.co2_kg} kg")
+
+print("\nGerekçeler:")
+for reason in response.reason_codes:
+    print("-", reason.text)
+```
+
+---
+
+## 🛠️ Kurulum & Dağıtım (Installation & Deployment)
+
+Proje hem lokal geliştirme hem de Docker üzerinden containerize edilmiş şekilde çalıştırılabilir. Backend ile model inference (`analyze(payload) → AnalyzeResponse`) arasındaki sözleşme sabittir. Detaylar için: `docs/master_model_egitim_raporu.md` §11.3.
+
+### Tek Komutla Tüm Stack (Docker)
+PostgreSQL, Redis, ML modelleri ve FastAPI sunucusunu ayağa kaldırmak için:
+```bash
+cp backend/.env.example backend/.env
+docker compose up -d --build
+docker compose exec api alembic upgrade head
+docker compose exec api python scripts/seed_demo.py
+```
+*API Dokümantasyonu (Swagger) artık `http://localhost:8000/docs` adresinde yayındadır.*
+
+### Lokal Geliştirme (Docker'sız)
+Eğer veritabanlarınız halihazırda sisteminizde çalışıyorsa (Postgres/Redis env ayarları yapılmışsa):
+```bash
+# ML Paketi Kurulumu
+pip install -e .                                          
+
+# Backend Bağımlılıkları
+pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+
+# Uvicorn ile Server'ı Başlatma
+cd backend && uvicorn app.main:app --reload
+```
+
+---
+
+## 🧠 ML Eğitim Pipeline'ı (Sıfırdan Eğitim)
+
+Sentetik verilerin üretilmesi, artırılması (augmentation) ve modellerin (XGBoost/CatBoost) eğitilmesi için pipeline otomatize edilmiştir.
+
+**Tüm süreci başlatmak için:**
+```bash
+# Linux/Mac
+bash scripts/run_full_pipeline.sh
+
+# Windows
+pwsh scripts/run_full_pipeline.ps1
+```
+
+*(Dilerseniz `ml/notebooks/` dizinindeki Jupyter Notebook'ları 01'den 06'ya kadar sırayla çalıştırarak süreci adım adım izleyebilirsiniz.)*
+
+---
+
+## 🧪 Test ve Performans Kriterleri
+
+Sistemin stabilitesi 80+ birim ve entegrasyon testi ile korunmaktadır. Tüm testler yeşil (passing) olmalıdır.
+```bash
+# ML Testleri
+pytest ml/tests/ -v
+
+# Backend QA Smoke (G4 Gate - 7/7 OK olmalı)
+bash backend/scripts/qa_smoke.sh
+
+# Backend Testleri
+cd backend && pytest tests/ -v
+```
+
+**Performans Hedeflerimiz:**
+| Operasyon | Maksimum Gecikme Hedefi |
+|---|---|
+| `analyze()` cold start | < 2.0s |
+| `analyze()` warm state | < 500ms |
+| `match_buyers()` (top_k=5) | < 50ms |
+
+---
+
+## 🔧 Sorun Giderme (Troubleshooting)
+
+- **Port Çakışması (5432 / 6379):** Host makinede Postgres veya Redis açıksa Docker "bind: address already in use" hatası verir. Dev override kullanarak host portlarını kaydırın:
+  ```bash
+  docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+  
+```
+  *(Host'tan DB: localhost:5433, Redis: localhost:6380 olur. Container içi değişmez).*
+- **TCMB API Key Hatası:** `backend/.env` dosyasında `JWT_SECRET` ve `TCMB_EVDS_API_KEY` placeholder kalsa da lokal dev için yeterlidir. Anahtar yoksa sistem `/api/fx/current` fallback değerlerine (USD=45, EUR=52) düşerek çalışır.
+- **Warmup Gecikmesi:** Docker `up` komutundan sonra ML modellerinin belleğe yüklenmesi (~20-30 saniye) sürebilir. Bu sürede `/health` servisi 503 döner. `docker compose logs api -f` ile `ml_warmup_complete` mesajını arayın.
+- **Docker İmajı Modelleri Görmüyor:** `.dockerignore` dosyasında `*.pkl` satırı varsa kaldırılmalıdır. Build context proje kök dizini olmalıdır (`docker-compose.yml` -> `context: .`).
+
+> Daha detaylı backend kurulum ve geliştirme rehberi için lütfen `docs/MASTER_BACKEND_GELISTIRME_RAPORU_PART1.md` ve `PART2.md` dosyalarını inceleyin.
+
+---
+
+> **Takım Feza** tarafından *Kapadokya Hackathon 2026* için sevgiyle ve kodla üretilmiştir. 🎈
