@@ -1,0 +1,69 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: raw2value-backend:dev
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://raw2value:secret@db:5432/raw2value
+      REDIS_URL: redis://redis:6379/0
+      ML_MODELS_DIR: /app/models
+      ML_DATA_DIR: /app/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  db:
+    image: postgis/postgis:16-3.4-alpine
+    environment:
+      POSTGRES_USER: raw2value
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: raw2value
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U raw2value"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    profiles:
+      - full
+
+volumes:
+  db_data:
+  redis_data:
+  minio_data:
