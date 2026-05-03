@@ -4,6 +4,7 @@ from __future__ import annotations
 from .analysis import AnalysisRecord
 from .organization import Organization
 from .profiles import BuyerProfile, ProcessorProfile, ProducerProfile
+from .uploaded_file import UploadedFile
 from .user import User
 
 __all__ = [
@@ -12,5 +13,6 @@ __all__ = [
     "Organization",
     "ProcessorProfile",
     "ProducerProfile",
+    "UploadedFile",
     "User",
 ]
