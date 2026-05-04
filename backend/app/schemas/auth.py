@@ -56,6 +56,11 @@ class CapabilityFlags(BaseModel):
 class OrganizationOut(BaseModel):
     id: uuid.UUID
     name: str
+    city: str | None = None
+    district: str | None = None
+    country: str | None = None
+    lat: float | None = None
+    lon: float | None = None
     capabilities: CapabilityFlags
 
     model_config = ConfigDict(from_attributes=True)

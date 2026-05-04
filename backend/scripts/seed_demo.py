@@ -110,6 +110,145 @@ _DEMO_ORGS = [
             "credit_score": 0.92,
         },
     },
+    # --- Ek mock processor'lar (match çeşitlilik için) ---
+    {
+        "name": "Akper Madencilik A.Ş.",
+        "city": "Nevşehir",
+        "district": "Acıgöl",
+        "country": "TR",
+        "lat": 38.59,
+        "lon": 34.55,
+        "capabilities": {
+            "can_process_material": True,
+            "has_storage": True,
+            "has_transport_capacity": True,
+        },
+        "processor": {
+            "processing_routes": [
+                "pomza_micronized_pumice",
+                "pomza_filtration_media",
+                "perlit_expanded",
+            ],
+            "capacity_ton_year": 35000,
+            "certifications": ["ISO9001", "CE"],
+            "unit_cost_try_per_ton": 780.0,
+        },
+    },
+    {
+        "name": "Etibaş Mineral Sanayi",
+        "city": "Kayseri",
+        "district": "Develi",
+        "country": "TR",
+        "lat": 38.38,
+        "lon": 35.49,
+        "capabilities": {
+            "can_process_material": True,
+            "has_storage": True,
+        },
+        "processor": {
+            "processing_routes": [
+                "pomza_filtration_media",
+                "perlit_filtration_product",
+                "perlit_expanded",
+            ],
+            "capacity_ton_year": 20000,
+            "certifications": ["ISO9001"],
+            "unit_cost_try_per_ton": 920.0,
+        },
+    },
+    {
+        "name": "Kapadokya Mikronize Ltd.",
+        "city": "Aksaray",
+        "district": "Merkez",
+        "country": "TR",
+        "lat": 38.37,
+        "lon": 34.03,
+        "capabilities": {
+            "can_process_material": True,
+            "can_export": True,
+        },
+        "processor": {
+            "processing_routes": [
+                "pomza_micronized_pumice",
+                "pomza_raw_sale",
+            ],
+            "capacity_ton_year": 18000,
+            "certifications": ["ISO14001"],
+            "unit_cost_try_per_ton": 870.0,
+        },
+    },
+    # --- Ek mock buyer'lar ---
+    {
+        "name": "Lhoist Benelux N.V.",
+        "city": "Rotterdam",
+        "country": "NL",
+        "lat": 51.92,
+        "lon": 4.48,
+        "capabilities": {"can_buy_material": True},
+        "buyer": {
+            "product_interests": [
+                "perlit_filtration_product",
+                "pomza_filtration_media",
+            ],
+            "payment_terms_days": 45,
+            "credit_score": 0.88,
+        },
+    },
+    {
+        "name": "Imerys Industrial Solutions",
+        "city": "Berlin",
+        "country": "DE",
+        "lat": 52.52,
+        "lon": 13.41,
+        "capabilities": {"can_buy_material": True},
+        "buyer": {
+            "product_interests": [
+                "pomza_micronized_pumice",
+                "perlit_expanded",
+            ],
+            "payment_terms_days": 60,
+            "credit_score": 0.85,
+        },
+    },
+    # --- Antalya producer (TR güney sahil çıkış noktası) ---
+    {
+        "name": "Antalya Mineral İhracat A.Ş.",
+        "city": "Antalya",
+        "district": "Aksu",
+        "country": "TR",
+        "lat": 36.8969,
+        "lon": 30.7133,
+        "capabilities": {
+            "can_supply_raw_material": True,
+            "can_export": True,
+            "has_storage": True,
+            "has_transport_capacity": True,
+        },
+        "producer": {
+            "raw_materials": ["pomza", "perlit"],
+            "capacity_ton_year": 45000,
+            "quality_grades": ["A", "B"],
+        },
+    },
+    # --- Duisburg ihracat hub (Avrupa'nın en büyük iç limanı) ---
+    {
+        "name": "Duisburger Hafen AG (Duisport)",
+        "city": "Duisburg",
+        "country": "DE",
+        "lat": 51.4344,
+        "lon": 6.7623,
+        "capabilities": {"can_buy_material": True, "has_storage": True},
+        "buyer": {
+            "product_interests": [
+                "pomza_micronized_pumice",
+                "pomza_filtration_media",
+                "perlit_filtration_product",
+                "perlit_expanded",
+            ],
+            "payment_terms_days": 30,
+            "credit_score": 0.94,
+        },
+    },
 ]
 
 
@@ -126,6 +265,45 @@ async def upsert_admin(session) -> User:
         hashed_password=hash_password(settings.DEMO_ADMIN_PASSWORD),
         role="admin",
         is_active=True,
+    )
+    session.add(user)
+    await session.flush()
+    return user
+
+
+async def upsert_demo_user(
+    session,
+    *,
+    email: str,
+    full_name: str,
+    password: str,
+    org_name: str,
+) -> User:
+    """Demo persona user — belirli organization'a bağlı.
+
+    Idempotent: email zaten varsa organization_id boşsa eşler, döner.
+    """
+    email = email.strip().lower()
+    org = (
+        await session.execute(
+            select(Organization).where(Organization.name == org_name)
+        )
+    ).scalar_one_or_none()
+    existing = (
+        await session.execute(select(User).where(User.email == email))
+    ).scalar_one_or_none()
+    if existing is not None:
+        if org is not None and existing.organization_id is None:
+            existing.organization_id = org.id
+            await session.flush()
+        return existing
+    user = User(
+        email=email,
+        full_name=full_name,
+        hashed_password=hash_password(password),
+        role="user",
+        is_active=True,
+        organization_id=org.id if org is not None else None,
     )
     session.add(user)
     await session.flush()
@@ -194,8 +372,19 @@ async def main() -> int:
         admin = await upsert_admin(session)
         for spec in _DEMO_ORGS:
             await upsert_org(session, spec=spec)
+        # Demo persona — Mehmet Amca / Doğa Pomza Ltd
+        mehmet = await upsert_demo_user(
+            session,
+            email="mehmet@dogapomza.tr",
+            full_name="Mehmet Yılmaz",
+            password="acigol2026",
+            org_name="Doğa Pomza Ltd",
+        )
         await session.commit()
-        print(f"seed_complete admin={admin.email} orgs={len(_DEMO_ORGS)}")
+        print(
+            f"seed_complete admin={admin.email} demo_user={mehmet.email} "
+            f"orgs={len(_DEMO_ORGS)}"
+        )
     return 0
 
 

@@ -13,6 +13,6 @@ class FxResponse(BaseModel):
     usd_try: float = Field(gt=0)
     eur_try: float = Field(gt=0)
     last_updated: str  # TCMB date (DD-MM-YYYY) ya da ISO; UI tarafı parse eder
-    source: Literal["TCMB_EVDS", "FALLBACK"] = "TCMB_EVDS"
+    source: Literal["TCMB_EVDS", "OPEN_ER_API", "FALLBACK"] = "TCMB_EVDS"
     is_stale: bool = False
     fetched_at: datetime

@@ -110,6 +110,82 @@ class OrsClient:
             "durations": data.get("durations"),
         }
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=0.5, max=4),
+        retry=retry_if_exception_type((httpx.HTTPError, OrsError)),
+        reraise=True,
+    )
+    async def directions(
+        self,
+        locations: list[tuple[float, float]],
+        profile: str = "driving-hgv",
+    ) -> dict[str, Any]:
+        """Karayolu rotası — GeoJSON LineString geometry döner.
+
+        Args:
+            locations: `[(lon, lat), ...]` (en az 2 nokta).
+            profile: `driving-hgv`, `driving-car`, vs.
+
+        Returns:
+            ``{"coordinates": [[lon, lat], ...],
+               "distance_m": float, "duration_s": float}``
+
+        Raises:
+            OrsError — API key yok, yanıt eksik, veya rota bulunamadıysa.
+        """
+        if not self.api_key or self.api_key.startswith("your-"):
+            raise OrsError("ORS_API_KEY tanımlı değil; düz çizgi fallback kullanın")
+        if not locations or len(locations) < 2:
+            raise OrsError("ORS directions en az 2 lokasyon ister")
+
+        url = f"{self.base_url}/v2/directions/{profile}/geojson"
+        body = {"coordinates": [[lon, lat] for (lon, lat) in locations]}
+        # Not: GeoJSON endpoint `Accept: application/json` reddediyor (406).
+        # Accept'i `application/geo+json` ya da hiç göndermemek gerek.
+        headers = {
+            "Authorization": self.api_key,
+            "Content-Type": "application/json",
+            "Accept": "application/geo+json",
+        }
+        response = await self._client.post(url, json=body, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        features = data.get("features") or []
+        if not features:
+            raise OrsError(f"ORS directions yanıtı boş: {list(data.keys())}")
+        feat = features[0]
+        coords = (feat.get("geometry") or {}).get("coordinates") or []
+        if not coords:
+            raise OrsError("ORS directions geometry boş")
+        summary = (feat.get("properties") or {}).get("summary") or {}
+        return {
+            "coordinates": coords,
+            "distance_m": float(summary.get("distance", 0.0)),
+            "duration_s": float(summary.get("duration", 0.0)),
+        }
+
+    async def directions_cached(
+        self,
+        locations: list[tuple[float, float]],
+        profile: str = "driving-hgv",
+    ) -> dict[str, Any]:
+        """Redis cache'li directions çağrısı (TTL `ORS_DISTANCE_CACHE_TTL_SEC`)."""
+        redis = await get_redis()
+        cache_key = f"ors:directions:{profile}:{_locations_hash(locations)}"
+        cached = await redis.get(cache_key)
+        if cached:
+            try:
+                return json.loads(cached)
+            except json.JSONDecodeError:
+                await redis.delete(cache_key)
+
+        result = await self.directions(locations, profile=profile)
+        ttl = settings.ORS_DISTANCE_CACHE_TTL_SEC
+        if ttl > 0:
+            await redis.setex(cache_key, ttl, json.dumps(result))
+        return result
+
     async def matrix_cached(
         self,
         locations: list[tuple[float, float]],

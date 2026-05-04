@@ -30,6 +30,7 @@ from .api import (
     history as history_router,
     organizations,
     processors,
+    route as route_router,
     whatif,
 )
 from .config import settings
@@ -111,6 +112,7 @@ app.include_router(evidence.router)
 app.include_router(analyze.router)
 app.include_router(whatif.router)
 app.include_router(processors.router)
+app.include_router(route_router.router)
 app.include_router(organizations.router)
 app.include_router(history_router.router)
 app.include_router(files_router.router)

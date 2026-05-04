@@ -54,7 +54,7 @@ class Settings(BaseSettings):
 
     # TCMB EVDS
     TCMB_EVDS_API_KEY: str = ""
-    TCMB_EVDS_BASE_URL: str = "https://evds2.tcmb.gov.tr/service/evds"
+    TCMB_EVDS_BASE_URL: str = "https://evds3.tcmb.gov.tr/service/evds"
     TCMB_FX_CACHE_TTL_SEC: int = 300
     TCMB_TIMEOUT_SEC: int = 10
     TCMB_FALLBACK_USD_TRY: float = 45.0

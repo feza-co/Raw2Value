@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-white:       #FFFFFF;
+  --color-parchment:   #F8F7F5;
+  --color-stone-50:    #F2F0EC;
+  --color-stone-100:   #E8E4DC;
+  --color-stone-300:   #C4BDB0;
+  --color-charcoal:    #1A1A1A;
+  --color-ink:         #0D0D0D;
+
+  --color-amber:       #C8973A;
+  --color-amber-dark:  #A67B2A;
+  --color-amber-light: #E8C47A;
+
+  --color-success:     #3D7A4E;
+  --color-warning:     #B8832A;
+  --color-danger:      #8B3A3A;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  --text-hero:     clamp(4rem, 8vw, 9rem);
+  --text-display:  clamp(2.5rem, 5vw, 5rem);
+  --text-headline: clamp(1.75rem, 3vw, 2.5rem);
+  --text-title:    clamp(1.25rem, 2vw, 1.5rem);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+
+  --duration-fast:   150ms;
+  --duration-base:   300ms;
+  --duration-slow:   600ms;
+  --duration-reveal: 900ms;
+
+  --radius-sm:   2px;
+  --radius-base: 4px;
+  --radius-lg:   8px;
+
+  --border-thin:   1px solid var(--color-stone-100);
+  --border-accent: 1px solid var(--color-amber);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-body);
+  background-color: var(--color-parchment);
+  color: var(--color-charcoal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
